@@ -1,15 +1,14 @@
-US Stock & Crypto Price Tracker + Investment Simulation Game
+US Stock Price Tracker + Investment Simulation Game
 
-Welcome to the Comprehensive Stock & Crypto Tracker & Investment Game — a Python-powered project that tracks every publicly traded U.S. company and popular cryptocurrencies, alongside a simulated investment game based on real-time market data.
+Welcome to the Comprehensive Stock & Crypto Investment Game — a Python-powered project that tracks every publicly traded U.S. company, alongside a simulated investment game based on real-time market data.
 
 This project blends real-time financial data, investment logic, and interactive simulation to create a hands-on, educational environment for understanding both stocks and crypto markets.
 
 Features
 
-Comprehensive Stock & Crypto Tracker
+Comprehensive Stock Tracker
 Tracks live prices for:
 Every U.S. publicly traded company (NYSE, NASDAQ, AMEX)
-Popular cryptocurrencies like Bitcoin, Ethereum, Solana, etc.
 Built using yfinance, pandas, and optionally streamlit or plotly
 Efficient handling of large ticker lists
 Supports:
