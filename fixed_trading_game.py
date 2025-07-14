@@ -444,7 +444,7 @@ class TradingGameDatabase:
 
 # Configure Streamlit page
 st.set_page_config(
-    page_title="Stock Trading Simulator with Database",
+    page_title="Leo's Trader",
     page_icon="💰",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -901,8 +901,8 @@ def main():
         # Header
         st.markdown("""
         <div class="main-header">
-            <h1>💰 Stock Trading Simulator with Database</h1>
-            <p>🎮 Learn trading with virtual money • 📈 Build your portfolio • 🏆 Compete with friends</p>
+            <h1>Leo's Trader</h1>
+            <p>🎮 Learn trading with virtual money • 📈 Build your portfolio • 🪙 Trade crypto 24/7 • 🏆 Compete with friends</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -1421,19 +1421,33 @@ def main():
                     portfolio_data = []
                     
                     for position in portfolio:
-                        stock_data = simulator.get_stock_price(position['symbol'])
-                        if stock_data:
-                            current_value = stock_data['price'] * position['shares']
+                        asset_data = simulator.get_stock_price(position['symbol'])
+                        if asset_data:
+                            current_value = asset_data['price'] * position['shares']
                             cost_basis = position['avg_price'] * position['shares']
                             unrealized_pl = current_value - cost_basis
                             unrealized_pl_pct = (unrealized_pl / cost_basis) * 100 if cost_basis > 0 else 0
                             
+                            # Format display based on asset type
+                            asset_display_name = position['symbol'].replace('-USD', '') if asset_data.get('is_crypto') else position['symbol']
+                            asset_type_icon = "🪙" if asset_data.get('is_crypto') else "📈"
+                            
+                            # Format amounts based on asset type
+                            if asset_data.get('is_crypto'):
+                                shares_display = f"{position['shares']:.6f}"
+                                avg_price_display = f"${position['avg_price']:.6f}" if position['avg_price'] < 1 else f"${position['avg_price']:.2f}"
+                                current_price_display = f"${asset_data['price']:.6f}" if asset_data['price'] < 1 else f"${asset_data['price']:.2f}"
+                            else:
+                                shares_display = str(position['shares'])
+                                avg_price_display = f"${position['avg_price']:.2f}"
+                                current_price_display = f"${asset_data['price']:.2f}"
+                            
                             portfolio_data.append({
-                                'Symbol': position['symbol'],
+                                'Symbol': f"{asset_type_icon} {asset_display_name}",
                                 'Name': position['name'][:30],
-                                'Shares': position['shares'],
-                                'Avg Price': f"${position['avg_price']:.2f}",
-                                'Current Price': f"${stock_data['price']:.2f}",
+                                'Amount': shares_display,
+                                'Avg Price': avg_price_display,
+                                'Current Price': current_price_display,
                                 'Cost Basis': f"${cost_basis:.2f}",
                                 'Current Value': f"${current_value:.2f}",
                                 'Unrealized P&L': f"${unrealized_pl:+.2f}",
@@ -1449,10 +1463,11 @@ def main():
                     
                     # Show empty state with helpful tips
                     st.write("### 💡 Getting Started Tips:")
-                    st.write("1. 🔍 Go to the **Research** tab to analyze stocks")
-                    st.write("2. 💰 Use the **Trade** tab to buy your first stocks")
+                    st.write("1. 🔍 Go to the **Research** tab to analyze stocks and crypto")
+                    st.write("2. 💰 Use the **Trade** tab to buy your first assets")
                     st.write("3. 📊 Return here to see your portfolio allocation")
                     st.write("4. 🏆 Compete with others on the **Leaderboard**")
+                    st.write("5. 🪙 Try trading cryptocurrencies for 24/7 markets!")
             
             with tab4:
                 st.subheader("📋 Trade History")
@@ -1485,7 +1500,7 @@ def main():
                     with col3:
                         st.metric("Worst Trade", f"${current_user['worst_trade']:+.2f}")
                 else:
-                    st.info("No trades yet!")
+                    st.info("No trades yet! Start by buying some stocks or crypto!")
             
             with tab5:
                 st.subheader("🏆 Leaderboard")
@@ -1543,7 +1558,7 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #666;'>
-        <p>🎮 Stock Trading Simulator with Database | 📈 Educational Tool | ⚠️ Virtual Money Only</p>
+        <p>🎮 Leo's Trader | 📈 Educational Tool | ⚠️ Virtual Money Only</p>
     </div>
     """, unsafe_allow_html=True)
 
