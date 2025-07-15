@@ -15,6 +15,7 @@ import hashlib
 import os
 import random
 import math
+import requests
 warnings.filterwarnings('ignore')
 
 # Database Manager Class
@@ -267,8 +268,8 @@ class TradingGameDatabase:
             st.error(f"Error getting trades: {str(e)}")
             return []
     
-    def execute_trade(self, user_id: str, symbol: str, action: str, shares: int, price: float, stock_name: str) -> Dict:
-        """Execute a trade and update database."""
+    def execute_trade(self, user_id: str, symbol: str, action: str, shares: int, price: float, stock_name: str, currency: str = 'USD') -> Dict:
+        """Execute a trade and update database with currency conversion"""
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -281,18 +282,32 @@ class TradingGameDatabase:
             cursor.execute('SELECT cash FROM users WHERE id = ?', (user_id,))
             current_cash = cursor.fetchone()[0]
             
-            total_cost = (price * shares) + commission
+            # Convert price to USD for internal calculations
+            # Simple conversion based on exchange rates
+            exchange_rates = {
+                'USD': 1.0,
+                'GHS': 12.50,
+                'KES': 155.0,
+                'NGN': 1580.0,
+                'ZAR': 18.50,
+                'EGP': 49.0
+            }
+            
+            rate = exchange_rates.get(currency, 1.0)
+            price_usd = price / rate
+            
+            total_cost_usd = (price_usd * shares) + commission
             
             if action.upper() == 'BUY':
-                if current_cash < total_cost:
+                if current_cash < total_cost_usd:
                     conn.close()
                     return {'success': False, 'message': 'Insufficient funds'}
                 
-                # Update cash
-                new_cash = current_cash - total_cost
+                # Update cash (stored in USD)
+                new_cash = current_cash - total_cost_usd
                 cursor.execute('UPDATE users SET cash = ? WHERE id = ?', (new_cash, user_id))
                 
-                # Update portfolio
+                # Update portfolio (store prices in USD)
                 cursor.execute('''
                     SELECT shares, avg_price FROM portfolio WHERE user_id = ? AND symbol = ?
                 ''', (user_id, symbol))
@@ -301,7 +316,7 @@ class TradingGameDatabase:
                 if existing:
                     old_shares, old_avg_price = existing
                     new_shares = old_shares + shares
-                    new_avg_price = ((old_shares * old_avg_price) + (shares * price)) / new_shares
+                    new_avg_price = ((old_shares * old_avg_price) + (shares * price_usd)) / new_shares
                     
                     cursor.execute('''
                         UPDATE portfolio SET shares = ?, avg_price = ?, stock_name = ?
@@ -311,14 +326,14 @@ class TradingGameDatabase:
                     cursor.execute('''
                         INSERT INTO portfolio (user_id, symbol, shares, avg_price, stock_name)
                         VALUES (?, ?, ?, ?, ?)
-                    ''', (user_id, symbol, shares, price, stock_name))
+                    ''', (user_id, symbol, shares, price_usd, stock_name))
                 
-                # Record trade
+                # Record trade (store in USD)
                 trade_id = str(uuid.uuid4())[:8]
                 cursor.execute('''
                     INSERT INTO trades (id, user_id, trade_type, symbol, shares, price, total_cost, commission, stock_name)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (trade_id, user_id, action, symbol, shares, price, total_cost, commission, stock_name))
+                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_cost_usd, commission, stock_name))
                 
                 profit_loss = 0
                 
@@ -333,14 +348,14 @@ class TradingGameDatabase:
                     conn.close()
                     return {'success': False, 'message': 'Insufficient shares'}
                 
-                owned_shares, avg_price = existing
+                owned_shares, avg_price_usd = existing
                 
-                # Calculate profit/loss
-                profit_loss = (price - avg_price) * shares - commission
+                # Calculate profit/loss in USD
+                profit_loss = (price_usd - avg_price_usd) * shares - commission
                 
-                # Update cash
-                total_proceeds = (price * shares) - commission
-                new_cash = current_cash + total_proceeds
+                # Update cash (in USD)
+                total_proceeds_usd = (price_usd * shares) - commission
+                new_cash = current_cash + total_proceeds_usd
                 cursor.execute('UPDATE users SET cash = ? WHERE id = ?', (new_cash, user_id))
                 
                 # Update portfolio
@@ -354,12 +369,12 @@ class TradingGameDatabase:
                         DELETE FROM portfolio WHERE user_id = ? AND symbol = ?
                     ''', (user_id, symbol))
                 
-                # Record trade
+                # Record trade (in USD)
                 trade_id = str(uuid.uuid4())[:8]
                 cursor.execute('''
                     INSERT INTO trades (id, user_id, trade_type, symbol, shares, price, total_cost, commission, profit_loss, stock_name)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (trade_id, user_id, action, symbol, shares, price, total_proceeds, commission, profit_loss, stock_name))
+                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_proceeds_usd, commission, profit_loss, stock_name))
                 
                 # Update user statistics
                 cursor.execute('''
@@ -533,6 +548,7 @@ class TradingSimulator:
         self.db = TradingGameDatabase()
         self.initialize_session_state()
         self.available_stocks = self.get_available_stocks()
+        self.initialize_exchange_rates()
         self.initialize_all_mock_data()
         
     def initialize_session_state(self):
@@ -563,6 +579,104 @@ class TradingSimulator:
             st.session_state.nigeria_mock_data = {}
         if 'nigeria_last_update' not in st.session_state:
             st.session_state.nigeria_last_update = datetime.now()
+        
+        # Initialize exchange rates
+        if 'exchange_rates' not in st.session_state:
+            st.session_state.exchange_rates = {}
+        if 'exchange_rates_last_update' not in st.session_state:
+            st.session_state.exchange_rates_last_update = datetime.now() - timedelta(hours=1)
+    
+    def initialize_exchange_rates(self):
+        """Initialize and update exchange rates"""
+        self.update_exchange_rates()
+    
+    def get_fallback_exchange_rates(self) -> Dict[str, float]:
+        """Get fallback exchange rates if API fails"""
+        return {
+            'GHS': 12.50,  # Ghana Cedi to USD
+            'KES': 155.0,  # Kenyan Shilling to USD
+            'NGN': 1580.0, # Nigerian Naira to USD
+            'ZAR': 18.50,  # South African Rand to USD
+            'EGP': 49.0,   # Egyptian Pound to USD
+            'USD': 1.0     # US Dollar base
+        }
+    
+    def update_exchange_rates(self):
+        """Update exchange rates from free API with fallback"""
+        current_time = datetime.now()
+        
+        # Update every hour
+        if (current_time - st.session_state.exchange_rates_last_update).total_seconds() < 3600:
+            return
+        
+        try:
+            # Using exchangerate-api.com free tier (1500 requests/month)
+            url = "https://api.exchangerate-api.com/v4/latest/USD"
+            response = requests.get(url, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                rates = data.get('rates', {})
+                
+                # Convert to USD rates (since API gives USD to other currency)
+                st.session_state.exchange_rates = {
+                    'USD': 1.0,
+                    'GHS': rates.get('GHS', 12.50),
+                    'KES': rates.get('KES', 155.0),
+                    'NGN': rates.get('NGN', 1580.0),
+                    'ZAR': rates.get('ZAR', 18.50),
+                    'EGP': rates.get('EGP', 49.0)
+                }
+                st.session_state.exchange_rates_last_update = current_time
+                
+            else:
+                # Use fallback rates
+                st.session_state.exchange_rates = self.get_fallback_exchange_rates()
+                
+        except Exception as e:
+            # Use fallback rates if API fails
+            st.session_state.exchange_rates = self.get_fallback_exchange_rates()
+            st.session_state.exchange_rates_last_update = current_time
+    
+    def convert_to_usd(self, amount: float, currency: str) -> float:
+        """Convert amount from local currency to USD"""
+        self.update_exchange_rates()
+        
+        if currency == 'USD':
+            return amount
+        
+        rate = st.session_state.exchange_rates.get(currency, 1.0)
+        return amount / rate
+    
+    def convert_from_usd(self, amount_usd: float, currency: str) -> float:
+        """Convert amount from USD to local currency"""
+        self.update_exchange_rates()
+        
+        if currency == 'USD':
+            return amount_usd
+        
+        rate = st.session_state.exchange_rates.get(currency, 1.0)
+        return amount_usd * rate
+    
+    def format_currency_display(self, amount: float, currency: str) -> str:
+        """Format currency for display with proper symbol and formatting"""
+        currency_symbols = {
+            'USD': '$',
+            'GHS': '₵',
+            'KES': 'KSh',
+            'NGN': '₦',
+            'ZAR': 'R',
+            'EGP': 'E£'
+        }
+        
+        symbol = currency_symbols.get(currency, currency + ' ')
+        
+        if currency in ['KES', 'NGN']:
+            # For currencies with larger numbers, use commas
+            return f"{symbol}{amount:,.0f}"
+        else:
+            # For others, use 2 decimal places
+            return f"{symbol}{amount:,.2f}"
     
     def initialize_all_mock_data(self):
         """Initialize mock data for all African Stock Exchanges"""
@@ -739,6 +853,9 @@ class TradingSimulator:
             wat_time = (current_time + timedelta(hours=1)).timetuple()
             is_weekday = wat_time.tm_wday < 5
             is_trading_hours = 10 <= wat_time.tm_hour < 14 or (wat_time.tm_hour == 14 and wat_time.tm_min <= 30)
+        else:
+            is_weekday = True
+            is_trading_hours = True
         
         # If not trading hours, use smaller price movements
         volatility_multiplier = 1.0 if (is_weekday and is_trading_hours) else 0.3
@@ -1543,6 +1660,8 @@ class TradingSimulator:
                     mock_text = "🇰🇪 LIVE MOCK DATA"
                 elif symbol.endswith('.LG'):
                     mock_text = "🇳🇬 LIVE MOCK DATA"
+                else:
+                    mock_text = "LIVE MOCK DATA"
                 
                 fig.add_annotation(
                     x=hist.index[0],
@@ -2296,6 +2415,10 @@ def main():
                             is_weekday = wat_time.tm_wday < 5
                             is_trading_hours = 10 <= wat_time.tm_hour < 14 or (wat_time.tm_hour == 14 and wat_time.tm_min <= 30)
                             market_hours = "10 AM - 2:30 PM WAT (GMT+1)"
+                        else:
+                            is_weekday = True
+                            is_trading_hours = True
+                            market_hours = "Market Hours"
                         
                         if is_weekday and is_trading_hours:
                             st.success(f"🟢 **Trading Hours**: Market is OPEN ({market_hours})")
@@ -2374,7 +2497,7 @@ def main():
                             st.write(f"""
                             **{selected_african_market} Mock Data Features:**
                             - **Real-time Updates**: Prices update every 30 seconds
-                            - **Trading Hours**: {market_hours} (Monday-Friday)
+                            - **Trading Hours**: {market_hours if 'market_hours' in locals() else 'Trading Hours'} (Monday-Friday)
                             - **Realistic Volatility**: Each stock has its own volatility and trend parameters
                             - **Volume Simulation**: Realistic trading volumes based on time of day
                             - **Historical Data**: 30 days of historical price data available
@@ -2497,9 +2620,19 @@ def main():
                                 buy_amount = st.number_input("Number of Shares", min_value=1, value=1, key="buy_shares")
                             
                             total_cost = (asset_data['price'] * buy_amount) + st.session_state.game_settings['commission']
+                            currency = asset_data.get('currency', 'USD')
                             
-                            st.write(f"**Total Cost:** {asset_data.get('currency', 'USD')} {total_cost:.2f}")
-                            st.write(f"**Available Cash:** {asset_data.get('currency', 'USD')} {current_user['cash']:,.2f}")
+                            # Convert to USD for comparison with available cash
+                            total_cost_usd = simulator.convert_to_usd(total_cost, currency)
+                            
+                            st.write(f"**Total Cost:** {simulator.format_currency_display(total_cost, currency)}")
+                            st.write(f"**Total Cost (USD):** ${total_cost_usd:.2f}")
+                            st.write(f"**Available Cash:** ${current_user['cash']:,.2f}")
+                            
+                            # Show exchange rate if not USD
+                            if currency != 'USD':
+                                rate = st.session_state.exchange_rates.get(currency, 1.0)
+                                st.write(f"**Exchange Rate:** 1 USD = {simulator.format_currency_display(rate, currency)}")
                             
                             buy_button_text = f"🛒 Buy {asset_display_name}"
                             if st.button(buy_button_text, key="buy_button"):
@@ -2509,7 +2642,8 @@ def main():
                                     'BUY', 
                                     buy_amount, 
                                     asset_data['price'], 
-                                    asset_data['name']
+                                    asset_data['name'],
+                                    currency
                                 )
                                 if result['success']:
                                     st.success(result['message'])
@@ -2610,9 +2744,22 @@ def main():
                                 expected_pl = (asset_data['price'] - position['avg_price']) * sell_amount - st.session_state.game_settings['commission']
                                 
                                 currency = asset_data.get('currency', 'USD')
-                                st.write(f"**Total Proceeds:** {currency} {total_proceeds:.2f}")
+                                
+                                # Convert to USD for display
+                                total_proceeds_usd = simulator.convert_to_usd(total_proceeds, currency)
+                                expected_pl_usd = simulator.convert_to_usd(expected_pl, currency) if currency != 'USD' else expected_pl
+                                
+                                st.write(f"**Total Proceeds:** {simulator.format_currency_display(total_proceeds, currency)}")
+                                st.write(f"**Total Proceeds (USD):** ${total_proceeds_usd:.2f}")
+                                
                                 pl_color = "positive" if expected_pl >= 0 else "negative"
-                                st.markdown(f"**Expected P&L:** <span class='{pl_color}'>{currency} {expected_pl:+.2f}</span>", unsafe_allow_html=True)
+                                st.markdown(f"**Expected P&L:** <span class='{pl_color}'>{simulator.format_currency_display(expected_pl, currency)}</span>", unsafe_allow_html=True)
+                                st.markdown(f"**Expected P&L (USD):** <span class='{pl_color}'>${expected_pl_usd:+.2f}</span>", unsafe_allow_html=True)
+                                
+                                # Show exchange rate if not USD
+                                if currency != 'USD':
+                                    rate = st.session_state.exchange_rates.get(currency, 1.0)
+                                    st.write(f"**Exchange Rate:** 1 USD = {simulator.format_currency_display(rate, currency)}")
                                 
                                 sell_button_text = f"💰 Sell {asset_display_name}"
                                 if st.button(sell_button_text, key="sell_button"):
@@ -2622,7 +2769,8 @@ def main():
                                         'SELL', 
                                         sell_amount, 
                                         asset_data['price'], 
-                                        asset_data['name']
+                                        asset_data['name'],
+                                        currency
                                     )
                                     if result['success']:
                                         st.success(result['message'])
@@ -2837,6 +2985,28 @@ def main():
                 st.write(f"Commission: ${settings['commission']:.2f}")
                 st.write(f"Game Duration: {settings['game_duration_days']} days")
                 
+                st.write("**💱 Current Exchange Rates (to USD):**")
+                simulator.update_exchange_rates()
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"🇬🇭 **Ghana Cedi (GHS):** {simulator.format_currency_display(st.session_state.exchange_rates['GHS'], 'GHS')} = $1.00")
+                    st.write(f"🇰🇪 **Kenyan Shilling (KES):** {simulator.format_currency_display(st.session_state.exchange_rates['KES'], 'KES')} = $1.00")
+                    st.write(f"🇳🇬 **Nigerian Naira (NGN):** {simulator.format_currency_display(st.session_state.exchange_rates['NGN'], 'NGN')} = $1.00")
+                
+                with col2:
+                    st.write(f"🇿🇦 **South African Rand (ZAR):** {simulator.format_currency_display(st.session_state.exchange_rates['ZAR'], 'ZAR')} = $1.00")
+                    st.write(f"🇪🇬 **Egyptian Pound (EGP):** {simulator.format_currency_display(st.session_state.exchange_rates['EGP'], 'EGP')} = $1.00")
+                    st.write(f"🇺🇸 **US Dollar (USD):** Base currency")
+                
+                st.write(f"**Last Updated:** {st.session_state.exchange_rates_last_update.strftime('%Y-%m-%d %H:%M:%S UTC')}")
+                
+                if st.button("🔄 Refresh Exchange Rates"):
+                    st.session_state.exchange_rates_last_update = datetime.now() - timedelta(hours=1)
+                    simulator.update_exchange_rates()
+                    st.success("Exchange rates updated!")
+                    st.rerun()
+                
                 st.write("**Available Markets:**")
                 st.write("📈 US Stocks & ETFs")
                 st.write("🪙 Cryptocurrencies")
@@ -2846,6 +3016,12 @@ def main():
                 st.write("  - 🇳🇬 Nigerian Exchange (NGX) - **Live Mock Data** 🔄")
                 st.write("  - 🇿🇦 Johannesburg Stock Exchange (JSE)")
                 st.write("  - 🇪🇬 Egyptian Exchange (EGX)")
+                
+                st.write("**🏦 Multi-Currency Trading:**")
+                st.write("- All transactions are internally converted to USD for consistency")
+                st.write("- Local currency prices are displayed for better user experience")
+                st.write("- Exchange rates update automatically every hour")
+                st.write("- Your cash balance is stored in USD but can be viewed in any currency")
                 
                 st.write("**Mock Data Markets:**")
                 st.write("- **🇬🇭 Ghana**: Updates every 30 seconds, 9 AM - 3 PM GMT, Currency: GHS")
