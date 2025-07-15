@@ -13,6 +13,8 @@ import warnings
 import sqlite3
 import hashlib
 import os
+import random
+import math
 warnings.filterwarnings('ignore')
 
 # Database Manager Class
@@ -531,6 +533,7 @@ class TradingSimulator:
         self.db = TradingGameDatabase()
         self.initialize_session_state()
         self.available_stocks = self.get_available_stocks()
+        self.initialize_ghana_mock_data()
         
     def initialize_session_state(self):
         """Initialize session state for the trading game"""
@@ -544,6 +547,372 @@ class TradingSimulator:
             st.session_state.market_data_cache = {}
         if 'last_update' not in st.session_state:
             st.session_state.last_update = datetime.now()
+        if 'ghana_mock_data' not in st.session_state:
+            st.session_state.ghana_mock_data = {}
+        if 'ghana_last_update' not in st.session_state:
+            st.session_state.ghana_last_update = datetime.now()
+    
+    def initialize_ghana_mock_data(self):
+        """Initialize mock data for Ghana Stock Exchange"""
+        ghana_stocks = {
+            'GOIL.AC': {'base_price': 2.15, 'volatility': 0.02, 'trend': 0.001},
+            'ECOBANK.AC': {'base_price': 5.80, 'volatility': 0.025, 'trend': 0.0005},
+            'CAL.AC': {'base_price': 0.85, 'volatility': 0.03, 'trend': -0.001},
+            'MTNGH.AC': {'base_price': 1.20, 'volatility': 0.02, 'trend': 0.002},
+            'GWEB.AC': {'base_price': 0.45, 'volatility': 0.04, 'trend': 0.001},
+            'SOGEGH.AC': {'base_price': 1.85, 'volatility': 0.02, 'trend': 0.0005},
+            'AYRTN.AC': {'base_price': 0.75, 'volatility': 0.03, 'trend': -0.0005},
+            'UNIL.AC': {'base_price': 18.50, 'volatility': 0.015, 'trend': 0.001},
+            'CMLT.AC': {'base_price': 0.95, 'volatility': 0.035, 'trend': 0.002},
+            'RBGH.AC': {'base_price': 0.65, 'volatility': 0.025, 'trend': 0.0005},
+            'BOPP.AC': {'base_price': 2.40, 'volatility': 0.03, 'trend': 0.001},
+            'TOTAL.AC': {'base_price': 3.80, 'volatility': 0.02, 'trend': 0.0005},
+            'GGBL.AC': {'base_price': 1.75, 'volatility': 0.025, 'trend': 0.001},
+            'SCBGH.AC': {'base_price': 15.20, 'volatility': 0.02, 'trend': 0.0005},
+            'DIGP.AC': {'base_price': 0.25, 'volatility': 0.05, 'trend': -0.001},
+            'CLYD.AC': {'base_price': 0.35, 'volatility': 0.04, 'trend': 0.002},
+            'AADS.AC': {'base_price': 0.55, 'volatility': 0.035, 'trend': 0.001},
+            'CAPL.AC': {'base_price': 0.45, 'volatility': 0.03, 'trend': 0.0005},
+            'NICO.AC': {'base_price': 0.95, 'volatility': 0.025, 'trend': 0.001},
+            'HORDS.AC': {'base_price': 0.15, 'volatility': 0.06, 'trend': 0.003},
+            'TRANSOL.AC': {'base_price': 0.25, 'volatility': 0.05, 'trend': 0.002},
+            'PRODUCE.AC': {'base_price': 0.35, 'volatility': 0.04, 'trend': 0.001},
+            'PIONEER.AC': {'base_price': 0.85, 'volatility': 0.03, 'trend': 0.0015}
+        }
+        
+        # Initialize Kenya stocks data
+        kenya_stocks = {
+            'KCB.NR': {'base_price': 45.50, 'volatility': 0.025, 'trend': 0.001},
+            'EQTY.NR': {'base_price': 52.75, 'volatility': 0.03, 'trend': 0.002},
+            'SCBK.NR': {'base_price': 162.00, 'volatility': 0.02, 'trend': 0.0005},
+            'ABSA.NR': {'base_price': 12.85, 'volatility': 0.025, 'trend': 0.001},
+            'DTBK.NR': {'base_price': 82.50, 'volatility': 0.03, 'trend': 0.0015},
+            'BAT.NR': {'base_price': 485.00, 'volatility': 0.02, 'trend': 0.001},
+            'EABL.NR': {'base_price': 195.00, 'volatility': 0.025, 'trend': 0.0005},
+            'SAFCOM.NR': {'base_price': 28.50, 'volatility': 0.02, 'trend': 0.002},
+            'BRITAM.NR': {'base_price': 6.45, 'volatility': 0.035, 'trend': 0.001},
+            'JUBILEE.NR': {'base_price': 245.00, 'volatility': 0.03, 'trend': 0.0015},
+            'LIBERTY.NR': {'base_price': 8.75, 'volatility': 0.04, 'trend': 0.002},
+            'COOP.NR': {'base_price': 14.20, 'volatility': 0.025, 'trend': 0.001},
+            'UNGA.NR': {'base_price': 38.50, 'volatility': 0.035, 'trend': 0.0005},
+            'KAKUZI.NR': {'base_price': 425.00, 'volatility': 0.04, 'trend': 0.002},
+            'SASINI.NR': {'base_price': 12.50, 'volatility': 0.05, 'trend': 0.001},
+            'KAPCHORUA.NR': {'base_price': 145.00, 'volatility': 0.045, 'trend': 0.0015},
+            'WILLIAMSON.NR': {'base_price': 42.50, 'volatility': 0.04, 'trend': 0.001},
+            'BAMBURI.NR': {'base_price': 58.00, 'volatility': 0.03, 'trend': 0.0005},
+            'CROWN.NR': {'base_price': 24.75, 'volatility': 0.035, 'trend': 0.001},
+            'KENGEN.NR': {'base_price': 2.84, 'volatility': 0.025, 'trend': 0.0005},
+            'KPLC.NR': {'base_price': 1.85, 'volatility': 0.04, 'trend': -0.001},
+            'KEGN.NR': {'base_price': 2.95, 'volatility': 0.03, 'trend': 0.001},
+            'KENOL.NR': {'base_price': 22.50, 'volatility': 0.03, 'trend': 0.0015},
+            'TPS.NR': {'base_price': 1.25, 'volatility': 0.05, 'trend': 0.002},
+            'UMEME.NR': {'base_price': 45.00, 'volatility': 0.025, 'trend': 0.001},
+            'TOTAL.NR': {'base_price': 18.50, 'volatility': 0.02, 'trend': 0.0005},
+            'CARBACID.NR': {'base_price': 7.85, 'volatility': 0.035, 'trend': 0.001},
+            'BOC.NR': {'base_price': 42.00, 'volatility': 0.03, 'trend': 0.0015},
+            'OLYMPIA.NR': {'base_price': 5.25, 'volatility': 0.04, 'trend': 0.002},
+            'CENTUM.NR': {'base_price': 18.75, 'volatility': 0.035, 'trend': 0.001}
+        }
+        
+        # Initialize Nigeria stocks data
+        nigeria_stocks = {
+            'GTCO.LG': {'base_price': 28.50, 'volatility': 0.025, 'trend': 0.001},
+            'ZENITHBANK.LG': {'base_price': 24.75, 'volatility': 0.03, 'trend': 0.0015},
+            'UBA.LG': {'base_price': 15.85, 'volatility': 0.025, 'trend': 0.001},
+            'ACCESS.LG': {'base_price': 12.45, 'volatility': 0.03, 'trend': 0.002},
+            'FBNH.LG': {'base_price': 18.20, 'volatility': 0.035, 'trend': 0.0005},
+            'FIDELITYBK.LG': {'base_price': 8.75, 'volatility': 0.03, 'trend': 0.001},
+            'STERLINGNG.LG': {'base_price': 2.45, 'volatility': 0.04, 'trend': 0.0015},
+            'WEMA.LG': {'base_price': 5.25, 'volatility': 0.035, 'trend': 0.001},
+            'UNITY.LG': {'base_price': 1.85, 'volatility': 0.05, 'trend': 0.002},
+            'STANBIC.LG': {'base_price': 42.50, 'volatility': 0.025, 'trend': 0.0005},
+            'DANGCEM.LG': {'base_price': 285.00, 'volatility': 0.02, 'trend': 0.001},
+            'BUA.LG': {'base_price': 95.50, 'volatility': 0.025, 'trend': 0.0015},
+            'MTNN.LG': {'base_price': 185.00, 'volatility': 0.02, 'trend': 0.001},
+            'AIRTELAFRI.LG': {'base_price': 1850.00, 'volatility': 0.025, 'trend': 0.002},
+            'SEPLAT.LG': {'base_price': 1250.00, 'volatility': 0.03, 'trend': 0.0005},
+            'OANDO.LG': {'base_price': 8.45, 'volatility': 0.04, 'trend': 0.001},
+            'TOTAL.LG': {'base_price': 485.00, 'volatility': 0.02, 'trend': 0.0005},
+            'CONOIL.LG': {'base_price': 35.50, 'volatility': 0.03, 'trend': 0.001},
+            'GUINNESS.LG': {'base_price': 48.75, 'volatility': 0.025, 'trend': 0.0015},
+            'NB.LG': {'base_price': 65.00, 'volatility': 0.025, 'trend': 0.001},
+            'INTBREW.LG': {'base_price': 5.85, 'volatility': 0.035, 'trend': 0.002},
+            'NESTLE.LG': {'base_price': 1485.00, 'volatility': 0.015, 'trend': 0.001},
+            'UNILEVER.LG': {'base_price': 16.25, 'volatility': 0.025, 'trend': 0.0005},
+            'DANGSUGAR.LG': {'base_price': 18.50, 'volatility': 0.03, 'trend': 0.001},
+            'FLOURMILL.LG': {'base_price': 32.75, 'volatility': 0.025, 'trend': 0.0015},
+            'HONEYFLOUR.LG': {'base_price': 4.25, 'volatility': 0.04, 'trend': 0.002},
+            'CADBURY.LG': {'base_price': 12.85, 'volatility': 0.03, 'trend': 0.001},
+            'VITAFOAM.LG': {'base_price': 15.50, 'volatility': 0.035, 'trend': 0.0005},
+            'JBERGER.LG': {'base_price': 38.25, 'volatility': 0.025, 'trend': 0.001},
+            'LIVESTOCK.LG': {'base_price': 2.45, 'volatility': 0.05, 'trend': 0.002},
+            'CHIPLC.LG': {'base_price': 0.85, 'volatility': 0.06, 'trend': 0.003},
+            'ELLAHLAKES.LG': {'base_price': 4.75, 'volatility': 0.045, 'trend': 0.0015},
+            'NAHCO.LG': {'base_price': 8.50, 'volatility': 0.04, 'trend': 0.001},
+            'RTBRISCOE.LG': {'base_price': 0.55, 'volatility': 0.055, 'trend': 0.002}
+        }
+        
+        self.initialize_mock_data_for_market('ghana', ghana_stocks)
+        self.initialize_mock_data_for_market('kenya', kenya_stocks)
+        self.initialize_mock_data_for_market('nigeria', nigeria_stocks)
+    
+    def initialize_mock_data_for_market(self, market: str, stocks_config: dict):
+        """Initialize mock data for a specific market"""
+        session_key = f'{market}_mock_data'
+        
+        # Initialize mock data if not exists
+        if session_key not in st.session_state or not st.session_state[session_key]:
+            current_time = datetime.now()
+            st.session_state[session_key] = {}
+            
+            for symbol, config in stocks_config.items():
+                # Generate 30 days of historical data
+                historical_data = []
+                price = config['base_price']
+                
+                for i in range(30):
+                    date = current_time - timedelta(days=29-i)
+                    
+                    # Add trend and random walk
+                    price_change = (random.gauss(0, config['volatility']) + config['trend']) * price
+                    price = max(0.01, price + price_change)  # Ensure price doesn't go below 0.01
+                    
+                    # Generate volume (random but realistic)
+                    volume = random.randint(10000, 500000)
+                    
+                    historical_data.append({
+                        'date': date,
+                        'open': price * random.uniform(0.995, 1.005),
+                        'high': price * random.uniform(1.005, 1.02),
+                        'low': price * random.uniform(0.98, 0.995),
+                        'close': price,
+                        'volume': volume
+                    })
+                
+                st.session_state[session_key][symbol] = {
+                    'config': config,
+                    'historical_data': historical_data,
+                    'current_price': price,
+                    'last_update': current_time
+                }
+    
+    def update_ghana_mock_data(self):
+        """Update Ghana mock data with new prices"""
+        self.update_mock_data_for_market('ghana', 'ghana_last_update')
+    
+    def update_mock_data_for_market(self, market: str, last_update_key: str):
+        """Update mock data for a specific market"""
+        current_time = datetime.now()
+        session_key = f'{market}_mock_data'
+        
+        # Update every 30 seconds to simulate real-time updates
+        if (current_time - st.session_state[last_update_key]).total_seconds() < 30:
+            return
+        
+        st.session_state[last_update_key] = current_time
+        
+        # Check if it's trading hours based on market
+        if market == 'ghana':
+            # Ghana: 9:00 AM - 3:00 PM GMT
+            gmt_time = current_time.utctimetuple()
+            is_weekday = gmt_time.tm_wday < 5
+            is_trading_hours = 9 <= gmt_time.tm_hour < 15
+        elif market == 'kenya':
+            # Kenya: 9:00 AM - 3:00 PM EAT (GMT+3)
+            eat_time = (current_time + timedelta(hours=3)).timetuple()
+            is_weekday = eat_time.tm_wday < 5
+            is_trading_hours = 9 <= eat_time.tm_hour < 15
+        elif market == 'nigeria':
+            # Nigeria: 10:00 AM - 2:30 PM WAT (GMT+1)
+            wat_time = (current_time + timedelta(hours=1)).timetuple()
+            is_weekday = wat_time.tm_wday < 5
+            is_trading_hours = 10 <= wat_time.tm_hour < 14 or (wat_time.tm_hour == 14 and wat_time.tm_min <= 30)
+        
+        # If not trading hours, use smaller price movements
+        volatility_multiplier = 1.0 if (is_weekday and is_trading_hours) else 0.3
+        
+        for symbol, data in st.session_state[session_key].items():
+            config = data['config']
+            current_price = data['current_price']
+            
+            # Generate new price with trend and volatility
+            price_change = (random.gauss(0, config['volatility'] * volatility_multiplier) + 
+                          config['trend'] * volatility_multiplier) * current_price
+            
+            new_price = max(0.01, current_price + price_change)
+            
+            # Generate realistic volume
+            if is_weekday and is_trading_hours:
+                base_volume = random.randint(50000, 800000)
+            else:
+                base_volume = random.randint(5000, 100000)
+            
+            # Add new data point
+            new_data_point = {
+                'date': current_time,
+                'open': current_price,
+                'high': max(current_price, new_price) * random.uniform(1.0, 1.01),
+                'low': min(current_price, new_price) * random.uniform(0.99, 1.0),
+                'close': new_price,
+                'volume': base_volume
+            }
+            
+            # Keep only last 30 days of data
+            data['historical_data'].append(new_data_point)
+            cutoff_date = current_time - timedelta(days=30)
+            data['historical_data'] = [
+                d for d in data['historical_data'] 
+                if d['date'] >= cutoff_date
+            ]
+            
+            # Update current price
+            data['current_price'] = new_price
+            data['last_update'] = current_time
+    
+    def get_currency_symbol(self, symbol: str) -> str:
+        """Get currency symbol for different markets"""
+        if symbol.endswith('.AC'):
+            return 'GHS'  # Ghana Cedi
+        elif symbol.endswith('.JO'):
+            return 'ZAR'  # South African Rand
+        elif symbol.endswith('.NR'):
+            return 'KES'  # Kenyan Shilling
+        elif symbol.endswith('.LG'):
+            return 'NGN'  # Nigerian Naira
+        elif symbol.endswith('.CA'):
+            return 'EGP'  # Egyptian Pound
+        elif symbol.endswith('-USD'):
+            return 'USD'  # US Dollar for crypto
+        else:
+            return 'USD'  # US Dollar for US stocks
+    
+    def get_ghana_mock_price(self, symbol: str) -> Dict:
+        """Get mock price data for Ghana stocks"""
+        return self.get_mock_price_for_market(symbol, 'ghana')
+    
+    def get_kenya_mock_price(self, symbol: str) -> Dict:
+        """Get mock price data for Kenya stocks"""
+        return self.get_mock_price_for_market(symbol, 'kenya')
+    
+    def get_nigeria_mock_price(self, symbol: str) -> Dict:
+        """Get mock price data for Nigeria stocks"""
+        return self.get_mock_price_for_market(symbol, 'nigeria')
+    
+    def get_mock_price_for_market(self, symbol: str, market: str) -> Dict:
+        """Get mock price data for a specific market"""
+        session_key = f'{market}_mock_data'
+        
+        if symbol not in st.session_state[session_key]:
+            return None
+        
+        # Update mock data
+        self.update_mock_data_for_market(market, f'{market}_last_update')
+        
+        data = st.session_state[session_key][symbol]
+        historical_data = data['historical_data']
+        
+        if len(historical_data) < 2:
+            return None
+        
+        current_point = historical_data[-1]
+        previous_point = historical_data[-2]
+        
+        current_price = current_point['close']
+        previous_price = previous_point['close']
+        
+        change = current_price - previous_price
+        change_percent = (change / previous_price) * 100 if previous_price > 0 else 0
+        
+        # Get stock name
+        african_names = self.get_african_stock_names()
+        stock_name = african_names.get(symbol, symbol)
+        
+        # Calculate market cap (mock value based on price)
+        shares_outstanding = random.randint(100000000, 1000000000)  # Mock shares outstanding
+        market_cap = current_price * shares_outstanding
+        
+        # Get currency symbol
+        currency = self.get_currency_symbol(symbol)
+        
+        return {
+            'symbol': symbol,
+            'name': stock_name,
+            'price': float(current_price),
+            'change': float(change),
+            'change_percent': float(change_percent),
+            'volume': int(current_point['volume']),
+            'market_cap': market_cap,
+            'pe_ratio': random.uniform(8, 25),  # Mock P/E ratio
+            'day_high': float(current_point['high']),
+            'day_low': float(current_point['low']),
+            'sector': f'African Markets - {market.title()}',
+            'industry': f'{market.title()} Stock Exchange',
+            'is_crypto': False,
+            'is_african': True,
+            'is_mock': True,  # Flag to indicate this is mock data
+            'country': market.title(),
+            'currency': currency,
+            'last_updated': datetime.now()
+        }
+    
+    def get_ghana_mock_history(self, symbol: str, period: str = "3mo") -> pd.DataFrame:
+        """Get historical mock data for Ghana stocks"""
+        return self.get_mock_history_for_market(symbol, 'ghana', period)
+    
+    def get_kenya_mock_history(self, symbol: str, period: str = "3mo") -> pd.DataFrame:
+        """Get historical mock data for Kenya stocks"""
+        return self.get_mock_history_for_market(symbol, 'kenya', period)
+    
+    def get_nigeria_mock_history(self, symbol: str, period: str = "3mo") -> pd.DataFrame:
+        """Get historical mock data for Nigeria stocks"""
+        return self.get_mock_history_for_market(symbol, 'nigeria', period)
+    
+    def get_mock_history_for_market(self, symbol: str, market: str, period: str = "3mo") -> pd.DataFrame:
+        """Get historical mock data for a specific market"""
+        session_key = f'{market}_mock_data'
+        
+        if symbol not in st.session_state[session_key]:
+            return pd.DataFrame()
+        
+        self.update_mock_data_for_market(market, f'{market}_last_update')
+        
+        data = st.session_state[session_key][symbol]
+        historical_data = data['historical_data']
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(historical_data)
+        df['Date'] = pd.to_datetime(df['date'])
+        df.set_index('Date', inplace=True)
+        
+        # Rename columns to match yfinance format
+        df.rename(columns={
+            'open': 'Open',
+            'high': 'High',
+            'low': 'Low',
+            'close': 'Close',
+            'volume': 'Volume'
+        }, inplace=True)
+        
+        # Filter by period
+        current_time = datetime.now()
+        if period == "1mo":
+            cutoff = current_time - timedelta(days=30)
+        elif period == "3mo":
+            cutoff = current_time - timedelta(days=90)
+        elif period == "6mo":
+            cutoff = current_time - timedelta(days=180)
+        elif period == "1y":
+            cutoff = current_time - timedelta(days=365)
+        elif period == "2y":
+            cutoff = current_time - timedelta(days=730)
+        elif period == "5y":
+            cutoff = current_time - timedelta(days=1825)
+        else:
+            cutoff = current_time - timedelta(days=90)
+        
+        df = df[df.index >= cutoff]
+        
+        return df
     
     def get_available_stocks(self) -> List[str]:
         """Get list of available stocks and cryptocurrencies for trading"""
@@ -883,6 +1252,15 @@ class TradingSimulator:
     def get_stock_price(_self, symbol: str) -> Dict:
         """Get current stock/crypto price and info with error handling"""
         try:
+            # Check if it's a mock data stock
+            if symbol.endswith('.AC'):
+                return _self.get_ghana_mock_price(symbol)
+            elif symbol.endswith('.NR'):
+                return _self.get_kenya_mock_price(symbol)
+            elif symbol.endswith('.LG'):
+                return _self.get_nigeria_mock_price(symbol)
+            
+            # For all other stocks, use yfinance
             ticker = yf.Ticker(symbol)
             hist = ticker.history(period="5d")
             
@@ -902,6 +1280,9 @@ class TradingSimulator:
             # Determine asset type
             is_crypto = symbol.endswith('-USD')
             is_african = _self.is_african_stock(symbol)
+            
+            # Get currency symbol
+            currency = _self.get_currency_symbol(symbol)
             
             # Get appropriate name
             if is_crypto:
@@ -992,7 +1373,9 @@ class TradingSimulator:
                 'industry': industry,
                 'is_crypto': is_crypto,
                 'is_african': is_african,
+                'is_mock': False,
                 'country': _self.get_african_country_from_symbol(symbol) if is_african else None,
+                'currency': currency,
                 'last_updated': datetime.now()
             }
         except Exception as e:
@@ -1022,8 +1405,20 @@ class TradingSimulator:
     def create_comprehensive_chart(self, symbol: str, period: str = "3mo"):
         """Create comprehensive stock/crypto chart with technical analysis"""
         try:
-            ticker = yf.Ticker(symbol)
-            hist = ticker.history(period=period)
+            # Check if it's a mock data stock
+            if symbol.endswith('.AC'):
+                hist = self.get_ghana_mock_history(symbol, period)
+                currency = 'GHS'
+            elif symbol.endswith('.NR'):
+                hist = self.get_kenya_mock_history(symbol, period)
+                currency = 'KES'
+            elif symbol.endswith('.LG'):
+                hist = self.get_nigeria_mock_history(symbol, period)
+                currency = 'NGN'
+            else:
+                ticker = yf.Ticker(symbol)
+                hist = ticker.history(period=period)
+                currency = self.get_currency_symbol(symbol)
             
             if hist.empty:
                 st.warning(f"No data available for {symbol} for the selected period")
@@ -1035,11 +1430,24 @@ class TradingSimulator:
             # Determine asset type
             is_crypto = symbol.endswith('-USD')
             is_african = self.is_african_stock(symbol)
+            is_mock = symbol.endswith('.AC') or symbol.endswith('.NR') or symbol.endswith('.LG')
             
             if is_crypto:
                 display_name = symbol.replace('-USD', '')
                 asset_type = "Cryptocurrency"
                 asset_icon = "🪙"
+            elif symbol.endswith('.AC'):
+                display_name = symbol
+                asset_type = "Ghana Stock Exchange (GSE) - Live Mock Data"
+                asset_icon = "🇬🇭"
+            elif symbol.endswith('.NR'):
+                display_name = symbol
+                asset_type = "Kenya NSE - Live Mock Data"
+                asset_icon = "🇰🇪"
+            elif symbol.endswith('.LG'):
+                display_name = symbol
+                asset_type = "Nigeria NGX - Live Mock Data"
+                asset_icon = "🇳🇬"
             elif is_african:
                 display_name = symbol
                 country = self.get_african_country_from_symbol(symbol)
@@ -1115,22 +1523,42 @@ class TradingSimulator:
                         borderwidth=1
                     )
             
+            # Add mock data indicator for mock data stocks
+            if is_mock:
+                if symbol.endswith('.AC'):
+                    mock_text = "🇬🇭 LIVE MOCK DATA"
+                elif symbol.endswith('.NR'):
+                    mock_text = "🇰🇪 LIVE MOCK DATA"
+                elif symbol.endswith('.LG'):
+                    mock_text = "🇳🇬 LIVE MOCK DATA"
+                
+                fig.add_annotation(
+                    x=hist.index[0],
+                    y=hist['High'].max(),
+                    text=mock_text,
+                    showarrow=False,
+                    bgcolor="rgba(255,193,7,0.8)",
+                    bordercolor="orange",
+                    borderwidth=2,
+                    font=dict(color="black", size=12)
+                )
+            
             # Price formatting
             if (is_crypto and hist['Close'].iloc[-1] < 1) or (is_african and hist['Close'].iloc[-1] < 10):
-                price_format = ".6f"
+                price_format = ".4f"
             else:
                 price_format = ".2f"
             
             # Update layout
             fig.update_layout(
                 title=f"{asset_icon} {display_name} - {asset_type} Technical Analysis ({period})",
-                yaxis_title="Price ($)",
+                yaxis_title=f"Price ({currency})",
                 xaxis_title="Date",
                 template="plotly_white",
                 height=600,
                 showlegend=True,
                 yaxis=dict(
-                    tickformat=f"${price_format}",
+                    tickformat=f"{currency} {price_format}",
                     side="left"
                 ),
                 yaxis2=dict(
@@ -1159,8 +1587,16 @@ class TradingSimulator:
             colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f']
             
             for i, symbol in enumerate(symbols):
-                ticker = yf.Ticker(symbol)
-                hist = ticker.history(period=period)
+                # Check if it's a mock data stock
+                if symbol.endswith('.AC'):
+                    hist = self.get_ghana_mock_history(symbol, period)
+                elif symbol.endswith('.NR'):
+                    hist = self.get_kenya_mock_history(symbol, period)
+                elif symbol.endswith('.LG'):
+                    hist = self.get_nigeria_mock_history(symbol, period)
+                else:
+                    ticker = yf.Ticker(symbol)
+                    hist = ticker.history(period=period)
                 
                 if not hist.empty:
                     # Normalize prices to percentage change from start
@@ -1169,6 +1605,12 @@ class TradingSimulator:
                     # Get display name based on asset type
                     if symbol.endswith('-USD'):
                         display_name = symbol.replace('-USD', '')
+                    elif symbol.endswith('.AC'):
+                        display_name = f"🇬🇭 {symbol}"
+                    elif symbol.endswith('.NR'):
+                        display_name = f"🇰🇪 {symbol}"
+                    elif symbol.endswith('.LG'):
+                        display_name = f"🇳🇬 {symbol}"
                     elif self.is_african_stock(symbol):
                         display_name = f"{symbol} ({self.get_african_country_from_symbol(symbol)})"
                     else:
@@ -1537,10 +1979,14 @@ def main():
                                 asset_display_name = analysis_asset
                                 asset_type_icon = "📈"
                             
-                            # Asset header
+                            # Asset header with mock data indicator
+                            asset_header = f"{asset_type_icon} {asset_data['name']} ({asset_display_name})"
+                            if asset_data.get('is_mock'):
+                                asset_header += " - Live Mock Data"
+                            
                             st.markdown(f"""
                             <div class="metric-card">
-                                <h2>{asset_type_icon} {asset_data['name']} ({asset_display_name})</h2>
+                                <h2>{asset_header}</h2>
                                 <p><strong>Sector:</strong> {asset_data['sector']}</p>
                                 <p><strong>Industry:</strong> {asset_data['industry']}</p>
                             </div>
@@ -1551,16 +1997,16 @@ def main():
                             
                             with col_price1:
                                 if asset_data.get('is_crypto') and asset_data['price'] < 1:
-                                    price_display = f"${asset_data['price']:.6f}"
+                                    price_display = f"{asset_data['currency']} {asset_data['price']:.6f}"
                                 else:
-                                    price_display = f"${asset_data['price']:.2f}"
+                                    price_display = f"{asset_data['currency']} {asset_data['price']:.2f}"
                                 st.metric("Current Price", price_display)
                             
                             with col_price2:
                                 change_color = "normal" if asset_data['change'] >= 0 else "inverse"
                                 st.metric(
                                     "24h Change", 
-                                    f"${asset_data['change']:+.2f}",
+                                    f"{asset_data['currency']} {asset_data['change']:+.2f}",
                                     f"{asset_data['change_percent']:+.2f}%",
                                     delta_color=change_color
                                 )
@@ -1571,9 +2017,9 @@ def main():
                             with col_price4:
                                 if asset_data['market_cap'] > 0:
                                     if asset_data['market_cap'] > 1_000_000_000:
-                                        cap_display = f"${asset_data['market_cap']/1_000_000_000:.1f}B"
+                                        cap_display = f"{asset_data['currency']} {asset_data['market_cap']/1_000_000_000:.1f}B"
                                     else:
-                                        cap_display = f"${asset_data['market_cap']/1_000_000:.1f}M"
+                                        cap_display = f"{asset_data['currency']} {asset_data['market_cap']/1_000_000:.1f}M"
                                     st.metric("Market Cap", cap_display)
                                 else:
                                     st.metric("Market Cap", "N/A")
@@ -1581,9 +2027,9 @@ def main():
                             # Additional metrics
                             col_info1, col_info2, col_info3 = st.columns(3)
                             with col_info1:
-                                st.metric("Day High", f"${asset_data['day_high']:.2f}")
+                                st.metric("Day High", f"{asset_data['currency']} {asset_data['day_high']:.2f}")
                             with col_info2:
-                                st.metric("Day Low", f"${asset_data['day_low']:.2f}")
+                                st.metric("Day Low", f"{asset_data['currency']} {asset_data['day_low']:.2f}")
                             with col_info3:
                                 if asset_data.get('pe_ratio') and not asset_data.get('is_crypto'):
                                     st.metric("P/E Ratio", f"{asset_data['pe_ratio']:.2f}")
@@ -1697,11 +2143,11 @@ def main():
                                 comparison_data.append({
                                     'Asset': f"{asset_type_icon} {display_name}",
                                     'Name': asset_data['name'][:30],
-                                    'Price': f"${asset_data['price']:.2f}",
+                                    'Price': f"{asset_data['currency']} {asset_data['price']:.2f}",
                                     'Change': f"{asset_data['change']:+.2f}",
                                     'Change %': f"{asset_data['change_percent']:+.2f}%",
                                     'Volume': f"{asset_data['volume']:,}",
-                                    'Market Cap': f"${asset_data['market_cap']/1_000_000_000:.1f}B" if asset_data['market_cap'] > 1_000_000_000 else f"${asset_data['market_cap']/1_000_000:.1f}M" if asset_data['market_cap'] > 0 else "N/A"
+                                    'Market Cap': f"{asset_data['currency']} {asset_data['market_cap']/1_000_000_000:.1f}B" if asset_data['market_cap'] > 1_000_000_000 else f"{asset_data['currency']} {asset_data['market_cap']/1_000_000:.1f}M" if asset_data['market_cap'] > 0 else "N/A"
                                 })
                         
                         if comparison_data:
@@ -1784,6 +2230,9 @@ def main():
                 elif research_mode == "🌍 African Markets":
                     st.write("### 🌍 African Markets Research")
                     
+                    # Add mock data notice
+                    st.info("🔴 **Live Mock Data Markets**: 🇬🇭 Ghana (GSE), 🇰🇪 Kenya (NSE), 🇳🇬 Nigeria (NGX) - Updates every 30 seconds during trading hours. 🇿🇦 South Africa (JSE) and 🇪🇬 Egypt (EGX) use real data when available.")
+                    
                     african_markets = simulator.get_african_markets()
                     
                     # African market selector
@@ -1796,12 +2245,50 @@ def main():
                     market_stocks = african_markets[selected_african_market]
                     
                     # Market overview
+                    market_card_class = "african-card"
+                    market_title = selected_african_market
+                    is_mock_market = ("Ghana" in selected_african_market or 
+                                    "Kenya" in selected_african_market or 
+                                    "Nigeria" in selected_african_market)
+                    
+                    if is_mock_market:
+                        market_title += " (Live Mock Data)"
+                    
                     st.markdown(f"""
-                    <div class="african-card">
-                        <h3>{selected_african_market}</h3>
+                    <div class="{market_card_class}">
+                        <h3>{market_title}</h3>
                         <p>📊 {len(market_stocks)} stocks available for trading</p>
+                        {"<p>🔄 Auto-updating mock data every 30 seconds</p>" if is_mock_market else ""}
                     </div>
                     """, unsafe_allow_html=True)
+                    
+                    # Show trading hours for mock markets
+                    if is_mock_market:
+                        current_time = datetime.now()
+                        
+                        if "Ghana" in selected_african_market:
+                            # Ghana: 9 AM - 3 PM GMT
+                            gmt_time = current_time.utctimetuple()
+                            is_weekday = gmt_time.tm_wday < 5
+                            is_trading_hours = 9 <= gmt_time.tm_hour < 15
+                            market_hours = "9 AM - 3 PM GMT"
+                        elif "Kenya" in selected_african_market:
+                            # Kenya: 9 AM - 3 PM EAT (GMT+3)
+                            eat_time = (current_time + timedelta(hours=3)).timetuple()
+                            is_weekday = eat_time.tm_wday < 5
+                            is_trading_hours = 9 <= eat_time.tm_hour < 15
+                            market_hours = "9 AM - 3 PM EAT (GMT+3)"
+                        elif "Nigeria" in selected_african_market:
+                            # Nigeria: 10 AM - 2:30 PM WAT (GMT+1)
+                            wat_time = (current_time + timedelta(hours=1)).timetuple()
+                            is_weekday = wat_time.tm_wday < 5
+                            is_trading_hours = 10 <= wat_time.tm_hour < 14 or (wat_time.tm_hour == 14 and wat_time.tm_min <= 30)
+                            market_hours = "10 AM - 2:30 PM WAT (GMT+1)"
+                        
+                        if is_weekday and is_trading_hours:
+                            st.success(f"🟢 **Trading Hours**: Market is OPEN ({market_hours})")
+                        else:
+                            st.warning(f"🟡 **Trading Hours**: Market is CLOSED ({market_hours}, Monday-Friday)")
                     
                     # Top stocks from selected market
                     st.write(f"#### 📈 Top Stocks from {selected_african_market}")
@@ -1810,10 +2297,21 @@ def main():
                     for stock in market_stocks[:20]:  # Show top 20
                         data = simulator.get_stock_price(stock)
                         if data:
+                            # Add mock data indicator
+                            if stock.endswith('.AC'):
+                                stock_display = f"🇬🇭 {stock}"
+                            elif stock.endswith('.NR'):
+                                stock_display = f"🇰🇪 {stock}"
+                            elif stock.endswith('.LG'):
+                                stock_display = f"🇳🇬 {stock}"
+                            else:
+                                stock_display = stock
+                            
+                            currency = data.get('currency', 'USD')
                             market_data.append({
-                                'Symbol': stock,
+                                'Symbol': stock_display,
                                 'Company': data['name'][:40],
-                                'Price': f"${data['price']:.2f}",
+                                'Price': f"{currency} {data['price']:.2f}",
                                 'Change': f"{data['change']:+.2f}",
                                 'Change %': f"{data['change_percent']:+.2f}%",
                                 'Volume': f"{data['volume']:,}",
@@ -1827,7 +2325,7 @@ def main():
                     # African market comparison chart
                     st.write("#### 📊 African Market Performance Comparison")
                     
-                    # Select representative stocks from each market
+                    # Select representative stocks from each market (including mock data)
                     african_comparison = []
                     for market_name, stocks in african_markets.items():
                         if stocks:
@@ -1843,18 +2341,58 @@ def main():
                     st.write("#### 💡 African Market Insights")
                     st.info("""
                     **🌍 African Markets Overview:**
-                    - **Ghana (GSE)**: Emerging market with strong banking and mining sectors
-                    - **South Africa (JSE)**: Most developed African market with large cap stocks
-                    - **Kenya (NSE)**: Fast-growing market with strong telecom and banking sectors
-                    - **Nigeria (NGX)**: Largest economy in Africa with diversified sectors
-                    - **Egypt (EGX)**: Strategic location connecting Africa, Middle East, and Europe
+                    - **🇬🇭 Ghana (GSE)**: Live mock data - emerging market with strong banking and mining sectors
+                    - **🇰🇪 Kenya (NSE)**: Live mock data - fast-growing market with strong telecom and banking sectors  
+                    - **🇳🇬 Nigeria (NGX)**: Live mock data - largest economy in Africa with diversified sectors
+                    - **🇿🇦 South Africa (JSE)**: Most developed African market with large cap stocks
+                    - **🇪🇬 Egypt (EGX)**: Strategic location connecting Africa, Middle East, and Europe
                     
                     **💰 Trading Tips:**
-                    - African markets may have different trading hours
+                    - Ghana, Kenya, and Nigeria stocks use mock data that updates every 30 seconds during trading hours
+                    - Each market has different currencies: Ghana (GHS), Kenya (KES), Nigeria (NGN), South Africa (ZAR), Egypt (EGP)
                     - Consider currency fluctuations when trading
                     - Research local economic conditions and political stability
                     - Diversify across different African countries and sectors
                     """)
+                    
+                    # Mock data information for applicable markets
+                    if is_mock_market:
+                        st.write("#### 🔄 Mock Data Information")
+                        with st.expander("View Mock Data Details"):
+                            st.write(f"""
+                            **{selected_african_market} Mock Data Features:**
+                            - **Real-time Updates**: Prices update every 30 seconds
+                            - **Trading Hours**: {market_hours} (Monday-Friday)
+                            - **Realistic Volatility**: Each stock has its own volatility and trend parameters
+                            - **Volume Simulation**: Realistic trading volumes based on time of day
+                            - **Historical Data**: 30 days of historical price data available
+                            - **Technical Analysis**: Full support for charts, moving averages, and RSI
+                            - **Proper Currency**: Displays prices in local currency
+                            
+                            **Current Mock Data Status:**
+                            - All stocks in this market use mock data
+                            - Charts and technical analysis fully functional
+                            - Portfolio tracking and P&L calculations work normally
+                            - Data will be replaced with real API when available
+                            """)
+                        
+                        # Show last update time
+                        market_key = selected_african_market.split()[0].lower()
+                        if market_key == "🇬🇭":
+                            market_key = "ghana"
+                        elif market_key == "🇰🇪":
+                            market_key = "kenya"
+                        elif market_key == "🇳🇬":
+                            market_key = "nigeria"
+                        
+                        last_update_key = f'{market_key}_last_update'
+                        if last_update_key in st.session_state:
+                            st.write(f"**Last Price Update:** {st.session_state[last_update_key].strftime('%Y-%m-%d %H:%M:%S UTC')}")
+                        
+                        # Auto-refresh button
+                        if st.button(f"🔄 Force Refresh {market_key.title()} Prices", key=f"refresh_{market_key}"):
+                            st.session_state[last_update_key] = datetime.now() - timedelta(minutes=1)
+                            st.rerun()
             
             with tab2:
                 st.subheader("🛒 Trade Stocks, Cryptocurrencies & African Markets")
@@ -1923,17 +2461,21 @@ def main():
                             # Show country for African stocks
                             if asset_data.get('is_african'):
                                 country = simulator.get_african_country_from_symbol(selected_asset)
-                                st.write(f"**Country:** {country}")
+                                if asset_data.get('is_mock'):
+                                    st.write(f"**Country:** {country} (Live Mock Data)")
+                                else:
+                                    st.write(f"**Country:** {country}")
                             
                             # Format price display
+                            currency = asset_data.get('currency', 'USD')
                             if asset_data.get('is_crypto') and asset_data['price'] < 1:
-                                price_display = f"${asset_data['price']:.6f}"
+                                price_display = f"{currency} {asset_data['price']:.6f}"
                             else:
-                                price_display = f"${asset_data['price']:.2f}"
+                                price_display = f"{currency} {asset_data['price']:.2f}"
                             st.write(f"**Current Price:** {price_display}")
                             
                             change_class = "positive" if asset_data['change'] >= 0 else "negative"
-                            st.markdown(f"**Change:** <span class='{change_class}'>${asset_data['change']:+.2f} ({asset_data['change_percent']:+.2f}%)</span>", unsafe_allow_html=True)
+                            st.markdown(f"**Change:** <span class='{change_class}'>{currency} {asset_data['change']:+.2f} ({asset_data['change_percent']:+.2f}%)</span>", unsafe_allow_html=True)
                             
                             # Shares/Units input
                             unit_label = "Amount" if asset_data.get('is_crypto') else "Shares"
@@ -1944,8 +2486,8 @@ def main():
                             
                             total_cost = (asset_data['price'] * buy_amount) + st.session_state.game_settings['commission']
                             
-                            st.write(f"**Total Cost:** ${total_cost:.2f}")
-                            st.write(f"**Available Cash:** ${current_user['cash']:,.2f}")
+                            st.write(f"**Total Cost:** {asset_data.get('currency', 'USD')} {total_cost:.2f}")
+                            st.write(f"**Available Cash:** {asset_data.get('currency', 'USD')} {current_user['cash']:,.2f}")
                             
                             buy_button_text = f"🛒 Buy {asset_display_name}"
                             if st.button(buy_button_text, key="buy_button"):
@@ -2009,23 +2551,28 @@ def main():
                                 # Show country for African stocks
                                 if asset_data.get('is_african'):
                                     country = simulator.get_african_country_from_symbol(selected_sell_asset)
-                                    st.write(f"**Country:** {country}")
+                                    currency = asset_data.get('currency', 'USD')
+                                    if asset_data.get('is_mock'):
+                                        st.write(f"**Country:** {country} (Live Mock Data)")
+                                    else:
+                                        st.write(f"**Country:** {country}")
                                 
                                 # Units owned
                                 unit_label = "Amount" if asset_data.get('is_crypto') else "Shares"
+                                currency = asset_data.get('currency', 'USD')
                                 if asset_data.get('is_crypto'):
                                     st.write(f"**{unit_label} Owned:** {position['shares']:.6f}")
                                 else:
                                     st.write(f"**{unit_label} Owned:** {position['shares']}")
                                 
                                 # Prices
-                                st.write(f"**Average Price:** ${position['avg_price']:.6f}" if asset_data.get('is_crypto') and position['avg_price'] < 1 else f"**Average Price:** ${position['avg_price']:.2f}")
-                                st.write(f"**Current Price:** ${asset_data['price']:.6f}" if asset_data.get('is_crypto') and asset_data['price'] < 1 else f"**Current Price:** ${asset_data['price']:.2f}")
+                                st.write(f"**Average Price:** {currency} {position['avg_price']:.6f}" if asset_data.get('is_crypto') and position['avg_price'] < 1 else f"**Average Price:** {currency} {position['avg_price']:.2f}")
+                                st.write(f"**Current Price:** {currency} {asset_data['price']:.6f}" if asset_data.get('is_crypto') and asset_data['price'] < 1 else f"**Current Price:** {currency} {asset_data['price']:.2f}")
                                 
                                 # Show unrealized P&L
                                 unrealized_pl = (asset_data['price'] - position['avg_price']) * position['shares']
                                 pl_color = "positive" if unrealized_pl >= 0 else "negative"
-                                st.markdown(f"**Unrealized P&L:** <span class='{pl_color}'>${unrealized_pl:+.2f}</span>", unsafe_allow_html=True)
+                                st.markdown(f"**Unrealized P&L:** <span class='{pl_color}'>{currency} {unrealized_pl:+.2f}</span>", unsafe_allow_html=True)
                                 
                                 # Amount to sell
                                 if asset_data.get('is_crypto'):
@@ -2050,9 +2597,10 @@ def main():
                                 total_proceeds = (asset_data['price'] * sell_amount) - st.session_state.game_settings['commission']
                                 expected_pl = (asset_data['price'] - position['avg_price']) * sell_amount - st.session_state.game_settings['commission']
                                 
-                                st.write(f"**Total Proceeds:** ${total_proceeds:.2f}")
+                                currency = asset_data.get('currency', 'USD')
+                                st.write(f"**Total Proceeds:** {currency} {total_proceeds:.2f}")
                                 pl_color = "positive" if expected_pl >= 0 else "negative"
-                                st.markdown(f"**Expected P&L:** <span class='{pl_color}'>${expected_pl:+.2f}</span>", unsafe_allow_html=True)
+                                st.markdown(f"**Expected P&L:** <span class='{pl_color}'>{currency} {expected_pl:+.2f}</span>", unsafe_allow_html=True)
                                 
                                 sell_button_text = f"💰 Sell {asset_display_name}"
                                 if st.button(sell_button_text, key="sell_button"):
@@ -2199,6 +2747,7 @@ def main():
                     st.write("4. 🏆 Compete with others on the **Leaderboard**")
                     st.write("5. 🪙 Try trading cryptocurrencies for 24/7 markets!")
                     st.write("6. 🌍 Explore African markets for emerging opportunities!")
+                    st.write("7. 🇬🇭🇰🇪🇳🇬 Ghana, Kenya, and Nigeria stocks have live mock data that updates every 30 seconds!")
             
             with tab4:
                 st.subheader("📋 Trade History")
@@ -2280,11 +2829,19 @@ def main():
                 st.write("📈 US Stocks & ETFs")
                 st.write("🪙 Cryptocurrencies")
                 st.write("🌍 African Markets:")
-                st.write("  - 🇬🇭 Ghana Stock Exchange (GSE)")
+                st.write("  - 🇬🇭 Ghana Stock Exchange (GSE) - **Live Mock Data** 🔄")
+                st.write("  - 🇰🇪 Nairobi Securities Exchange (NSE) - **Live Mock Data** 🔄")
+                st.write("  - 🇳🇬 Nigerian Exchange (NGX) - **Live Mock Data** 🔄")
                 st.write("  - 🇿🇦 Johannesburg Stock Exchange (JSE)")
-                st.write("  - 🇰🇪 Nairobi Securities Exchange (NSE)")
-                st.write("  - 🇳🇬 Nigerian Exchange (NGX)")
                 st.write("  - 🇪🇬 Egyptian Exchange (EGX)")
+                
+                st.write("**Mock Data Markets:**")
+                st.write("- **🇬🇭 Ghana**: Updates every 30 seconds, 9 AM - 3 PM GMT, Currency: GHS")
+                st.write("- **🇰🇪 Kenya**: Updates every 30 seconds, 9 AM - 3 PM EAT, Currency: KES")
+                st.write("- **🇳🇬 Nigeria**: Updates every 30 seconds, 10 AM - 2:30 PM WAT, Currency: NGN")
+                st.write("- 30 days of historical data available for all mock markets")
+                st.write("- Full technical analysis support with proper local currencies")
+                st.write("- Will be replaced with real APIs when available")
                 
                 st.write("**Database Information:**")
                 st.write(f"Database file: {simulator.db.db_path}")
@@ -2307,7 +2864,7 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #666;'>
-        <p>🎮 Leo's Trader | 📈 Educational Tool | 🌍 Now with African Markets | ⚠️ Virtual Money Only</p>
+        <p>🎮 Leo's Trader | 📈 Educational Tool | 🌍 African Markets | 🇬🇭🇰🇪🇳🇬 Live Mock Data | ⚠️ Virtual Money Only</p>
     </div>
     """, unsafe_allow_html=True)
 
