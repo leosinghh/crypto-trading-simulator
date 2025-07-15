@@ -486,21 +486,81 @@ class TradingSimulator:
     
     def get_available_stocks(self) -> List[str]:
         return [
-            # Tech stocks
+            # US Tech stocks
             'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'NFLX',
-            # Finance
-            'JPM', 'BAC', 'WFC', 'V', 'MA',
-            # ETFs
-            'SPY', 'QQQ', 'VTI',
-            # South African stocks
-            'NPN.JO', 'MTN.JO', 'SHP.JO', 'VOD.JO',
-            # African ETFs
-            'AFK', 'EZA',
-            # GSE stocks
-            'GSE:EGL', 'GSE:CAL', 'GSE:GCB', 'GSE:MTN',
+            # US Finance
+            'JPM', 'BAC', 'WFC', 'V', 'MA', 'BRK-B', 'GS', 'MS',
+            # US ETFs
+            'SPY', 'QQQ', 'VTI', 'VOO', 'IWM',
             # Crypto
-            'BTC-USD', 'ETH-USD', 'BNB-USD', 'ADA-USD', 'SOL-USD'
+            'BTC-USD', 'ETH-USD', 'BNB-USD', 'ADA-USD', 'SOL-USD', 'DOGE-USD'
         ]
+    
+    def get_african_stocks(self) -> List[str]:
+        return [
+            # South African stocks (JSE) - Real data
+            'NPN.JO', 'MTN.JO', 'SHP.JO', 'VOD.JO', 'NED.JO', 'SBK.JO', 
+            'FSR.JO', 'INL.JO', 'AGL.JO', 'SOL.JO', 'BVT.JO', 'WHL.JO',
+            # Ghana stocks (GSE) - Mock data
+            'GSE:EGL', 'GSE:CAL', 'GSE:GCB', 'GSE:MTN', 'GSE:GOIL', 'GSE:TOTAL',
+            'GSE:SIC', 'GSE:SCB', 'GSE:TLW', 'GSE:BOPP', 'GSE:ACI', 'GSE:FML',
+            # African ETFs
+            'AFK', 'EZA', 'GAF', 'FLZA'
+        ]
+    
+    def get_african_categories(self) -> Dict[str, List[str]]:
+        return {
+            "South African Stocks (JSE)": [
+                'NPN.JO', 'MTN.JO', 'SHP.JO', 'VOD.JO', 'NED.JO', 'SBK.JO', 
+                'FSR.JO', 'INL.JO', 'AGL.JO', 'SOL.JO', 'BVT.JO', 'WHL.JO'
+            ],
+            "Ghana Stock Exchange (GSE)": [
+                'GSE:EGL', 'GSE:CAL', 'GSE:GCB', 'GSE:MTN', 'GSE:GOIL', 'GSE:TOTAL',
+                'GSE:SIC', 'GSE:SCB', 'GSE:TLW', 'GSE:BOPP', 'GSE:ACI', 'GSE:FML'
+            ],
+            "African ETFs": [
+                'AFK', 'EZA', 'GAF', 'FLZA'
+            ]
+        }
+    
+    def get_stock_display_name(self, symbol: str) -> str:
+        """Get friendly display name for stocks"""
+        names = {
+            # South African stocks
+            'NPN.JO': 'Naspers Limited',
+            'MTN.JO': 'MTN Group',
+            'SHP.JO': 'Shoprite Holdings',
+            'VOD.JO': 'Vodacom Group',
+            'NED.JO': 'Nedbank Group',
+            'SBK.JO': 'Standard Bank Group',
+            'FSR.JO': 'FirstRand Limited',
+            'INL.JO': 'Investec Limited',
+            'AGL.JO': 'Anglo American Platinum',
+            'SOL.JO': 'Sasol Limited',
+            'BVT.JO': 'Bidvest Group',
+            'WHL.JO': 'Woolworths Holdings',
+            
+            # Ghana stocks
+            'GSE:EGL': 'Enterprise Group Limited',
+            'GSE:CAL': 'CAL Bank Limited',
+            'GSE:GCB': 'GCB Bank Limited',
+            'GSE:MTN': 'MTN Ghana',
+            'GSE:GOIL': 'Ghana Oil Company',
+            'GSE:TOTAL': 'Total Petroleum Ghana',
+            'GSE:SIC': 'SIC Insurance Company',
+            'GSE:SCB': 'Standard Chartered Bank Ghana',
+            'GSE:TLW': 'Tullow Oil Ghana',
+            'GSE:BOPP': 'Benso Oil Palm Plantation',
+            'GSE:ACI': 'Ayrton Drug Manufacturing',
+            'GSE:FML': 'Fan Milk Limited',
+            
+            # African ETFs
+            'AFK': 'VanEck Africa Index ETF',
+            'EZA': 'iShares MSCI South Africa ETF',
+            'GAF': 'SPDR S&P Emerging Middle East & Africa ETF',
+            'FLZA': 'Franklin FTSE South Africa ETF'
+        }
+        return names.get(symbol, symbol)
     
     def is_african_stock(self, symbol: str) -> bool:
         return (symbol.endswith('.JO') or 
@@ -509,7 +569,9 @@ class TradingSimulator:
     
     def get_gse_mock_data(self, symbol: str) -> Dict:
         base_prices = {
-            'GSE:EGL': 1.5, 'GSE:CAL': 0.8, 'GSE:GCB': 2.3, 'GSE:MTN': 0.9
+            'GSE:EGL': 1.5, 'GSE:CAL': 0.8, 'GSE:GCB': 2.3, 'GSE:MTN': 0.9,
+            'GSE:GOIL': 1.2, 'GSE:TOTAL': 3.1, 'GSE:SIC': 0.6, 'GSE:SCB': 2.8,
+            'GSE:TLW': 4.2, 'GSE:BOPP': 1.8, 'GSE:ACI': 2.5, 'GSE:FML': 1.4
         }
         
         current_time = time.time()
@@ -538,7 +600,7 @@ class TradingSimulator:
         
         return {
             'symbol': symbol,
-            'name': symbol.replace('GSE:', ''),
+            'name': self.get_stock_display_name(symbol),
             'price': float(current_price),
             'change': float(change),
             'change_percent': float(change_percent),
@@ -797,18 +859,85 @@ def main():
             with tab1:
                 st.subheader("📊 Research")
                 
-                selected_stock = st.selectbox("Select Asset", [''] + simulator.available_stocks)
+                # Asset type selector
+                asset_type = st.selectbox(
+                    "Select Asset Type",
+                    ["US Stocks & ETFs", "African Markets", "Cryptocurrencies"]
+                )
                 
+                # Get appropriate stock list
+                if asset_type == "US Stocks & ETFs":
+                    available_assets = simulator.available_stocks
+                    selected_stock = st.selectbox("Select Asset", [''] + available_assets)
+                elif asset_type == "African Markets":
+                    st.write("### 🌍 African Markets")
+                    
+                    # Show African categories
+                    african_categories = simulator.get_african_categories()
+                    selected_category = st.selectbox(
+                        "Select Market",
+                        ["All African Markets"] + list(african_categories.keys())
+                    )
+                    
+                    if selected_category == "All African Markets":
+                        available_assets = simulator.get_african_stocks()
+                    else:
+                        available_assets = african_categories[selected_category]
+                    
+                    selected_stock = st.selectbox("Select African Asset", [''] + available_assets)
+                    
+                    # Show helpful info about African markets
+                    if selected_category != "All African Markets":
+                        if selected_category == "South African Stocks (JSE)":
+                            st.info("🇿🇦 Real-time data from Johannesburg Stock Exchange via Yahoo Finance")
+                        elif selected_category == "Ghana Stock Exchange (GSE)":
+                            st.info("🇬🇭 Mock data that updates every 5-10 minutes • Market hours: 9 AM - 3 PM GMT")
+                        elif selected_category == "African ETFs":
+                            st.info("🌍 Real-time data for Africa-focused ETFs")
+                
+                else:  # Cryptocurrencies
+                    crypto_stocks = [s for s in simulator.available_stocks if s.endswith('-USD')]
+                    selected_stock = st.selectbox("Select Cryptocurrency", [''] + crypto_stocks)
+                
+                # Display stock information
                 if selected_stock:
                     stock_data = simulator.get_stock_price(selected_stock)
                     if stock_data:
+                        # Show stock info with African-specific details
                         st.write(f"**{stock_data['name']}** ({selected_stock})")
+                        
+                        # Show market-specific info
+                        if selected_stock.startswith('GSE:'):
+                            market_status = stock_data.get('market_status', 'Unknown')
+                            status_color = "🟢" if market_status == 'Open' else "🔴"
+                            st.write(f"**Market Status:** {status_color} {market_status}")
+                            st.write(f"**Exchange:** Ghana Stock Exchange")
+                            st.write(f"**Currency:** Ghana Cedi (₵)")
+                        elif selected_stock.endswith('.JO'):
+                            st.write(f"**Exchange:** Johannesburg Stock Exchange")
+                            st.write(f"**Currency:** South African Rand (ZAR)")
+                        elif selected_stock in ['AFK', 'EZA', 'GAF', 'FLZA']:
+                            st.write(f"**Type:** African ETF")
+                            st.write(f"**Exchange:** US Markets")
                         
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.metric("Price", f"${stock_data['price']:.2f}")
+                            # Format price for African currencies
+                            if selected_stock.startswith('GSE:'):
+                                price_display = f"₵{stock_data['price']:.2f}"
+                            else:
+                                price_display = f"${stock_data['price']:.2f}"
+                            st.metric("Price", price_display)
                         with col2:
                             st.metric("Change", f"{stock_data['change']:+.2f}", f"{stock_data['change_percent']:+.2f}%")
+                        
+                        # Additional info for GSE stocks
+                        if selected_stock.startswith('GSE:'):
+                            st.write("---")
+                            st.write("**📊 GSE Mock Data Info:**")
+                            st.write(f"• Updates every 5-10 minutes")
+                            st.write(f"• Market hours: 9:00 AM - 3:00 PM GMT")
+                            st.write(f"• Last updated: {stock_data['last_updated'].strftime('%H:%M:%S')}")
                         
                         # Quick trade buttons
                         col1, col2 = st.columns(2)
@@ -828,13 +957,44 @@ def main():
                 
                 with col1:
                     st.write("### Buy")
-                    buy_stock = st.selectbox("Select Stock to Buy", [''] + simulator.available_stocks, key="buy_stock")
+                    
+                    # Asset type selector for buying
+                    buy_asset_type = st.selectbox(
+                        "Asset Type",
+                        ["US Stocks & ETFs", "African Markets", "Cryptocurrencies"],
+                        key="buy_asset_type"
+                    )
+                    
+                    # Get appropriate stock list
+                    if buy_asset_type == "US Stocks & ETFs":
+                        buy_options = simulator.available_stocks
+                    elif buy_asset_type == "African Markets":
+                        buy_options = simulator.get_african_stocks()
+                    else:  # Cryptocurrencies
+                        buy_options = [s for s in simulator.available_stocks if s.endswith('-USD')]
+                    
+                    buy_stock = st.selectbox("Select Asset to Buy", [''] + buy_options, key="buy_stock")
                     
                     if buy_stock:
                         stock_data = simulator.get_stock_price(buy_stock)
                         if stock_data:
                             st.write(f"**{stock_data['name']}**")
-                            st.write(f"**Price:** ${stock_data['price']:.2f}")
+                            
+                            # Format price display
+                            if buy_stock.startswith('GSE:'):
+                                price_display = f"₵{stock_data['price']:.2f}"
+                                st.write(f"**Price:** {price_display}")
+                            else:
+                                price_display = f"${stock_data['price']:.2f}"
+                                st.write(f"**Price:** {price_display}")
+                            
+                            # Show market info for African stocks
+                            if buy_stock.startswith('GSE:'):
+                                market_status = stock_data.get('market_status', 'Unknown')
+                                status_color = "🟢" if market_status == 'Open' else "🔴"
+                                st.write(f"**Market:** {status_color} {market_status}")
+                            elif buy_stock.endswith('.JO'):
+                                st.write(f"**Exchange:** JSE (South Africa)")
                             
                             buy_shares = st.number_input("Shares", min_value=1, value=1, key="buy_shares")
                             total_cost = (stock_data['price'] * buy_shares) + 9.99
@@ -858,8 +1018,43 @@ def main():
                     portfolio = simulator.db.get_user_portfolio(current_user['id'])
                     
                     if portfolio:
+                        # Group portfolio by asset type
+                        us_stocks = []
+                        african_stocks = []
+                        crypto_stocks = []
+                        
+                        for p in portfolio:
+                            if p['symbol'].endswith('-USD'):
+                                crypto_stocks.append(p)
+                            elif simulator.is_african_stock(p['symbol']):
+                                african_stocks.append(p)
+                            else:
+                                us_stocks.append(p)
+                        
+                        # Show portfolio breakdown
+                        if us_stocks:
+                            st.write("**🇺🇸 US Stocks:**")
+                            for stock in us_stocks:
+                                st.write(f"• {stock['symbol']} ({stock['shares']} shares)")
+                        
+                        if african_stocks:
+                            st.write("**🌍 African Markets:**")
+                            for stock in african_stocks:
+                                if stock['symbol'].startswith('GSE:'):
+                                    st.write(f"• {stock['symbol']} - Ghana ({stock['shares']} shares)")
+                                elif stock['symbol'].endswith('.JO'):
+                                    st.write(f"• {stock['symbol']} - South Africa ({stock['shares']} shares)")
+                                else:
+                                    st.write(f"• {stock['symbol']} ({stock['shares']} shares)")
+                        
+                        if crypto_stocks:
+                            st.write("**🪙 Cryptocurrencies:**")
+                            for stock in crypto_stocks:
+                                st.write(f"• {stock['symbol']} ({stock['shares']} shares)")
+                        
+                        # Sell interface
                         owned_stocks = [p['symbol'] for p in portfolio]
-                        sell_stock = st.selectbox("Select Stock to Sell", [''] + owned_stocks, key="sell_stock")
+                        sell_stock = st.selectbox("Select Asset to Sell", [''] + owned_stocks, key="sell_stock")
                         
                         if sell_stock:
                             position = next((p for p in portfolio if p['symbol'] == sell_stock), None)
@@ -868,7 +1063,17 @@ def main():
                             if position and stock_data:
                                 st.write(f"**{stock_data['name']}**")
                                 st.write(f"**Owned:** {position['shares']} shares")
-                                st.write(f"**Current Price:** ${stock_data['price']:.2f}")
+                                
+                                # Format price display
+                                if sell_stock.startswith('GSE:'):
+                                    current_price_display = f"₵{stock_data['price']:.2f}"
+                                    avg_price_display = f"₵{position['avg_price']:.2f}"
+                                else:
+                                    current_price_display = f"${stock_data['price']:.2f}"
+                                    avg_price_display = f"${position['avg_price']:.2f}"
+                                
+                                st.write(f"**Average Price:** {avg_price_display}")
+                                st.write(f"**Current Price:** {current_price_display}")
                                 
                                 sell_shares = st.number_input("Shares to Sell", min_value=1, max_value=position['shares'], value=1, key="sell_shares")
                                 total_proceeds = (stock_data['price'] * sell_shares) - 9.99
@@ -890,7 +1095,22 @@ def main():
                                     else:
                                         st.error(result['message'])
                     else:
-                        st.info("No stocks owned")
+                        st.info("No stocks owned. Buy some stocks first!")
+                        
+                        # Show available African stocks to buy
+                        st.write("### 🌍 Try These African Stocks:")
+                        st.write("**🇿🇦 South African (Real Data):**")
+                        st.write("• NPN.JO (Naspers), MTN.JO (MTN Group)")
+                        st.write("• SHP.JO (Shoprite), VOD.JO (Vodacom)")
+                        
+                        st.write("**🇬🇭 Ghana (Mock Data):**")
+                        st.write("• GSE:EGL (Enterprise Group)")
+                        st.write("• GSE:CAL (CAL Bank)")
+                        st.write("• GSE:GCB (GCB Bank)")
+                        
+                        st.write("**🌍 African ETFs:**")
+                        st.write("• AFK (VanEck Africa ETF)")
+                        st.write("• EZA (iShares South Africa ETF)")
             
             with tab3:
                 st.subheader("📈 Portfolio")
