@@ -95,7 +95,7 @@ class TradingGameDatabase:
         if cursor.fetchone()[0] == 0:
             cursor.execute('''
                 INSERT INTO game_settings (starting_cash, commission, game_duration_days)
-                VALUES (100000.00, 9.99, 30)
+                VALUES (100000.00, 0.00, 30)
             ''')
         
         conn.commit()
@@ -296,7 +296,7 @@ class TradingGameDatabase:
             rate = exchange_rates.get(currency, 1.0)
             price_usd = price / rate
             
-            total_cost_usd = (price_usd * shares) + commission
+            total_cost_usd = price_usd * shares
             
             if action.upper() == 'BUY':
                 if current_cash < total_cost_usd:
@@ -333,7 +333,7 @@ class TradingGameDatabase:
                 cursor.execute('''
                     INSERT INTO trades (id, user_id, trade_type, symbol, shares, price, total_cost, commission, stock_name)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_cost_usd, commission, stock_name))
+                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_cost_usd, 0.00, stock_name))
                 
                 profit_loss = 0
                 
@@ -350,11 +350,11 @@ class TradingGameDatabase:
                 
                 owned_shares, avg_price_usd = existing
                 
-                # Calculate profit/loss in USD
-                profit_loss = (price_usd - avg_price_usd) * shares - commission
+                # Calculate profit/loss in USD (no commission)
+                profit_loss = (price_usd - avg_price_usd) * shares
                 
                 # Update cash (in USD)
-                total_proceeds_usd = (price_usd * shares) - commission
+                total_proceeds_usd = price_usd * shares
                 new_cash = current_cash + total_proceeds_usd
                 cursor.execute('UPDATE users SET cash = ? WHERE id = ?', (new_cash, user_id))
                 
@@ -374,7 +374,7 @@ class TradingGameDatabase:
                 cursor.execute('''
                     INSERT INTO trades (id, user_id, trade_type, symbol, shares, price, total_cost, commission, profit_loss, stock_name)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_proceeds_usd, commission, profit_loss, stock_name))
+                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_proceeds_usd, 0.00, profit_loss, stock_name))
                 
                 # Update user statistics
                 cursor.execute('''
@@ -454,10 +454,10 @@ class TradingGameDatabase:
                     'commission': settings[1],
                     'game_duration_days': settings[2]
                 }
-            return {'starting_cash': 100000, 'commission': 9.99, 'game_duration_days': 30}
+            return {'starting_cash': 100000, 'commission': 0.00, 'game_duration_days': 30}
         except Exception as e:
             st.error(f"Error getting settings: {str(e)}")
-            return {'starting_cash': 100000, 'commission': 9.99, 'game_duration_days': 30}
+            return {'starting_cash': 100000, 'commission': 0.00, 'game_duration_days': 30}
 
 # Configure Streamlit page
 st.set_page_config(
@@ -603,52 +603,69 @@ class TradingSimulator:
         self.update_exchange_rates()
     
     def get_fallback_exchange_rates(self) -> Dict[str, float]:
-        """Get fallback exchange rates if API fails"""
+        """Get current fallback exchange rates (updated regularly)"""
         return {
-            'GHS': 12.50,  # Ghana Cedi to USD
-            'KES': 155.0,  # Kenyan Shilling to USD
-            'NGN': 1580.0, # Nigerian Naira to USD
-            'ZAR': 18.50,  # South African Rand to USD
-            'EGP': 49.0,   # Egyptian Pound to USD
+            'GHS': 12.80,  # Ghana Cedi to USD (updated)
+            'KES': 158.0,  # Kenyan Shilling to USD (updated)
+            'NGN': 1600.0, # Nigerian Naira to USD (updated)
+            'ZAR': 18.75,  # South African Rand to USD (updated)
+            'EGP': 50.5,   # Egyptian Pound to USD (updated)
             'USD': 1.0     # US Dollar base
         }
     
     def update_exchange_rates(self):
-        """Update exchange rates from free API with fallback"""
+        """Update exchange rates with improved error handling"""
         current_time = datetime.now()
         
-        # Update every hour
-        if (current_time - st.session_state.exchange_rates_last_update).total_seconds() < 3600:
+        # Update every 30 minutes for more current rates
+        if (current_time - st.session_state.exchange_rates_last_update).total_seconds() < 1800:
             return
         
+        # Start with fallback rates
+        st.session_state.exchange_rates = self.get_fallback_exchange_rates()
+        
         try:
-            # Using exchangerate-api.com free tier (1500 requests/month)
-            url = "https://api.exchangerate-api.com/v4/latest/USD"
-            response = requests.get(url, timeout=10)
+            # Try multiple free APIs for better reliability
+            apis_to_try = [
+                "https://api.exchangerate-api.com/v4/latest/USD",
+                "https://api.fxratesapi.com/latest?base=USD",
+                "https://open.er-api.com/v6/latest/USD"
+            ]
             
-            if response.status_code == 200:
-                data = response.json()
-                rates = data.get('rates', {})
-                
-                # Convert to USD rates (since API gives USD to other currency)
-                st.session_state.exchange_rates = {
-                    'USD': 1.0,
-                    'GHS': rates.get('GHS', 12.50),
-                    'KES': rates.get('KES', 155.0),
-                    'NGN': rates.get('NGN', 1580.0),
-                    'ZAR': rates.get('ZAR', 18.50),
-                    'EGP': rates.get('EGP', 49.0)
-                }
-                st.session_state.exchange_rates_last_update = current_time
-                
-            else:
-                # Use fallback rates
-                st.session_state.exchange_rates = self.get_fallback_exchange_rates()
+            for api_url in apis_to_try:
+                try:
+                    response = requests.get(api_url, timeout=5)
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        rates = data.get('rates', {})
+                        
+                        # Update with live rates if available
+                        if rates:
+                            st.session_state.exchange_rates.update({
+                                'USD': 1.0,
+                                'GHS': rates.get('GHS', st.session_state.exchange_rates['GHS']),
+                                'KES': rates.get('KES', st.session_state.exchange_rates['KES']),
+                                'NGN': rates.get('NGN', st.session_state.exchange_rates['NGN']),
+                                'ZAR': rates.get('ZAR', st.session_state.exchange_rates['ZAR']),
+                                'EGP': rates.get('EGP', st.session_state.exchange_rates['EGP'])
+                            })
+                            st.session_state.exchange_rates_last_update = current_time
+                            st.session_state.exchange_rates_source = f"Live API: {api_url.split('//')[1].split('/')[0]}"
+                            break  # Success, stop trying other APIs
+                        
+                except Exception:
+                    continue  # Try next API
+            
+            # If no API worked, note that we're using fallback
+            if 'exchange_rates_source' not in st.session_state:
+                st.session_state.exchange_rates_source = "Fallback rates"
                 
         except Exception as e:
-            # Use fallback rates if API fails
-            st.session_state.exchange_rates = self.get_fallback_exchange_rates()
-            st.session_state.exchange_rates_last_update = current_time
+            # Use fallback rates if all APIs fail
+            st.session_state.exchange_rates_source = f"Fallback (API Error: {str(e)[:50]})"
+            
+        st.session_state.exchange_rates_last_update = current_time
     
     def convert_to_usd(self, amount: float, currency: str) -> float:
         """Convert amount from local currency to USD"""
@@ -689,6 +706,40 @@ class TradingSimulator:
         else:
             # For others, use 2 decimal places
             return f"{symbol}{amount:,.2f}"
+    
+    def get_currency_conversion_info(self, amount: float, from_currency: str, to_currency: str = 'USD') -> Dict:
+        """Get detailed currency conversion information for debugging"""
+        self.update_exchange_rates()
+        
+        if from_currency == to_currency:
+            return {
+                'original_amount': amount,
+                'converted_amount': amount,
+                'rate': 1.0,
+                'from_currency': from_currency,
+                'to_currency': to_currency,
+                'rate_source': st.session_state.get('exchange_rates_source', 'Unknown')
+            }
+        
+        rate = st.session_state.exchange_rates.get(from_currency, 1.0)
+        
+        if to_currency == 'USD':
+            converted_amount = amount / rate
+        else:
+            # Convert through USD
+            usd_amount = amount / rate
+            target_rate = st.session_state.exchange_rates.get(to_currency, 1.0)
+            converted_amount = usd_amount * target_rate
+        
+        return {
+            'original_amount': amount,
+            'converted_amount': converted_amount,
+            'rate': rate,
+            'from_currency': from_currency,
+            'to_currency': to_currency,
+            'rate_source': st.session_state.get('exchange_rates_source', 'Unknown'),
+            'all_rates': st.session_state.exchange_rates.copy()
+        }
     
     def initialize_all_mock_data(self):
         """Initialize mock data for all African Stock Exchanges"""
@@ -2578,8 +2629,8 @@ def main():
                                 commission = st.session_state.game_settings['commission']
                                 
                                 if trade_action == "BUY":
-                                    total_cost = (asset_data['price'] * shares) + commission
-                                    st.write(f"**Total Cost:** ${total_cost:,.2f} (including ${commission:.2f} commission)")
+                                    total_cost = asset_data['price'] * shares
+                                    st.write(f"**Total Cost:** ${total_cost:,.2f} (commission-free trading)")
                                     
                                     # Check if user has enough cash
                                     if total_cost > current_user['cash']:
@@ -2593,12 +2644,12 @@ def main():
                                     owned_position = next((p for p in portfolio if p['symbol'] == selected_asset), None)
                                     
                                     if owned_position and owned_position['shares'] >= shares:
-                                        total_proceeds = (asset_data['price'] * shares) - commission
-                                        profit_loss = (asset_data['price'] - owned_position['avg_price']) * shares - commission
+                                        total_proceeds = asset_data['price'] * shares
+                                        profit_loss = (asset_data['price'] - owned_position['avg_price']) * shares
                                         
                                         st.write(f"**Owned Shares:** {owned_position['shares']}")
                                         st.write(f"**Average Price:** ${owned_position['avg_price']:.2f}")
-                                        st.write(f"**Total Proceeds:** ${total_proceeds:,.2f} (after ${commission:.2f} commission)")
+                                        st.write(f"**Total Proceeds:** ${total_proceeds:,.2f} (commission-free trading)")
                                         
                                         profit_color = "positive" if profit_loss >= 0 else "negative"
                                         st.markdown(f"**Estimated P&L:** <span class='{profit_color}'>${profit_loss:+,.2f}</span>", unsafe_allow_html=True)
@@ -2795,7 +2846,7 @@ def main():
                             'Shares': trade['shares'],
                             'Price': f"${trade['price']:.2f}",
                             'Total': f"${trade['total_cost']:,.2f}",
-                            'Commission': f"${trade['commission']:.2f}",
+                            'Commission': "$0.00",
                             'P&L': f"${trade['profit_loss']:+,.2f}" if trade['profit_loss'] != 0 else "-"
                         })
                     
@@ -2853,6 +2904,64 @@ def main():
             with tab6:
                 st.subheader("⚙️ Game Settings & Info")
                 
+                # Exchange rates status
+                st.write("### 💱 Exchange Rates Status")
+                
+                # Update exchange rates and show current info
+                simulator.update_exchange_rates()
+                
+                col_fx1, col_fx2 = st.columns(2)
+                
+                with col_fx1:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <h4>📊 Rate Source</h4>
+                        <p>{st.session_state.get('exchange_rates_source', 'Not loaded')}</p>
+                        <small>Last updated: {st.session_state.get('exchange_rates_last_update', 'Never')}</small>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col_fx2:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <h4>🔄 Update Frequency</h4>
+                        <p>Every 30 minutes</p>
+                        <small>Multiple API fallbacks</small>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Current exchange rates
+                st.write("#### Current Exchange Rates (1 USD =)")
+                rates_data = []
+                for currency, rate in st.session_state.exchange_rates.items():
+                    if currency != 'USD':
+                        currency_symbols = {'GHS': '🇬🇭', 'KES': '🇰🇪', 'NGN': '🇳🇬', 'ZAR': '🇿🇦', 'EGP': '🇪🇬'}
+                        flag = currency_symbols.get(currency, '🏳️')
+                        rates_data.append({
+                            'Currency': f"{flag} {currency}",
+                            'Rate': f"{rate:.2f}",
+                            'Example': f"$100 = {simulator.format_currency_display(rate * 100, currency)}"
+                        })
+                
+                if rates_data:
+                    df_rates = pd.DataFrame(rates_data)
+                    st.dataframe(df_rates, use_container_width=True)
+                
+                # Currency conversion test
+                st.write("#### 🧪 Test Currency Conversion")
+                test_col1, test_col2 = st.columns(2)
+                
+                with test_col1:
+                    test_amount = st.number_input("Amount", value=100.0, min_value=0.01)
+                    test_currency = st.selectbox("From Currency", ['GHS', 'KES', 'NGN', 'ZAR', 'EGP'])
+                
+                with test_col2:
+                    if st.button("Convert to USD"):
+                        conversion_info = simulator.get_currency_conversion_info(test_amount, test_currency, 'USD')
+                        st.success(f"{simulator.format_currency_display(test_amount, test_currency)} = ${conversion_info['converted_amount']:.2f} USD")
+                        st.info(f"Rate: 1 USD = {conversion_info['rate']:.2f} {test_currency}")
+                        st.caption(f"Source: {conversion_info['rate_source']}")
+                
                 # Game settings display
                 settings = st.session_state.game_settings
                 
@@ -2872,7 +2981,7 @@ def main():
                     st.markdown(f"""
                     <div class="metric-card">
                         <h4>💸 Commission</h4>
-                        <p>${settings['commission']:.2f} per trade</p>
+                        <p>$0.00 per trade (Commission-Free!)</p>
                     </div>
                     """, unsafe_allow_html=True)
                 
