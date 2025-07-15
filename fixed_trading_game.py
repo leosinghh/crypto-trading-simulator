@@ -1026,17 +1026,31 @@ class TradingSimulator:
         # Get currency symbol
         currency = self.get_currency_symbol(symbol)
         
+        # Convert price to local currency for display
+        if currency != 'USD':
+            current_price_local = self.convert_from_usd(current_price, currency)
+            previous_price_local = self.convert_from_usd(previous_price, currency)
+            change_local = current_price_local - previous_price_local
+            change_percent = (change_local / previous_price_local) * 100 if previous_price_local > 0 else 0
+            day_high_local = self.convert_from_usd(current_point['high'], currency)
+            day_low_local = self.convert_from_usd(current_point['low'], currency)
+        else:
+            current_price_local = current_price
+            change_local = change
+            day_high_local = current_point['high']
+            day_low_local = current_point['low']
+        
         return {
             'symbol': symbol,
             'name': stock_name,
-            'price': float(current_price),
-            'change': float(change),
+            'price': float(current_price_local),
+            'change': float(change_local),
             'change_percent': float(change_percent),
             'volume': int(current_point['volume']),
             'market_cap': market_cap,
             'pe_ratio': random.uniform(8, 25),  # Mock P/E ratio
-            'day_high': float(current_point['high']),
-            'day_low': float(current_point['low']),
+            'day_high': float(day_high_local),
+            'day_low': float(day_low_local),
             'sector': f'African Markets - {market.title()}',
             'industry': f'{market.title()} Stock Exchange',
             'is_crypto': False,
@@ -2266,14 +2280,15 @@ def main():
                                 if asset_data.get('is_crypto') and asset_data['price'] < 1:
                                     price_display = f"{asset_data['currency']} {asset_data['price']:.6f}"
                                 else:
-                                    price_display = f"{asset_data['currency']} {asset_data['price']:.2f}"
+                                    price_display = simulator.format_currency_display(asset_data['price'], asset_data['currency'])
                                 st.metric("Current Price", price_display)
                             
                             with col_price2:
                                 change_color = "normal" if asset_data['change'] >= 0 else "inverse"
+                                change_display = simulator.format_currency_display(asset_data['change'], asset_data['currency'])
                                 st.metric(
                                     "24h Change", 
-                                    f"{asset_data['currency']} {asset_data['change']:+.2f}",
+                                    change_display,
                                     f"{asset_data['change_percent']:+.2f}%",
                                     delta_color=change_color
                                 )
@@ -2294,9 +2309,9 @@ def main():
                             # Additional metrics
                             col_info1, col_info2, col_info3 = st.columns(3)
                             with col_info1:
-                                st.metric("Day High", f"{asset_data['currency']} {asset_data['day_high']:.2f}")
+                                st.metric("Day High", simulator.format_currency_display(asset_data['day_high'], asset_data['currency']))
                             with col_info2:
-                                st.metric("Day Low", f"{asset_data['currency']} {asset_data['day_low']:.2f}")
+                                st.metric("Day Low", simulator.format_currency_display(asset_data['day_low'], asset_data['currency']))
                             with col_info3:
                                 if asset_data.get('pe_ratio') and not asset_data.get('is_crypto'):
                                     st.metric("P/E Ratio", f"{asset_data['pe_ratio']:.2f}")
@@ -2410,8 +2425,8 @@ def main():
                                 comparison_data.append({
                                     'Asset': f"{asset_type_icon} {display_name}",
                                     'Name': asset_data['name'][:30],
-                                    'Price': f"{asset_data['currency']} {asset_data['price']:.2f}",
-                                    'Change': f"{asset_data['change']:+.2f}",
+                                    'Price': simulator.format_currency_display(asset_data['price'], asset_data['currency']),
+                                    'Change': simulator.format_currency_display(asset_data['change'], asset_data['currency']),
                                     'Change %': f"{asset_data['change_percent']:+.2f}%",
                                     'Volume': f"{asset_data['volume']:,}",
                                     'Market Cap': f"{asset_data['currency']} {asset_data['market_cap']/1_000_000_000:.1f}B" if asset_data['market_cap'] > 1_000_000_000 else f"{asset_data['currency']} {asset_data['market_cap']/1_000_000:.1f}M" if asset_data['market_cap'] > 0 else "N/A"
@@ -2597,8 +2612,8 @@ def main():
                             st.markdown(f"""
                             <div class="metric-card">
                                 <h3>{asset_type_icon} {asset_data['name']} ({display_name})</h3>
-                                <p><strong>Current Price:</strong> {asset_data['currency']} {asset_data['price']:.2f}</p>
-                                <p><strong>24h Change:</strong> <span class="{'positive' if asset_data['change'] >= 0 else 'negative'}">{asset_data['change']:+.2f} ({asset_data['change_percent']:+.2f}%)</span></p>
+                                <p><strong>Current Price:</strong> {simulator.format_currency_display(asset_data['price'], asset_data['currency'])}</p>
+                                <p><strong>24h Change:</strong> <span class="{'positive' if asset_data['change'] >= 0 else 'negative'}">{simulator.format_currency_display(asset_data['change'], asset_data['currency'])} ({asset_data['change_percent']:+.2f}%)</span></p>
                             </div>
                             """, unsafe_allow_html=True)
                             
@@ -2629,12 +2644,19 @@ def main():
                                 commission = st.session_state.game_settings['commission']
                                 
                                 if trade_action == "BUY":
-                                    total_cost = asset_data['price'] * shares
-                                    st.write(f"**Total Cost:** ${total_cost:,.2f} (commission-free trading)")
+                                    # Convert USD cost to local currency for display
+                                    total_cost_usd = asset_data['price'] * shares
+                                    if asset_data['currency'] != 'USD':
+                                        total_cost_local = simulator.convert_from_usd(total_cost_usd, asset_data['currency'])
+                                        cost_display = simulator.format_currency_display(total_cost_local, asset_data['currency'])
+                                        st.write(f"**Total Cost:** {cost_display} (commission-free trading)")
+                                        st.caption(f"Equivalent to: ${total_cost_usd:,.2f} USD")
+                                    else:
+                                        st.write(f"**Total Cost:** ${total_cost_usd:,.2f} (commission-free trading)")
                                     
-                                    # Check if user has enough cash
-                                    if total_cost > current_user['cash']:
-                                        st.error(f"Insufficient funds! You need ${total_cost:,.2f} but only have ${current_user['cash']:,.2f}")
+                                    # Check if user has enough cash (in USD)
+                                    if total_cost_usd > current_user['cash']:
+                                        st.error(f"Insufficient funds! You need ${total_cost_usd:,.2f} USD but only have ${current_user['cash']:,.2f} USD")
                                         can_trade = False
                                     else:
                                         can_trade = True
@@ -2644,15 +2666,27 @@ def main():
                                     owned_position = next((p for p in portfolio if p['symbol'] == selected_asset), None)
                                     
                                     if owned_position and owned_position['shares'] >= shares:
-                                        total_proceeds = asset_data['price'] * shares
-                                        profit_loss = (asset_data['price'] - owned_position['avg_price']) * shares
+                                        total_proceeds_usd = asset_data['price'] * shares
+                                        profit_loss_usd = (asset_data['price'] - owned_position['avg_price']) * shares
                                         
                                         st.write(f"**Owned Shares:** {owned_position['shares']}")
-                                        st.write(f"**Average Price:** ${owned_position['avg_price']:.2f}")
-                                        st.write(f"**Total Proceeds:** ${total_proceeds:,.2f} (commission-free trading)")
                                         
-                                        profit_color = "positive" if profit_loss >= 0 else "negative"
-                                        st.markdown(f"**Estimated P&L:** <span class='{profit_color}'>${profit_loss:+,.2f}</span>", unsafe_allow_html=True)
+                                        # Display average price in local currency
+                                        if asset_data['currency'] != 'USD':
+                                            avg_price_local = simulator.convert_from_usd(owned_position['avg_price'], asset_data['currency'])
+                                            avg_price_display = simulator.format_currency_display(avg_price_local, asset_data['currency'])
+                                            st.write(f"**Average Price:** {avg_price_display}")
+                                            
+                                            total_proceeds_local = simulator.convert_from_usd(total_proceeds_usd, asset_data['currency'])
+                                            proceeds_display = simulator.format_currency_display(total_proceeds_local, asset_data['currency'])
+                                            st.write(f"**Total Proceeds:** {proceeds_display} (commission-free trading)")
+                                            st.caption(f"Equivalent to: ${total_proceeds_usd:,.2f} USD")
+                                        else:
+                                            st.write(f"**Average Price:** ${owned_position['avg_price']:.2f}")
+                                            st.write(f"**Total Proceeds:** ${total_proceeds_usd:,.2f} (commission-free trading)")
+                                        
+                                        profit_color = "positive" if profit_loss_usd >= 0 else "negative"
+                                        st.markdown(f"**Estimated P&L:** <span class='{profit_color}'>${profit_loss_usd:+,.2f} USD</span>", unsafe_allow_html=True)
                                         
                                         can_trade = True
                                     else:
@@ -2720,7 +2754,7 @@ def main():
                             st.markdown(f"""
                             <div class="metric-card">
                                 <p><strong>{icon} {display_name}</strong></p>
-                                <p>{data['currency']} {data['price']:.2f} <span class="{change_class}">({data['change_percent']:+.2f}%)</span></p>
+                                <p>{simulator.format_currency_display(data['price'], data['currency'])} <span class="{change_class}">({data['change_percent']:+.2f}%)</span></p>
                             </div>
                             """, unsafe_allow_html=True)
             
