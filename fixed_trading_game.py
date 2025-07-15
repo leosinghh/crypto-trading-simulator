@@ -2809,16 +2809,46 @@ def main():
                             else:
                                 icon = "📈"
                             
-                            holdings_data.append({
-                                'Asset': f"{icon} {position['symbol']}",
-                                'Company': position['name'][:25],
-                                'Shares': position['shares'],
-                                'Avg Price': f"${position['avg_price']:.2f}",
-                                'Current Price': f"${current_data['price']:.2f}",
-                                'Market Value': f"${current_value:,.2f}",
-                                'Unrealized P&L': f"${unrealized_pl:+,.2f}",
-                                'P&L %': f"{unrealized_pl_percent:+.2f}%"
-                            })
+                            # For African stocks, convert USD stored prices back to local currency for display
+                            if current_data.get('is_african') and current_data['currency'] != 'USD':
+                                # Convert average price from USD to local currency
+                                avg_price_local = simulator.convert_from_usd(position['avg_price'], current_data['currency'])
+                                avg_price_display = simulator.format_currency_display(avg_price_local, current_data['currency'])
+                                
+                                # Current price is already in local currency
+                                current_price_display = simulator.format_currency_display(current_data['price'], current_data['currency'])
+                                
+                                # Convert market value to local currency
+                                current_value_usd = simulator.convert_to_usd(current_data['price'], current_data['currency']) * position['shares']
+                                current_value_local = current_data['price'] * position['shares']
+                                market_value_display = simulator.format_currency_display(current_value_local, current_data['currency'])
+                                
+                                # Calculate P&L in USD for accuracy
+                                unrealized_pl_usd = current_value_usd - (position['avg_price'] * position['shares'])
+                                unrealized_pl_percent_usd = (unrealized_pl_usd / (position['avg_price'] * position['shares'])) * 100 if position['avg_price'] > 0 else 0
+                                
+                                holdings_data.append({
+                                    'Asset': f"{icon} {position['symbol']}",
+                                    'Company': position['name'][:25],
+                                    'Shares': position['shares'],
+                                    'Avg Price': avg_price_display,
+                                    'Current Price': current_price_display,
+                                    'Market Value': market_value_display,
+                                    'Unrealized P&L': f"${unrealized_pl_usd:+,.2f} USD",
+                                    'P&L %': f"{unrealized_pl_percent_usd:+.2f}%"
+                                })
+                            else:
+                                # For USD assets (US stocks, crypto)
+                                holdings_data.append({
+                                    'Asset': f"{icon} {position['symbol']}",
+                                    'Company': position['name'][:25],
+                                    'Shares': position['shares'],
+                                    'Avg Price': f"${position['avg_price']:.2f}",
+                                    'Current Price': f"${current_data['price']:.2f}",
+                                    'Market Value': f"${current_value:,.2f}",
+                                    'Unrealized P&L': f"${unrealized_pl:+,.2f}",
+                                    'P&L %': f"{unrealized_pl_percent:+.2f}%"
+                                })
                     
                     if holdings_data:
                         df_holdings = pd.DataFrame(holdings_data)
@@ -2864,10 +2894,30 @@ def main():
                         # Asset type icon
                         if trade['symbol'].endswith('-USD'):
                             icon = "🪙"
+                            is_african = False
+                            currency = 'USD'
                         elif simulator.is_african_stock(trade['symbol']):
                             icon = "🌍"
+                            is_african = True
+                            currency = simulator.get_currency_symbol(trade['symbol'])
                         else:
                             icon = "📈"
+                            is_african = False
+                            currency = 'USD'
+                        
+                        # For African stocks, convert USD stored prices back to local currency for display
+                        if is_african and currency != 'USD':
+                            # Convert trade price from USD to local currency for display
+                            trade_price_local = simulator.convert_from_usd(trade['price'], currency)
+                            price_display = simulator.format_currency_display(trade_price_local, currency)
+                            
+                            # Convert total cost from USD to local currency for display
+                            total_cost_local = simulator.convert_from_usd(trade['total_cost'], currency)
+                            total_display = simulator.format_currency_display(total_cost_local, currency)
+                        else:
+                            # For USD assets
+                            price_display = f"${trade['price']:.2f}"
+                            total_display = f"${trade['total_cost']:,.2f}"
                         
                         trades_data.append({
                             'Date': trade['timestamp'].strftime('%Y-%m-%d %H:%M'),
@@ -2875,10 +2925,10 @@ def main():
                             'Asset': f"{icon} {trade['symbol']}",
                             'Company': trade['name'][:20],
                             'Shares': trade['shares'],
-                            'Price': f"${trade['price']:.2f}",
-                            'Total': f"${trade['total_cost']:,.2f}",
+                            'Price': price_display,
+                            'Total': total_display,
                             'Commission': "$0.00",
-                            'P&L': f"${trade['profit_loss']:+,.2f}" if trade['profit_loss'] != 0 else "-"
+                            'P&L': f"${trade['profit_loss']:+,.2f} USD" if trade['profit_loss'] != 0 else "-"
                         })
                     
                     if trades_data:
