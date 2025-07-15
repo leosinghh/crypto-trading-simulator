@@ -533,7 +533,7 @@ class TradingSimulator:
         self.db = TradingGameDatabase()
         self.initialize_session_state()
         self.available_stocks = self.get_available_stocks()
-        self.initialize_ghana_mock_data()
+        self.initialize_all_mock_data()
         
     def initialize_session_state(self):
         """Initialize session state for the trading game"""
@@ -547,13 +547,25 @@ class TradingSimulator:
             st.session_state.market_data_cache = {}
         if 'last_update' not in st.session_state:
             st.session_state.last_update = datetime.now()
+        
+        # Initialize mock data for all markets
         if 'ghana_mock_data' not in st.session_state:
             st.session_state.ghana_mock_data = {}
         if 'ghana_last_update' not in st.session_state:
             st.session_state.ghana_last_update = datetime.now()
+        
+        if 'kenya_mock_data' not in st.session_state:
+            st.session_state.kenya_mock_data = {}
+        if 'kenya_last_update' not in st.session_state:
+            st.session_state.kenya_last_update = datetime.now()
+        
+        if 'nigeria_mock_data' not in st.session_state:
+            st.session_state.nigeria_mock_data = {}
+        if 'nigeria_last_update' not in st.session_state:
+            st.session_state.nigeria_last_update = datetime.now()
     
-    def initialize_ghana_mock_data(self):
-        """Initialize mock data for Ghana Stock Exchange"""
+    def initialize_all_mock_data(self):
+        """Initialize mock data for all African Stock Exchanges"""
         ghana_stocks = {
             'GOIL.AC': {'base_price': 2.15, 'volatility': 0.02, 'trend': 0.001},
             'ECOBANK.AC': {'base_price': 5.80, 'volatility': 0.025, 'trend': 0.0005},
