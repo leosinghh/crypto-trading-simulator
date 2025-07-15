@@ -743,102 +743,106 @@ class TradingSimulator:
     
     def initialize_all_mock_data(self):
         """Initialize mock data for all African Stock Exchanges"""
+        # Update exchange rates first
+        self.update_exchange_rates()
+        
+        # Base prices in local currencies (realistic values)
         ghana_stocks = {
-            'GOIL.AC': {'base_price': 2.15, 'volatility': 0.02, 'trend': 0.001},
-            'ECOBANK.AC': {'base_price': 5.80, 'volatility': 0.025, 'trend': 0.0005},
-            'CAL.AC': {'base_price': 0.85, 'volatility': 0.03, 'trend': -0.001},
-            'MTNGH.AC': {'base_price': 1.20, 'volatility': 0.02, 'trend': 0.002},
-            'GWEB.AC': {'base_price': 0.45, 'volatility': 0.04, 'trend': 0.001},
-            'SOGEGH.AC': {'base_price': 1.85, 'volatility': 0.02, 'trend': 0.0005},
-            'AYRTN.AC': {'base_price': 0.75, 'volatility': 0.03, 'trend': -0.0005},
-            'UNIL.AC': {'base_price': 18.50, 'volatility': 0.015, 'trend': 0.001},
-            'CMLT.AC': {'base_price': 0.95, 'volatility': 0.035, 'trend': 0.002},
-            'RBGH.AC': {'base_price': 0.65, 'volatility': 0.025, 'trend': 0.0005},
-            'BOPP.AC': {'base_price': 2.40, 'volatility': 0.03, 'trend': 0.001},
-            'TOTAL.AC': {'base_price': 3.80, 'volatility': 0.02, 'trend': 0.0005},
-            'GGBL.AC': {'base_price': 1.75, 'volatility': 0.025, 'trend': 0.001},
-            'SCBGH.AC': {'base_price': 15.20, 'volatility': 0.02, 'trend': 0.0005},
-            'DIGP.AC': {'base_price': 0.25, 'volatility': 0.05, 'trend': -0.001},
-            'CLYD.AC': {'base_price': 0.35, 'volatility': 0.04, 'trend': 0.002},
-            'AADS.AC': {'base_price': 0.55, 'volatility': 0.035, 'trend': 0.001},
-            'CAPL.AC': {'base_price': 0.45, 'volatility': 0.03, 'trend': 0.0005},
-            'NICO.AC': {'base_price': 0.95, 'volatility': 0.025, 'trend': 0.001},
-            'HORDS.AC': {'base_price': 0.15, 'volatility': 0.06, 'trend': 0.003},
-            'TRANSOL.AC': {'base_price': 0.25, 'volatility': 0.05, 'trend': 0.002},
-            'PRODUCE.AC': {'base_price': 0.35, 'volatility': 0.04, 'trend': 0.001},
-            'PIONEER.AC': {'base_price': 0.85, 'volatility': 0.03, 'trend': 0.0015}
+            'GOIL.AC': {'base_price': 25.50, 'volatility': 0.02, 'trend': 0.001},
+            'ECOBANK.AC': {'base_price': 74.25, 'volatility': 0.025, 'trend': 0.0005},
+            'CAL.AC': {'base_price': 10.88, 'volatility': 0.03, 'trend': -0.001},
+            'MTNGH.AC': {'base_price': 15.36, 'volatility': 0.02, 'trend': 0.002},
+            'GWEB.AC': {'base_price': 5.76, 'volatility': 0.04, 'trend': 0.001},
+            'SOGEGH.AC': {'base_price': 23.68, 'volatility': 0.02, 'trend': 0.0005},
+            'AYRTN.AC': {'base_price': 9.60, 'volatility': 0.03, 'trend': -0.0005},
+            'UNIL.AC': {'base_price': 236.80, 'volatility': 0.015, 'trend': 0.001},
+            'CMLT.AC': {'base_price': 12.16, 'volatility': 0.035, 'trend': 0.002},
+            'RBGH.AC': {'base_price': 8.32, 'volatility': 0.025, 'trend': 0.0005},
+            'BOPP.AC': {'base_price': 30.72, 'volatility': 0.03, 'trend': 0.001},
+            'TOTAL.AC': {'base_price': 48.64, 'volatility': 0.02, 'trend': 0.0005},
+            'GGBL.AC': {'base_price': 22.40, 'volatility': 0.025, 'trend': 0.001},
+            'SCBGH.AC': {'base_price': 194.56, 'volatility': 0.02, 'trend': 0.0005},
+            'DIGP.AC': {'base_price': 3.20, 'volatility': 0.05, 'trend': -0.001},
+            'CLYD.AC': {'base_price': 4.48, 'volatility': 0.04, 'trend': 0.002},
+            'AADS.AC': {'base_price': 7.04, 'volatility': 0.035, 'trend': 0.001},
+            'CAPL.AC': {'base_price': 5.76, 'volatility': 0.03, 'trend': 0.0005},
+            'NICO.AC': {'base_price': 12.16, 'volatility': 0.025, 'trend': 0.001},
+            'HORDS.AC': {'base_price': 1.92, 'volatility': 0.06, 'trend': 0.003},
+            'TRANSOL.AC': {'base_price': 3.20, 'volatility': 0.05, 'trend': 0.002},
+            'PRODUCE.AC': {'base_price': 4.48, 'volatility': 0.04, 'trend': 0.001},
+            'PIONEER.AC': {'base_price': 10.88, 'volatility': 0.03, 'trend': 0.0015}
         }
         
-        # Initialize Kenya stocks data
+        # Initialize Kenya stocks data (in KES)
         kenya_stocks = {
-            'KCB.NR': {'base_price': 45.50, 'volatility': 0.025, 'trend': 0.001},
-            'EQTY.NR': {'base_price': 52.75, 'volatility': 0.03, 'trend': 0.002},
-            'SCBK.NR': {'base_price': 162.00, 'volatility': 0.02, 'trend': 0.0005},
-            'ABSA.NR': {'base_price': 12.85, 'volatility': 0.025, 'trend': 0.001},
-            'DTBK.NR': {'base_price': 82.50, 'volatility': 0.03, 'trend': 0.0015},
-            'BAT.NR': {'base_price': 485.00, 'volatility': 0.02, 'trend': 0.001},
-            'EABL.NR': {'base_price': 195.00, 'volatility': 0.025, 'trend': 0.0005},
-            'SAFCOM.NR': {'base_price': 28.50, 'volatility': 0.02, 'trend': 0.002},
-            'BRITAM.NR': {'base_price': 6.45, 'volatility': 0.035, 'trend': 0.001},
-            'JUBILEE.NR': {'base_price': 245.00, 'volatility': 0.03, 'trend': 0.0015},
-            'LIBERTY.NR': {'base_price': 8.75, 'volatility': 0.04, 'trend': 0.002},
-            'COOP.NR': {'base_price': 14.20, 'volatility': 0.025, 'trend': 0.001},
-            'UNGA.NR': {'base_price': 38.50, 'volatility': 0.035, 'trend': 0.0005},
-            'KAKUZI.NR': {'base_price': 425.00, 'volatility': 0.04, 'trend': 0.002},
-            'SASINI.NR': {'base_price': 12.50, 'volatility': 0.05, 'trend': 0.001},
-            'KAPCHORUA.NR': {'base_price': 145.00, 'volatility': 0.045, 'trend': 0.0015},
-            'WILLIAMSON.NR': {'base_price': 42.50, 'volatility': 0.04, 'trend': 0.001},
-            'BAMBURI.NR': {'base_price': 58.00, 'volatility': 0.03, 'trend': 0.0005},
-            'CROWN.NR': {'base_price': 24.75, 'volatility': 0.035, 'trend': 0.001},
-            'KENGEN.NR': {'base_price': 2.84, 'volatility': 0.025, 'trend': 0.0005},
-            'KPLC.NR': {'base_price': 1.85, 'volatility': 0.04, 'trend': -0.001},
-            'KEGN.NR': {'base_price': 2.95, 'volatility': 0.03, 'trend': 0.001},
-            'KENOL.NR': {'base_price': 22.50, 'volatility': 0.03, 'trend': 0.0015},
-            'TPS.NR': {'base_price': 1.25, 'volatility': 0.05, 'trend': 0.002},
-            'UMEME.NR': {'base_price': 45.00, 'volatility': 0.025, 'trend': 0.001},
-            'TOTAL.NR': {'base_price': 18.50, 'volatility': 0.02, 'trend': 0.0005},
-            'CARBACID.NR': {'base_price': 7.85, 'volatility': 0.035, 'trend': 0.001},
-            'BOC.NR': {'base_price': 42.00, 'volatility': 0.03, 'trend': 0.0015},
-            'OLYMPIA.NR': {'base_price': 5.25, 'volatility': 0.04, 'trend': 0.002},
-            'CENTUM.NR': {'base_price': 18.75, 'volatility': 0.035, 'trend': 0.001}
+            'KCB.NR': {'base_price': 7189.00, 'volatility': 0.025, 'trend': 0.001},
+            'EQTY.NR': {'base_price': 8334.50, 'volatility': 0.03, 'trend': 0.002},
+            'SCBK.NR': {'base_price': 25596.00, 'volatility': 0.02, 'trend': 0.0005},
+            'ABSA.NR': {'base_price': 2030.30, 'volatility': 0.025, 'trend': 0.001},
+            'DTBK.NR': {'base_price': 13035.00, 'volatility': 0.03, 'trend': 0.0015},
+            'BAT.NR': {'base_price': 76630.00, 'volatility': 0.02, 'trend': 0.001},
+            'EABL.NR': {'base_price': 30810.00, 'volatility': 0.025, 'trend': 0.0005},
+            'SAFCOM.NR': {'base_price': 4503.00, 'volatility': 0.02, 'trend': 0.002},
+            'BRITAM.NR': {'base_price': 1019.10, 'volatility': 0.035, 'trend': 0.001},
+            'JUBILEE.NR': {'base_price': 38710.00, 'volatility': 0.03, 'trend': 0.0015},
+            'LIBERTY.NR': {'base_price': 1382.50, 'volatility': 0.04, 'trend': 0.002},
+            'COOP.NR': {'base_price': 2243.60, 'volatility': 0.025, 'trend': 0.001},
+            'UNGA.NR': {'base_price': 6083.00, 'volatility': 0.035, 'trend': 0.0005},
+            'KAKUZI.NR': {'base_price': 67150.00, 'volatility': 0.04, 'trend': 0.002},
+            'SASINI.NR': {'base_price': 1975.00, 'volatility': 0.05, 'trend': 0.001},
+            'KAPCHORUA.NR': {'base_price': 22910.00, 'volatility': 0.045, 'trend': 0.0015},
+            'WILLIAMSON.NR': {'base_price': 6715.00, 'volatility': 0.04, 'trend': 0.001},
+            'BAMBURI.NR': {'base_price': 9164.00, 'volatility': 0.03, 'trend': 0.0005},
+            'CROWN.NR': {'base_price': 3910.50, 'volatility': 0.035, 'trend': 0.001},
+            'KENGEN.NR': {'base_price': 448.72, 'volatility': 0.025, 'trend': 0.0005},
+            'KPLC.NR': {'base_price': 292.30, 'volatility': 0.04, 'trend': -0.001},
+            'KEGN.NR': {'base_price': 466.10, 'volatility': 0.03, 'trend': 0.001},
+            'KENOL.NR': {'base_price': 3555.00, 'volatility': 0.03, 'trend': 0.0015},
+            'TPS.NR': {'base_price': 197.50, 'volatility': 0.05, 'trend': 0.002},
+            'UMEME.NR': {'base_price': 7110.00, 'volatility': 0.025, 'trend': 0.001},
+            'TOTAL.NR': {'base_price': 2923.00, 'volatility': 0.02, 'trend': 0.0005},
+            'CARBACID.NR': {'base_price': 1240.30, 'volatility': 0.035, 'trend': 0.001},
+            'BOC.NR': {'base_price': 6636.00, 'volatility': 0.03, 'trend': 0.0015},
+            'OLYMPIA.NR': {'base_price': 829.50, 'volatility': 0.04, 'trend': 0.002},
+            'CENTUM.NR': {'base_price': 2962.50, 'volatility': 0.035, 'trend': 0.001}
         }
         
-        # Initialize Nigeria stocks data
+        # Initialize Nigeria stocks data (in NGN)
         nigeria_stocks = {
-            'GTCO.LG': {'base_price': 28.50, 'volatility': 0.025, 'trend': 0.001},
-            'ZENITHBANK.LG': {'base_price': 24.75, 'volatility': 0.03, 'trend': 0.0015},
-            'UBA.LG': {'base_price': 15.85, 'volatility': 0.025, 'trend': 0.001},
-            'ACCESS.LG': {'base_price': 12.45, 'volatility': 0.03, 'trend': 0.002},
-            'FBNH.LG': {'base_price': 18.20, 'volatility': 0.035, 'trend': 0.0005},
-            'FIDELITYBK.LG': {'base_price': 8.75, 'volatility': 0.03, 'trend': 0.001},
-            'STERLINGNG.LG': {'base_price': 2.45, 'volatility': 0.04, 'trend': 0.0015},
-            'WEMA.LG': {'base_price': 5.25, 'volatility': 0.035, 'trend': 0.001},
-            'UNITY.LG': {'base_price': 1.85, 'volatility': 0.05, 'trend': 0.002},
-            'STANBIC.LG': {'base_price': 42.50, 'volatility': 0.025, 'trend': 0.0005},
-            'DANGCEM.LG': {'base_price': 285.00, 'volatility': 0.02, 'trend': 0.001},
-            'BUA.LG': {'base_price': 95.50, 'volatility': 0.025, 'trend': 0.0015},
-            'MTNN.LG': {'base_price': 185.00, 'volatility': 0.02, 'trend': 0.001},
-            'AIRTELAFRI.LG': {'base_price': 1850.00, 'volatility': 0.025, 'trend': 0.002},
-            'SEPLAT.LG': {'base_price': 1250.00, 'volatility': 0.03, 'trend': 0.0005},
-            'OANDO.LG': {'base_price': 8.45, 'volatility': 0.04, 'trend': 0.001},
-            'TOTAL.LG': {'base_price': 485.00, 'volatility': 0.02, 'trend': 0.0005},
-            'CONOIL.LG': {'base_price': 35.50, 'volatility': 0.03, 'trend': 0.001},
-            'GUINNESS.LG': {'base_price': 48.75, 'volatility': 0.025, 'trend': 0.0015},
-            'NB.LG': {'base_price': 65.00, 'volatility': 0.025, 'trend': 0.001},
-            'INTBREW.LG': {'base_price': 5.85, 'volatility': 0.035, 'trend': 0.002},
-            'NESTLE.LG': {'base_price': 1485.00, 'volatility': 0.015, 'trend': 0.001},
-            'UNILEVER.LG': {'base_price': 16.25, 'volatility': 0.025, 'trend': 0.0005},
-            'DANGSUGAR.LG': {'base_price': 18.50, 'volatility': 0.03, 'trend': 0.001},
-            'FLOURMILL.LG': {'base_price': 32.75, 'volatility': 0.025, 'trend': 0.0015},
-            'HONEYFLOUR.LG': {'base_price': 4.25, 'volatility': 0.04, 'trend': 0.002},
-            'CADBURY.LG': {'base_price': 12.85, 'volatility': 0.03, 'trend': 0.001},
-            'VITAFOAM.LG': {'base_price': 15.50, 'volatility': 0.035, 'trend': 0.0005},
-            'JBERGER.LG': {'base_price': 38.25, 'volatility': 0.025, 'trend': 0.001},
-            'LIVESTOCK.LG': {'base_price': 2.45, 'volatility': 0.05, 'trend': 0.002},
-            'CHIPLC.LG': {'base_price': 0.85, 'volatility': 0.06, 'trend': 0.003},
-            'ELLAHLAKES.LG': {'base_price': 4.75, 'volatility': 0.045, 'trend': 0.0015},
-            'NAHCO.LG': {'base_price': 8.50, 'volatility': 0.04, 'trend': 0.001},
-            'RTBRISCOE.LG': {'base_price': 0.55, 'volatility': 0.055, 'trend': 0.002}
+            'GTCO.LG': {'base_price': 45600.00, 'volatility': 0.025, 'trend': 0.001},
+            'ZENITHBANK.LG': {'base_price': 39600.00, 'volatility': 0.03, 'trend': 0.0015},
+            'UBA.LG': {'base_price': 25360.00, 'volatility': 0.025, 'trend': 0.001},
+            'ACCESS.LG': {'base_price': 19920.00, 'volatility': 0.03, 'trend': 0.002},
+            'FBNH.LG': {'base_price': 29120.00, 'volatility': 0.035, 'trend': 0.0005},
+            'FIDELITYBK.LG': {'base_price': 14000.00, 'volatility': 0.03, 'trend': 0.001},
+            'STERLINGNG.LG': {'base_price': 3920.00, 'volatility': 0.04, 'trend': 0.0015},
+            'WEMA.LG': {'base_price': 8400.00, 'volatility': 0.035, 'trend': 0.001},
+            'UNITY.LG': {'base_price': 2960.00, 'volatility': 0.05, 'trend': 0.002},
+            'STANBIC.LG': {'base_price': 68000.00, 'volatility': 0.025, 'trend': 0.0005},
+            'DANGCEM.LG': {'base_price': 456000.00, 'volatility': 0.02, 'trend': 0.001},
+            'BUA.LG': {'base_price': 152800.00, 'volatility': 0.025, 'trend': 0.0015},
+            'MTNN.LG': {'base_price': 296000.00, 'volatility': 0.02, 'trend': 0.001},
+            'AIRTELAFRI.LG': {'base_price': 2960000.00, 'volatility': 0.025, 'trend': 0.002},
+            'SEPLAT.LG': {'base_price': 2000000.00, 'volatility': 0.03, 'trend': 0.0005},
+            'OANDO.LG': {'base_price': 13520.00, 'volatility': 0.04, 'trend': 0.001},
+            'TOTAL.LG': {'base_price': 776000.00, 'volatility': 0.02, 'trend': 0.0005},
+            'CONOIL.LG': {'base_price': 56800.00, 'volatility': 0.03, 'trend': 0.001},
+            'GUINNESS.LG': {'base_price': 78000.00, 'volatility': 0.025, 'trend': 0.0015},
+            'NB.LG': {'base_price': 104000.00, 'volatility': 0.025, 'trend': 0.001},
+            'INTBREW.LG': {'base_price': 9360.00, 'volatility': 0.035, 'trend': 0.002},
+            'NESTLE.LG': {'base_price': 2376000.00, 'volatility': 0.015, 'trend': 0.001},
+            'UNILEVER.LG': {'base_price': 26000.00, 'volatility': 0.025, 'trend': 0.0005},
+            'DANGSUGAR.LG': {'base_price': 29600.00, 'volatility': 0.03, 'trend': 0.001},
+            'FLOURMILL.LG': {'base_price': 52400.00, 'volatility': 0.025, 'trend': 0.0015},
+            'HONEYFLOUR.LG': {'base_price': 6800.00, 'volatility': 0.04, 'trend': 0.002},
+            'CADBURY.LG': {'base_price': 20560.00, 'volatility': 0.03, 'trend': 0.001},
+            'VITAFOAM.LG': {'base_price': 24800.00, 'volatility': 0.035, 'trend': 0.0005},
+            'JBERGER.LG': {'base_price': 61200.00, 'volatility': 0.025, 'trend': 0.001},
+            'LIVESTOCK.LG': {'base_price': 3920.00, 'volatility': 0.05, 'trend': 0.002},
+            'CHIPLC.LG': {'base_price': 1360.00, 'volatility': 0.06, 'trend': 0.003},
+            'ELLAHLAKES.LG': {'base_price': 7600.00, 'volatility': 0.045, 'trend': 0.0015},
+            'NAHCO.LG': {'base_price': 13600.00, 'volatility': 0.04, 'trend': 0.001},
+            'RTBRISCOE.LG': {'base_price': 880.00, 'volatility': 0.055, 'trend': 0.002}
         }
         
         self.initialize_mock_data_for_market('ghana', ghana_stocks)
@@ -1026,31 +1030,17 @@ class TradingSimulator:
         # Get currency symbol
         currency = self.get_currency_symbol(symbol)
         
-        # Convert price to local currency for display
-        if currency != 'USD':
-            current_price_local = self.convert_from_usd(current_price, currency)
-            previous_price_local = self.convert_from_usd(previous_price, currency)
-            change_local = current_price_local - previous_price_local
-            change_percent = (change_local / previous_price_local) * 100 if previous_price_local > 0 else 0
-            day_high_local = self.convert_from_usd(current_point['high'], currency)
-            day_low_local = self.convert_from_usd(current_point['low'], currency)
-        else:
-            current_price_local = current_price
-            change_local = change
-            day_high_local = current_point['high']
-            day_low_local = current_point['low']
-        
         return {
             'symbol': symbol,
             'name': stock_name,
-            'price': float(current_price_local),
-            'change': float(change_local),
+            'price': float(current_price),
+            'change': float(change),
             'change_percent': float(change_percent),
             'volume': int(current_point['volume']),
             'market_cap': market_cap,
             'pe_ratio': random.uniform(8, 25),  # Mock P/E ratio
-            'day_high': float(day_high_local),
-            'day_low': float(day_low_local),
+            'day_high': float(current_point['high']),
+            'day_low': float(current_point['low']),
             'sector': f'African Markets - {market.title()}',
             'industry': f'{market.title()} Stock Exchange',
             'is_crypto': False,
