@@ -61,7 +61,7 @@ class TradingGameDatabase:
             )
         ''')
         
-        # Create trades table
+        # Create trades table - UPDATED to store original currency and local price
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS trades (
                 id TEXT PRIMARY KEY,
@@ -75,9 +75,22 @@ class TradingGameDatabase:
                 profit_loss REAL DEFAULT 0.0,
                 stock_name TEXT,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                original_currency TEXT DEFAULT 'USD',
+                original_price REAL,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
         ''')
+        
+        # Add new columns to existing trades table if they don't exist
+        try:
+            cursor.execute('ALTER TABLE trades ADD COLUMN original_currency TEXT DEFAULT "USD"')
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        
+        try:
+            cursor.execute('ALTER TABLE trades ADD COLUMN original_price REAL')
+        except sqlite3.OperationalError:
+            pass  # Column already exists
         
         # Create game_settings table
         cursor.execute('''
@@ -241,7 +254,7 @@ class TradingGameDatabase:
             
             cursor.execute('''
                 SELECT id, trade_type, symbol, shares, price, total_cost, commission, 
-                       profit_loss, stock_name, timestamp
+                       profit_loss, stock_name, timestamp, original_currency, original_price
                 FROM trades 
                 WHERE user_id = ? 
                 ORDER BY timestamp DESC
@@ -254,12 +267,14 @@ class TradingGameDatabase:
                     'type': row[1],
                     'symbol': row[2],
                     'shares': row[3],
-                    'price': row[4],
-                    'total_cost': row[5],
+                    'price': row[4],  # USD price (stored)
+                    'total_cost': row[5],  # USD total cost (stored)
                     'commission': row[6],
                     'profit_loss': row[7],
                     'name': row[8] or row[2],
-                    'timestamp': datetime.strptime(row[9], '%Y-%m-%d %H:%M:%S')
+                    'timestamp': datetime.strptime(row[9], '%Y-%m-%d %H:%M:%S'),
+                    'original_currency': row[10] or 'USD',
+                    'original_price': row[11] or row[4]  # Fallback to USD price if no original price
                 })
             
             conn.close()
@@ -268,7 +283,7 @@ class TradingGameDatabase:
             st.error(f"Error getting trades: {str(e)}")
             return []
     
-    def execute_trade(self, user_id: str, symbol: str, action: str, shares: int, price: float, stock_name: str, currency: str = 'USD') -> Dict:
+    def execute_trade(self, user_id: str, symbol: str, action: str, shares: int, price: float, stock_name: str, currency: str = 'USD', original_price: float = None) -> Dict:
         """Execute a trade and update database with currency conversion"""
         try:
             conn = sqlite3.connect(self.db_path)
@@ -283,7 +298,6 @@ class TradingGameDatabase:
             current_cash = cursor.fetchone()[0]
             
             # Convert price to USD for internal calculations
-            # Simple conversion based on exchange rates
             exchange_rates = {
                 'USD': 1.0,
                 'GHS': 12.50,
@@ -295,6 +309,10 @@ class TradingGameDatabase:
             
             rate = exchange_rates.get(currency, 1.0)
             price_usd = price / rate
+            
+            # Store the original price in local currency for display purposes
+            if original_price is None:
+                original_price = price
             
             total_cost_usd = price_usd * shares
             
@@ -328,12 +346,12 @@ class TradingGameDatabase:
                         VALUES (?, ?, ?, ?, ?)
                     ''', (user_id, symbol, shares, price_usd, stock_name))
                 
-                # Record trade (store in USD)
+                # Record trade (store in USD but also save original price and currency)
                 trade_id = str(uuid.uuid4())[:8]
                 cursor.execute('''
-                    INSERT INTO trades (id, user_id, trade_type, symbol, shares, price, total_cost, commission, stock_name)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_cost_usd, 0.00, stock_name))
+                    INSERT INTO trades (id, user_id, trade_type, symbol, shares, price, total_cost, commission, stock_name, original_currency, original_price)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_cost_usd, 0.00, stock_name, currency, original_price))
                 
                 profit_loss = 0
                 
@@ -369,12 +387,12 @@ class TradingGameDatabase:
                         DELETE FROM portfolio WHERE user_id = ? AND symbol = ?
                     ''', (user_id, symbol))
                 
-                # Record trade (in USD)
+                # Record trade (in USD but also save original price and currency)
                 trade_id = str(uuid.uuid4())[:8]
                 cursor.execute('''
-                    INSERT INTO trades (id, user_id, trade_type, symbol, shares, price, total_cost, commission, profit_loss, stock_name)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_proceeds_usd, 0.00, profit_loss, stock_name))
+                    INSERT INTO trades (id, user_id, trade_type, symbol, shares, price, total_cost, commission, profit_loss, stock_name, original_currency, original_price)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (trade_id, user_id, action, symbol, shares, price_usd, total_proceeds_usd, 0.00, profit_loss, stock_name, currency, original_price))
                 
                 # Update user statistics
                 cursor.execute('''
@@ -2700,10 +2718,12 @@ def main():
                                             selected_asset,
                                             trade_action,
                                             shares,
-                                            # Convert local currency price to USD for storage
+                                            # Pass the USD price for internal storage
                                             simulator.convert_to_usd(asset_data['price'], asset_data['currency']) if asset_data['currency'] != 'USD' else asset_data['price'],
                                             asset_data['name'],
-                                            asset_data['currency']
+                                            asset_data['currency'],
+                                            # Pass the original local currency price for display purposes
+                                            asset_data['price']
                                         )
                                         
                                         if result['success']:
@@ -2818,14 +2838,18 @@ def main():
                                 # Current price is already in local currency
                                 current_price_display = simulator.format_currency_display(current_data['price'], current_data['currency'])
                                 
-                                # Convert market value to local currency
+                                # Calculate market value: current USD value for accurate P&L, local currency for display
                                 current_value_usd = simulator.convert_to_usd(current_data['price'], current_data['currency']) * position['shares']
                                 current_value_local = current_data['price'] * position['shares']
-                                market_value_display = simulator.format_currency_display(current_value_local, current_data['currency'])
+                                market_value_display = f"{simulator.format_currency_display(current_value_local, current_data['currency'])} (${current_value_usd:,.2f})"
                                 
                                 # Calculate P&L in USD for accuracy
                                 unrealized_pl_usd = current_value_usd - (position['avg_price'] * position['shares'])
                                 unrealized_pl_percent_usd = (unrealized_pl_usd / (position['avg_price'] * position['shares'])) * 100 if position['avg_price'] > 0 else 0
+                                
+                                # Calculate P&L in local currency for display
+                                invested_value_local = avg_price_local * position['shares']
+                                unrealized_pl_local = current_value_local - invested_value_local
                                 
                                 holdings_data.append({
                                     'Asset': f"{icon} {position['symbol']}",
@@ -2834,7 +2858,7 @@ def main():
                                     'Avg Price': avg_price_display,
                                     'Current Price': current_price_display,
                                     'Market Value': market_value_display,
-                                    'Unrealized P&L': f"${unrealized_pl_usd:+,.2f} USD",
+                                    'Unrealized P&L': f"{simulator.format_currency_display(unrealized_pl_local, current_data['currency'])} (${unrealized_pl_usd:+,.2f})",
                                     'P&L %': f"{unrealized_pl_percent_usd:+.2f}%"
                                 })
                             else:
@@ -2905,13 +2929,16 @@ def main():
                             is_african = False
                             currency = 'USD'
                         
-                        # For African stocks, convert USD stored prices back to local currency for display
-                        if is_african and currency != 'USD':
-                            # Convert trade price from USD to local currency for display
+                        # FIXED: Use the original_price if available, otherwise convert from USD stored price
+                        if trade.get('original_price') and trade['original_currency'] != 'USD':
+                            # Use the original local currency price that was stored
+                            price_display = simulator.format_currency_display(trade['original_price'], trade['original_currency'])
+                            total_display = simulator.format_currency_display(trade['original_price'] * trade['shares'], trade['original_currency'])
+                        elif is_african and currency != 'USD':
+                            # Convert USD stored prices back to local currency for display
                             trade_price_local = simulator.convert_from_usd(trade['price'], currency)
                             price_display = simulator.format_currency_display(trade_price_local, currency)
                             
-                            # Convert total cost from USD to local currency for display
                             total_cost_local = simulator.convert_from_usd(trade['total_cost'], currency)
                             total_display = simulator.format_currency_display(total_cost_local, currency)
                         else:
