@@ -2634,19 +2634,20 @@ def main():
                                 commission = st.session_state.game_settings['commission']
                                 
                                 if trade_action == "BUY":
-                                    # Convert USD cost to local currency for display
-                                    total_cost_usd = asset_data['price'] * shares
+                                    # For African stocks, convert local currency price to USD for actual cost
                                     if asset_data['currency'] != 'USD':
-                                        total_cost_local = simulator.convert_from_usd(total_cost_usd, asset_data['currency'])
+                                        actual_cost_usd = simulator.convert_to_usd(asset_data['price'], asset_data['currency']) * shares
+                                        total_cost_local = asset_data['price'] * shares
                                         cost_display = simulator.format_currency_display(total_cost_local, asset_data['currency'])
                                         st.write(f"**Total Cost:** {cost_display} (commission-free trading)")
-                                        st.caption(f"Equivalent to: ${total_cost_usd:,.2f} USD")
+                                        st.write(f"**Equivalent to:** ${actual_cost_usd:,.2f} USD")
                                     else:
-                                        st.write(f"**Total Cost:** ${total_cost_usd:,.2f} (commission-free trading)")
+                                        actual_cost_usd = asset_data['price'] * shares
+                                        st.write(f"**Total Cost:** ${actual_cost_usd:,.2f} (commission-free trading)")
                                     
                                     # Check if user has enough cash (in USD)
-                                    if total_cost_usd > current_user['cash']:
-                                        st.error(f"Insufficient funds! You need ${total_cost_usd:,.2f} USD but only have ${current_user['cash']:,.2f} USD")
+                                    if actual_cost_usd > current_user['cash']:
+                                        st.error(f"Insufficient funds! You need ${actual_cost_usd:,.2f} USD but only have ${current_user['cash']:,.2f} USD")
                                         can_trade = False
                                     else:
                                         can_trade = True
@@ -2656,24 +2657,29 @@ def main():
                                     owned_position = next((p for p in portfolio if p['symbol'] == selected_asset), None)
                                     
                                     if owned_position and owned_position['shares'] >= shares:
-                                        total_proceeds_usd = asset_data['price'] * shares
-                                        profit_loss_usd = (asset_data['price'] - owned_position['avg_price']) * shares
-                                        
-                                        st.write(f"**Owned Shares:** {owned_position['shares']}")
-                                        
-                                        # Display average price in local currency
+                                        # For African stocks, convert local currency price to USD for actual proceeds
                                         if asset_data['currency'] != 'USD':
+                                            actual_proceeds_usd = simulator.convert_to_usd(asset_data['price'], asset_data['currency']) * shares
+                                            total_proceeds_local = asset_data['price'] * shares
+                                            proceeds_display = simulator.format_currency_display(total_proceeds_local, asset_data['currency'])
+                                            
+                                            # Convert average price back to local currency for display
                                             avg_price_local = simulator.convert_from_usd(owned_position['avg_price'], asset_data['currency'])
                                             avg_price_display = simulator.format_currency_display(avg_price_local, asset_data['currency'])
-                                            st.write(f"**Average Price:** {avg_price_display}")
                                             
-                                            total_proceeds_local = simulator.convert_from_usd(total_proceeds_usd, asset_data['currency'])
-                                            proceeds_display = simulator.format_currency_display(total_proceeds_local, asset_data['currency'])
+                                            profit_loss_usd = actual_proceeds_usd - (owned_position['avg_price'] * shares)
+                                            
+                                            st.write(f"**Owned Shares:** {owned_position['shares']}")
+                                            st.write(f"**Average Price:** {avg_price_display}")
                                             st.write(f"**Total Proceeds:** {proceeds_display} (commission-free trading)")
-                                            st.caption(f"Equivalent to: ${total_proceeds_usd:,.2f} USD")
+                                            st.write(f"**Equivalent to:** ${actual_proceeds_usd:,.2f} USD")
                                         else:
+                                            actual_proceeds_usd = asset_data['price'] * shares
+                                            profit_loss_usd = (asset_data['price'] - owned_position['avg_price']) * shares
+                                            
+                                            st.write(f"**Owned Shares:** {owned_position['shares']}")
                                             st.write(f"**Average Price:** ${owned_position['avg_price']:.2f}")
-                                            st.write(f"**Total Proceeds:** ${total_proceeds_usd:,.2f} (commission-free trading)")
+                                            st.write(f"**Total Proceeds:** ${actual_proceeds_usd:,.2f} (commission-free trading)")
                                         
                                         profit_color = "positive" if profit_loss_usd >= 0 else "negative"
                                         st.markdown(f"**Estimated P&L:** <span class='{profit_color}'>${profit_loss_usd:+,.2f} USD</span>", unsafe_allow_html=True)
@@ -2694,7 +2700,8 @@ def main():
                                             selected_asset,
                                             trade_action,
                                             shares,
-                                            asset_data['price'],
+                                            # Convert local currency price to USD for storage
+                                            simulator.convert_to_usd(asset_data['price'], asset_data['currency']) if asset_data['currency'] != 'USD' else asset_data['price'],
                                             asset_data['name'],
                                             asset_data['currency']
                                         )
