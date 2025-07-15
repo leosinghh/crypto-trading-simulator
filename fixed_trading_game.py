@@ -497,6 +497,22 @@ st.markdown("""
     .positive { color: #28a745; font-weight: bold; }
     .negative { color: #dc3545; font-weight: bold; }
     .neutral { color: #6c757d; }
+    
+    .chart-container {
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin: 1rem 0;
+    }
+    
+    .metric-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        margin: 0.5rem 0;
+        border-left: 4px solid #007bff;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -709,8 +725,8 @@ class TradingSimulator:
             st.error(f"Error calculating portfolio value: {str(e)}")
             return 0
     
-    def create_stock_price_chart(self, symbol: str, period: str = "3mo"):
-        """Create comprehensive stock/crypto price chart with technical indicators"""
+    def create_comprehensive_chart(self, symbol: str, period: str = "3mo"):
+        """Create comprehensive stock/crypto chart with technical analysis"""
         try:
             ticker = yf.Ticker(symbol)
             hist = ticker.history(period=period)
@@ -719,14 +735,15 @@ class TradingSimulator:
                 st.warning(f"No data available for {symbol} for the selected period")
                 return None
             
+            # Create subplots
             fig = go.Figure()
             
-            # Determine if it's crypto for chart title
+            # Determine asset type
             is_crypto = symbol.endswith('-USD')
             display_name = symbol.replace('-USD', '') if is_crypto else symbol
             asset_type = "Cryptocurrency" if is_crypto else "Stock"
             
-            # Candlestick chart
+            # Main candlestick chart
             fig.add_trace(go.Candlestick(
                 x=hist.index,
                 open=hist['Open'],
@@ -734,45 +751,93 @@ class TradingSimulator:
                 low=hist['Low'],
                 close=hist['Close'],
                 name='Price',
-                increasing_line_color='#00ff00',
-                decreasing_line_color='#ff0000'
+                increasing_line_color='#26a69a',
+                decreasing_line_color='#ef5350',
+                increasing_fillcolor='rgba(38, 166, 154, 0.3)',
+                decreasing_fillcolor='rgba(239, 83, 80, 0.3)'
             ))
             
-            # Moving averages
+            # Add moving averages
             if len(hist) >= 20:
-                hist['MA20'] = hist['Close'].rolling(window=20).mean()
+                hist['SMA20'] = hist['Close'].rolling(window=20).mean()
                 fig.add_trace(go.Scatter(
                     x=hist.index,
-                    y=hist['MA20'],
+                    y=hist['SMA20'],
                     mode='lines',
-                    name='20-Day MA',
+                    name='SMA 20',
                     line=dict(color='orange', width=2)
                 ))
             
             if len(hist) >= 50:
-                hist['MA50'] = hist['Close'].rolling(window=50).mean()
+                hist['SMA50'] = hist['Close'].rolling(window=50).mean()
                 fig.add_trace(go.Scatter(
                     x=hist.index,
-                    y=hist['MA50'],
+                    y=hist['SMA50'],
                     mode='lines',
-                    name='50-Day MA',
+                    name='SMA 50',
                     line=dict(color='blue', width=2)
                 ))
             
-            # Price formatting for crypto vs stocks
-            price_format = ".6f" if is_crypto and hist['Close'].iloc[-1] < 1 else ".2f"
+            # Add volume bars as secondary y-axis
+            fig.add_trace(go.Bar(
+                x=hist.index,
+                y=hist['Volume'],
+                name='Volume',
+                marker_color='rgba(158, 158, 158, 0.3)',
+                yaxis='y2'
+            ))
             
+            # Calculate RSI
+            if len(hist) >= 14:
+                delta = hist['Close'].diff()
+                gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+                loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+                rs = gain / loss
+                rsi = 100 - (100 / (1 + rs))
+                
+                # Add RSI as text annotation
+                current_rsi = rsi.iloc[-1]
+                if not pd.isna(current_rsi):
+                    fig.add_annotation(
+                        x=hist.index[-1],
+                        y=hist['High'].max(),
+                        text=f"RSI: {current_rsi:.1f}",
+                        showarrow=False,
+                        bgcolor="rgba(255,255,255,0.8)",
+                        bordercolor="black",
+                        borderwidth=1
+                    )
+            
+            # Price formatting
+            if is_crypto and hist['Close'].iloc[-1] < 1:
+                price_format = ".6f"
+            else:
+                price_format = ".2f"
+            
+            # Update layout
             fig.update_layout(
-                title=f"{display_name} - {asset_type} Price Analysis ({period})",
+                title=f"{display_name} - {asset_type} Technical Analysis ({period})",
                 yaxis_title="Price ($)",
                 xaxis_title="Date",
                 template="plotly_white",
                 height=600,
                 showlegend=True,
-                yaxis=dict(tickformat=f"${price_format}")
+                yaxis=dict(
+                    tickformat=f"${price_format}",
+                    side="left"
+                ),
+                yaxis2=dict(
+                    title="Volume",
+                    overlaying="y",
+                    side="right",
+                    showgrid=False
+                ),
+                xaxis=dict(
+                    rangeslider=dict(visible=False),
+                    type="date"
+                ),
+                hovermode='x unified'
             )
-            
-            fig.update_layout(xaxis_rangeslider_visible=False)
             
             return fig
             
@@ -780,8 +845,48 @@ class TradingSimulator:
             st.error(f"Error creating chart for {symbol}: {str(e)}")
             return None
     
+    def create_comparison_chart(self, symbols: List[str], period: str = "3mo"):
+        """Create comparison chart for multiple assets"""
+        try:
+            fig = go.Figure()
+            colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f']
+            
+            for i, symbol in enumerate(symbols):
+                ticker = yf.Ticker(symbol)
+                hist = ticker.history(period=period)
+                
+                if not hist.empty:
+                    # Normalize prices to percentage change from start
+                    normalized_prices = ((hist['Close'] / hist['Close'].iloc[0]) - 1) * 100
+                    
+                    display_name = symbol.replace('-USD', '') if symbol.endswith('-USD') else symbol
+                    
+                    fig.add_trace(go.Scatter(
+                        x=hist.index,
+                        y=normalized_prices,
+                        mode='lines',
+                        name=display_name,
+                        line=dict(color=colors[i % len(colors)], width=2)
+                    ))
+            
+            fig.update_layout(
+                title=f"Asset Comparison - Normalized Performance ({period})",
+                xaxis_title="Date",
+                yaxis_title="Percentage Change (%)",
+                template="plotly_white",
+                height=500,
+                showlegend=True,
+                hovermode='x unified'
+            )
+            
+            return fig
+            
+        except Exception as e:
+            st.error(f"Error creating comparison chart: {str(e)}")
+            return None
+    
     def create_portfolio_pie_chart(self, user_id: str):
-        """Create portfolio allocation pie chart showing investment holdings"""
+        """Create portfolio allocation pie chart"""
         try:
             portfolio = self.db.get_user_portfolio(user_id)
             
@@ -807,10 +912,8 @@ class TradingSimulator:
             if not portfolio_data or total_portfolio_value == 0:
                 return None
             
-            # Create DataFrame for plotly express
             df = pd.DataFrame(portfolio_data)
             
-            # Create pie chart using DataFrame
             fig = px.pie(
                 df,
                 values='Value',
@@ -820,7 +923,6 @@ class TradingSimulator:
                 labels={'Value': 'Value ($)', 'Symbol': 'Holdings'}
             )
             
-            # Customize the pie chart
             fig.update_traces(
                 textposition='inside', 
                 textinfo='percent+label',
@@ -835,7 +937,6 @@ class TradingSimulator:
                 marker=dict(line=dict(color='#FFFFFF', width=2))
             )
             
-            # Update layout
             fig.update_layout(
                 height=500,
                 font=dict(size=12),
@@ -1019,152 +1120,292 @@ def main():
             tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 Research", "💰 Trade", "📈 Portfolio", "📋 History", "🏆 Leaderboard", "⚙️ Settings"])
             
             with tab1:
-                st.subheader("📊 Stock & Crypto Research & Analysis")
+                st.subheader("📊 Research & Technical Analysis")
                 
-                # Asset type selector
-                asset_type = st.selectbox(
-                    "Select Asset Type",
-                    ["All Assets", "Stocks & ETFs", "Cryptocurrencies"],
-                    key="asset_type_filter"
+                # Research mode selector
+                research_mode = st.selectbox(
+                    "Research Mode",
+                    ["Single Asset Analysis", "Compare Multiple Assets", "Market Overview"],
+                    key="research_mode"
                 )
                 
-                # Filter available assets based on selection
-                if asset_type == "Stocks & ETFs":
-                    available_assets = [s for s in simulator.available_stocks if not s.endswith('-USD')]
-                elif asset_type == "Cryptocurrencies":
-                    available_assets = [s for s in simulator.available_stocks if s.endswith('-USD')]
-                else:
-                    available_assets = simulator.available_stocks
-                
-                # For crypto, show by categories
-                if asset_type == "Cryptocurrencies":
-                    st.write("### 🪙 Cryptocurrency Categories")
-                    crypto_categories = simulator.get_crypto_categories()
-                    
-                    selected_category = st.selectbox(
-                        "Select Category",
-                        ["All Cryptocurrencies"] + list(crypto_categories.keys()),
-                        key="crypto_category"
+                if research_mode == "Single Asset Analysis":
+                    # Asset type selector
+                    asset_type = st.selectbox(
+                        "Select Asset Type",
+                        ["All Assets", "Stocks & ETFs", "Cryptocurrencies"],
+                        key="asset_type_filter"
                     )
                     
-                    if selected_category != "All Cryptocurrencies":
-                        available_assets = crypto_categories[selected_category]
-                
-                # Asset selector for analysis
-                analysis_asset = st.selectbox(
-                    "Select Asset for Analysis",
-                    [''] + available_assets[:100],
-                    key="analysis_asset"
-                )
-                
-                if analysis_asset:
-                    # Time period selector
-                    period_options = {
-                        '1 Month': '1mo',
-                        '3 Months': '3mo',
-                        '6 Months': '6mo',
-                        '1 Year': '1y',
-                        '2 Years': '2y',
-                        '5 Years': '5y'
-                    }
-                    
-                    selected_period = st.selectbox(
-                        "Time Period",
-                        list(period_options.keys()),
-                        index=1
-                    )
-                    
-                    period = period_options[selected_period]
-                    
-                    # Get asset info
-                    asset_data = simulator.get_stock_price(analysis_asset)
-                    if asset_data:
-                        # Display asset info with crypto-specific styling
-                        asset_display_name = analysis_asset.replace('-USD', '') if asset_data.get('is_crypto') else analysis_asset
-                        asset_type_icon = "🪙" if asset_data.get('is_crypto') else "📈"
-                        
-                        st.write(f"{asset_type_icon} **{asset_data['name']}** ({asset_display_name})")
-                        
-                        # Show sector/category
-                        if asset_data.get('is_crypto'):
-                            st.write(f"**Category:** {asset_data['sector']}")
-                        else:
-                            st.write(f"**Sector:** {asset_data['sector']}")
-                        
-                        # Current price and change
-                        col_price1, col_price2 = st.columns(2)
-                        with col_price1:
-                            # Format price based on asset type
-                            if asset_data.get('is_crypto') and asset_data['price'] < 1:
-                                price_display = f"${asset_data['price']:.6f}"
-                            else:
-                                price_display = f"${asset_data['price']:.2f}"
-                            st.metric("Current Price", price_display)
-                        with col_price2:
-                            change_color = "normal" if asset_data['change'] >= 0 else "inverse"
-                            st.metric(
-                                "Change", 
-                                f"${asset_data['change']:+.2f}",
-                                f"{asset_data['change_percent']:+.2f}%",
-                                delta_color=change_color
-                            )
-                        
-                        # Additional metrics
-                        col_info1, col_info2, col_info3 = st.columns(3)
-                        with col_info1:
-                            st.metric("Volume", f"{asset_data['volume']:,}")
-                        with col_info2:
-                            if asset_data['market_cap'] > 0:
-                                if asset_data['market_cap'] > 1_000_000_000:
-                                    cap_display = f"${asset_data['market_cap']/1_000_000_000:.1f}B"
-                                else:
-                                    cap_display = f"${asset_data['market_cap']/1_000_000:.1f}M"
-                                st.metric("Market Cap", cap_display)
-                            else:
-                                st.metric("Market Cap", "N/A")
-                        with col_info3:
-                            if asset_data.get('pe_ratio') and not asset_data.get('is_crypto'):
-                                st.metric("P/E Ratio", f"{asset_data['pe_ratio']:.2f}")
-                            else:
-                                st.metric("24h High", f"${asset_data['day_high']:.2f}")
-                        
-                        # Charts section
-                        st.write("### 📊 Price Chart")
-                        
-                        with st.spinner("Loading price chart..."):
-                            price_chart = simulator.create_stock_price_chart(analysis_asset, period)
-                            if price_chart:
-                                st.plotly_chart(price_chart, use_container_width=True)
-                            else:
-                                st.error("Unable to load price chart")
-                        
-                        # Quick trade section
-                        st.write("### ⚡ Quick Trade")
-                        quick_col1, quick_col2 = st.columns(2)
-                        
-                        with quick_col1:
-                            buy_button_text = f"🛒 Buy {asset_display_name}"
-                            if st.button(buy_button_text, key="quick_buy"):
-                                st.session_state.quick_trade_asset = analysis_asset
-                                st.session_state.quick_trade_action = 'BUY'
-                                st.info(f"Go to Trade tab to buy {asset_display_name}")
-                        
-                        with quick_col2:
-                            # Check if user owns this asset
-                            portfolio = simulator.db.get_user_portfolio(current_user['id'])
-                            owns_asset = any(p['symbol'] == analysis_asset for p in portfolio)
-                            
-                            sell_button_text = f"💰 Sell {asset_display_name}"
-                            if owns_asset:
-                                if st.button(sell_button_text, key="quick_sell"):
-                                    st.session_state.quick_trade_asset = analysis_asset
-                                    st.session_state.quick_trade_action = 'SELL'
-                                    st.info(f"Go to Trade tab to sell {asset_display_name}")
-                            else:
-                                st.button(sell_button_text, key="quick_sell", disabled=True, help="You don't own this asset")
-                    
+                    # Filter available assets based on selection
+                    if asset_type == "Stocks & ETFs":
+                        available_assets = [s for s in simulator.available_stocks if not s.endswith('-USD')]
+                    elif asset_type == "Cryptocurrencies":
+                        available_assets = [s for s in simulator.available_stocks if s.endswith('-USD')]
                     else:
-                        st.error("Unable to load asset data")
+                        available_assets = simulator.available_stocks
+                    
+                    # For crypto, show by categories
+                    if asset_type == "Cryptocurrencies":
+                        st.write("### 🪙 Cryptocurrency Categories")
+                        crypto_categories = simulator.get_crypto_categories()
+                        
+                        selected_category = st.selectbox(
+                            "Select Category",
+                            ["All Cryptocurrencies"] + list(crypto_categories.keys()),
+                            key="crypto_category"
+                        )
+                        
+                        if selected_category != "All Cryptocurrencies":
+                            available_assets = crypto_categories[selected_category]
+                    
+                    # Asset selector for analysis
+                    analysis_asset = st.selectbox(
+                        "Select Asset for Analysis",
+                        [''] + available_assets[:100],
+                        key="analysis_asset"
+                    )
+                    
+                    if analysis_asset:
+                        # Time period selector
+                        period_options = {
+                            '1 Month': '1mo',
+                            '3 Months': '3mo',
+                            '6 Months': '6mo',
+                            '1 Year': '1y',
+                            '2 Years': '2y',
+                            '5 Years': '5y'
+                        }
+                        
+                        selected_period = st.selectbox(
+                            "Time Period",
+                            list(period_options.keys()),
+                            index=1
+                        )
+                        
+                        period = period_options[selected_period]
+                        
+                        # Get asset info
+                        asset_data = simulator.get_stock_price(analysis_asset)
+                        if asset_data:
+                            # Display asset info
+                            asset_display_name = analysis_asset.replace('-USD', '') if asset_data.get('is_crypto') else analysis_asset
+                            asset_type_icon = "🪙" if asset_data.get('is_crypto') else "📈"
+                            
+                            # Asset header
+                            st.markdown(f"""
+                            <div class="metric-card">
+                                <h2>{asset_type_icon} {asset_data['name']} ({asset_display_name})</h2>
+                                <p><strong>Sector:</strong> {asset_data['sector']}</p>
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            # Current price metrics
+                            col_price1, col_price2, col_price3, col_price4 = st.columns(4)
+                            
+                            with col_price1:
+                                if asset_data.get('is_crypto') and asset_data['price'] < 1:
+                                    price_display = f"${asset_data['price']:.6f}"
+                                else:
+                                    price_display = f"${asset_data['price']:.2f}"
+                                st.metric("Current Price", price_display)
+                            
+                            with col_price2:
+                                change_color = "normal" if asset_data['change'] >= 0 else "inverse"
+                                st.metric(
+                                    "24h Change", 
+                                    f"${asset_data['change']:+.2f}",
+                                    f"{asset_data['change_percent']:+.2f}%",
+                                    delta_color=change_color
+                                )
+                            
+                            with col_price3:
+                                st.metric("Volume", f"{asset_data['volume']:,}")
+                            
+                            with col_price4:
+                                if asset_data['market_cap'] > 0:
+                                    if asset_data['market_cap'] > 1_000_000_000:
+                                        cap_display = f"${asset_data['market_cap']/1_000_000_000:.1f}B"
+                                    else:
+                                        cap_display = f"${asset_data['market_cap']/1_000_000:.1f}M"
+                                    st.metric("Market Cap", cap_display)
+                                else:
+                                    st.metric("Market Cap", "N/A")
+                            
+                            # Additional metrics
+                            col_info1, col_info2, col_info3 = st.columns(3)
+                            with col_info1:
+                                st.metric("Day High", f"${asset_data['day_high']:.2f}")
+                            with col_info2:
+                                st.metric("Day Low", f"${asset_data['day_low']:.2f}")
+                            with col_info3:
+                                if asset_data.get('pe_ratio') and not asset_data.get('is_crypto'):
+                                    st.metric("P/E Ratio", f"{asset_data['pe_ratio']:.2f}")
+                                else:
+                                    daily_change = ((asset_data['day_high'] - asset_data['day_low']) / asset_data['day_low']) * 100
+                                    st.metric("Daily Range", f"{daily_change:.2f}%")
+                            
+                            # Comprehensive chart
+                            st.markdown("""
+                            <div class="chart-container">
+                                <h3>📊 Technical Analysis Chart</h3>
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            with st.spinner("Loading comprehensive chart..."):
+                                comprehensive_chart = simulator.create_comprehensive_chart(analysis_asset, period)
+                                if comprehensive_chart:
+                                    st.plotly_chart(comprehensive_chart, use_container_width=True)
+                                else:
+                                    st.error("Unable to load chart data")
+                            
+                            # Quick trade section
+                            st.write("### ⚡ Quick Trade")
+                            quick_col1, quick_col2 = st.columns(2)
+                            
+                            with quick_col1:
+                                buy_button_text = f"🛒 Buy {asset_display_name}"
+                                if st.button(buy_button_text, key="research_buy"):
+                                    st.session_state.quick_trade_asset = analysis_asset
+                                    st.session_state.quick_trade_action = 'BUY'
+                                    st.info(f"Go to Trade tab to buy {asset_display_name}")
+                            
+                            with quick_col2:
+                                # Check if user owns this asset
+                                portfolio = simulator.db.get_user_portfolio(current_user['id'])
+                                owns_asset = any(p['symbol'] == analysis_asset for p in portfolio)
+                                
+                                sell_button_text = f"💰 Sell {asset_display_name}"
+                                if owns_asset:
+                                    if st.button(sell_button_text, key="research_sell"):
+                                        st.session_state.quick_trade_asset = analysis_asset
+                                        st.session_state.quick_trade_action = 'SELL'
+                                        st.info(f"Go to Trade tab to sell {asset_display_name}")
+                                else:
+                                    st.button(sell_button_text, key="research_sell", disabled=True, help="You don't own this asset")
+                        
+                        else:
+                            st.error("Unable to load asset data")
+                
+                elif research_mode == "Compare Multiple Assets":
+                    st.write("### 📊 Asset Comparison")
+                    
+                    # Asset selector for comparison
+                    comparison_assets = st.multiselect(
+                        "Select Assets to Compare (max 5)",
+                        simulator.available_stocks[:50],
+                        max_selections=5,
+                        key="comparison_assets"
+                    )
+                    
+                    if comparison_assets:
+                        # Time period for comparison
+                        period_options = {
+                            '1 Month': '1mo',
+                            '3 Months': '3mo',
+                            '6 Months': '6mo',
+                            '1 Year': '1y',
+                            '2 Years': '2y'
+                        }
+                        
+                        comparison_period = st.selectbox(
+                            "Time Period",
+                            list(period_options.keys()),
+                            index=1,
+                            key="comparison_period"
+                        )
+                        
+                        period = period_options[comparison_period]
+                        
+                        # Create comparison chart
+                        st.markdown("""
+                        <div class="chart-container">
+                            <h3>📈 Normalized Performance Comparison</h3>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        with st.spinner("Loading comparison chart..."):
+                            comparison_chart = simulator.create_comparison_chart(comparison_assets, period)
+                            if comparison_chart:
+                                st.plotly_chart(comparison_chart, use_container_width=True)
+                            else:
+                                st.error("Unable to load comparison chart")
+                        
+                        # Comparison table
+                        st.write("### 📋 Asset Comparison Table")
+                        comparison_data = []
+                        
+                        for asset in comparison_assets:
+                            asset_data = simulator.get_stock_price(asset)
+                            if asset_data:
+                                display_name = asset.replace('-USD', '') if asset_data.get('is_crypto') else asset
+                                asset_type_icon = "🪙" if asset_data.get('is_crypto') else "📈"
+                                
+                                comparison_data.append({
+                                    'Asset': f"{asset_type_icon} {display_name}",
+                                    'Name': asset_data['name'][:30],
+                                    'Price': f"${asset_data['price']:.2f}",
+                                    'Change': f"{asset_data['change']:+.2f}",
+                                    'Change %': f"{asset_data['change_percent']:+.2f}%",
+                                    'Volume': f"{asset_data['volume']:,}",
+                                    'Market Cap': f"${asset_data['market_cap']/1_000_000_000:.1f}B" if asset_data['market_cap'] > 1_000_000_000 else f"${asset_data['market_cap']/1_000_000:.1f}M" if asset_data['market_cap'] > 0 else "N/A"
+                                })
+                        
+                        if comparison_data:
+                            df = pd.DataFrame(comparison_data)
+                            st.dataframe(df, use_container_width=True)
+                
+                elif research_mode == "Market Overview":
+                    st.write("### 🌐 Market Overview")
+                    
+                    # Market indices
+                    indices = ['SPY', 'QQQ', 'IWM', 'VTI']
+                    crypto_major = ['BTC-USD', 'ETH-USD', 'BNB-USD', 'XRP-USD']
+                    
+                    # Market indices overview
+                    st.write("#### 📈 Market Indices")
+                    indices_data = []
+                    for index in indices:
+                        data = simulator.get_stock_price(index)
+                        if data:
+                            indices_data.append({
+                                'Index': index,
+                                'Price': f"${data['price']:.2f}",
+                                'Change': f"{data['change']:+.2f}",
+                                'Change %': f"{data['change_percent']:+.2f}%"
+                            })
+                    
+                    if indices_data:
+                        df_indices = pd.DataFrame(indices_data)
+                        st.dataframe(df_indices, use_container_width=True)
+                    
+                    # Crypto overview
+                    st.write("#### 🪙 Major Cryptocurrencies")
+                    crypto_data = []
+                    for crypto in crypto_major:
+                        data = simulator.get_stock_price(crypto)
+                        if data:
+                            display_name = crypto.replace('-USD', '')
+                            crypto_data.append({
+                                'Crypto': display_name,
+                                'Name': data['name'],
+                                'Price': f"${data['price']:.2f}",
+                                'Change': f"{data['change']:+.2f}",
+                                'Change %': f"{data['change_percent']:+.2f}%"
+                            })
+                    
+                    if crypto_data:
+                        df_crypto = pd.DataFrame(crypto_data)
+                        st.dataframe(df_crypto, use_container_width=True)
+                    
+                    # Market comparison chart
+                    st.write("#### 📊 Market Comparison")
+                    market_assets = indices + crypto_major
+                    
+                    with st.spinner("Loading market comparison..."):
+                        market_chart = simulator.create_comparison_chart(market_assets, "3mo")
+                        if market_chart:
+                            st.plotly_chart(market_chart, use_container_width=True)
             
             with tab2:
                 st.subheader("🛒 Trade Stocks & Cryptocurrencies")
@@ -1389,7 +1630,11 @@ def main():
                     col1, col2 = st.columns([2, 1])
                     
                     with col1:
-                        st.write("### 🥧 Portfolio Allocation")
+                        st.markdown("""
+                        <div class="chart-container">
+                            <h3>🥧 Portfolio Allocation</h3>
+                        </div>
+                        """, unsafe_allow_html=True)
                         pie_chart = simulator.create_portfolio_pie_chart(current_user['id'])
                         if pie_chart:
                             st.plotly_chart(pie_chart, use_container_width=True)
