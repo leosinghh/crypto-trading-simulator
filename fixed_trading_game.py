@@ -482,7 +482,7 @@ st.set_page_config(
     page_title="Leo's Trader",
     page_icon="📈",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # Enhanced CSS with updated color palette (removed emojis from CSS)
@@ -907,10 +907,93 @@ st.markdown("""
     
     /* Sidebar styling */
     .css-1d391kg {
-        background: white;
+        background: #37392E;
+        border-radius: 0;
+        padding: 2rem 1rem;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    
+    /* Sidebar navigation styles */
+    .sidebar-nav {
+        background: #37392E;
+        padding: 1rem 0;
         border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .sidebar-nav .stButton > button {
+        background: transparent;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-align: left;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        box-shadow: none;
+    }
+    
+    .sidebar-nav .stButton > button:hover {
+        background: #28AFB0;
+        color: white;
+        transform: translateX(5px);
+        box-shadow: 0 2px 8px rgba(40,175,176,0.3);
+    }
+    
+    .sidebar-nav .stButton > button.active {
+        background: #19647E;
+        color: white;
+        font-weight: 600;
+        border-left: 4px solid #28AFB0;
+    }
+    
+    /* Sidebar header */
+    .sidebar-header {
+        background: #19647E;
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .sidebar-header h2 {
+        color: white;
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .sidebar-header p {
+        color: white;
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+    
+    /* User info in sidebar */
+    .sidebar-user-info {
+        background: #28AFB0;
+        color: white;
         padding: 1rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .sidebar-user-info h4 {
+        color: white;
+        margin: 0 0 0.5rem 0;
+        font-size: 1rem;
+    }
+    
+    .sidebar-user-info p {
+        color: white;
+        margin: 0.2rem 0;
+        font-size: 0.8rem;
+        opacity: 0.9;
     }
     
     /* Login/Register forms */
@@ -3702,39 +3785,70 @@ def main():
         if current_user:
             st.session_state.current_user = current_user
         
-        # Header with user info
+        # Sidebar Navigation
+        with st.sidebar:
+            # Sidebar Header
+            st.markdown("""
+            <div class="sidebar-header">
+                <h2>Leo's Trader</h2>
+                <p>Trading Simulator</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # User Info
+            st.markdown(f"""
+            <div class="sidebar-user-info">
+                <h4>Welcome, {current_user['username']}</h4>
+                <p>Cash: ${current_user['cash']:,.2f}</p>
+                <p>Total Trades: {current_user['total_trades']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Navigation Menu
+            st.markdown('<div class="sidebar-nav">', unsafe_allow_html=True)
+            
+            # Navigation buttons
+            pages = {
+                "Dashboard": "Dashboard",
+                "Research": "Research", 
+                "Trade": "Trade",
+                "Portfolio": "Portfolio",
+                "History": "History",
+                "Leaderboard": "Leaderboard",
+                "Account": "Account"
+            }
+            
+            # Create navigation buttons
+            for page_name, page_key in pages.items():
+                if st.button(page_name, key=f"nav_{page_key}", use_container_width=True):
+                    st.session_state.current_page = page_key
+                    st.rerun()
+            
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Logout button at bottom
+            st.markdown("---")
+            if st.button("Logout", key="logout_btn", use_container_width=True):
+                st.session_state.logged_in = False
+                st.session_state.current_user = None
+                st.rerun()
+            
+            # Ghana Pride Section in sidebar
+            st.markdown("""
+            <div style="background: #DDCECD; color: #37392E; padding: 1rem; border-radius: 8px; margin-top: 2rem; text-align: center;">
+                <h4 style="color: #37392E; margin: 0;">Proudly Made in Ghana</h4>
+                <p style="color: #37392E; margin: 0.5rem 0 0 0; font-size: 0.8rem;">Gateway to Africa</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Main Content Area
+        # Header with title only (no navigation)
         st.markdown("""
         <div class="trading-header">
             <h1>Leo's Trader</h1>
             <p>Professional Trading Simulator - Master the Markets</p>
         </div>
         """, unsafe_allow_html=True)
-        
-        # Navigation
-        pages = {
-            "Dashboard": "Dashboard",
-            "Research": "Research", 
-            "Trade": "Trade",
-            "Portfolio": "Portfolio",
-            "History": "History",
-            "Leaderboard": "Leaderboard",
-            "Account": "Account",
-            "Logout": "Logout"
-        }
-        
-        # Create navigation
-        col_nav = st.columns(len(pages))
-        
-        for i, (page_name, page_key) in enumerate(pages.items()):
-            with col_nav[i]:
-                if st.button(page_name, key=f"nav_{page_key}", use_container_width=True):
-                    if page_key == "Logout":
-                        st.session_state.logged_in = False
-                        st.session_state.current_user = None
-                        st.rerun()
-                    else:
-                        st.session_state.current_page = page_key
-                        st.rerun()
         
         # Show selected page
         current_page = st.session_state.get('current_page', 'Dashboard')
