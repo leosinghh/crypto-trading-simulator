@@ -500,6 +500,85 @@ st.markdown("""
         padding: 1rem 2rem;
         background: #DDCECD;
         min-height: 100vh;
+        transition: all 0.3s ease-in-out;
+    }
+    
+    /* Page transition animations */
+    .page-content {
+        animation: slideInFromRight 0.4s ease-out;
+        transform-origin: center;
+    }
+    
+    @keyframes slideInFromRight {
+        0% {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideInFromLeft {
+        0% {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Navigation transition effects */
+    .nav-container {
+        transition: all 0.3s ease;
+    }
+    
+    /* Content container animations */
+    .content-section {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(0);
+        opacity: 1;
+    }
+    
+    .content-section.slide-out-left {
+        animation: slideOutLeft 0.3s ease-in;
+    }
+    
+    .content-section.slide-out-right {
+        animation: slideOutRight 0.3s ease-in;
+    }
+    
+    .content-section.slide-in-left {
+        animation: slideInFromLeft 0.4s ease-out;
+    }
+    
+    .content-section.slide-in-right {
+        animation: slideInFromRight 0.4s ease-out;
+    }
+    
+    @keyframes slideOutLeft {
+        0% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+    }
+    
+    @keyframes slideOutRight {
+        0% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(100px);
+        }
     }
     
     /* Header Styles */
@@ -589,12 +668,13 @@ st.markdown("""
         margin: 1rem 0;
         box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         border: 1px solid #e9ecef;
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(0);
     }
     
     .metric-card:hover {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateY(-4px);
     }
     
     .summary-card {
@@ -604,6 +684,13 @@ st.markdown("""
         margin: 1rem 0;
         box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         border-left: 4px solid #19647E;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(0);
+    }
+    
+    .summary-card:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
     }
     
     .summary-card h3 {
@@ -677,7 +764,7 @@ st.markdown("""
         border-radius: 8px;
         padding: 0.75rem 1rem;
         font-weight: 600;
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 0 2px 8px rgba(25,100,126,0.3);
         white-space: nowrap;
         overflow: hidden;
@@ -687,16 +774,41 @@ st.markdown("""
         align-items: center;
         justify-content: center;
         font-size: 0.9rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stButton > button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .stButton > button:hover::before {
+        left: 100%;
     }
     
     .stButton > button:hover {
         background: #37392E;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(55,57,46,0.4);
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 6px 20px rgba(55,57,46,0.4);
     }
     
     .stButton > button:active {
-        transform: translateY(0);
+        transform: translateY(0) scale(0.98);
+        transition: all 0.1s ease;
+    }
+    
+    /* Active navigation button indicator */
+    .stButton > button.active {
+        background: #28AFB0;
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(40,175,176,0.4);
     }
     
     /* Form Styles */
@@ -2429,7 +2541,7 @@ def show_login_page():
 def show_dashboard(simulator, current_user):
     """Show main dashboard"""
     st.markdown("""
-    <div class="page-header">
+    <div class="page-header page-content">
         <h2>Trading Dashboard</h2>
         <p>Your complete trading overview and market summary</p>
     </div>
@@ -2573,7 +2685,7 @@ def show_dashboard(simulator, current_user):
 def show_research_page(simulator, current_user):
     """Show research and analysis page"""
     st.markdown("""
-    <div class="page-header">
+    <div class="page-header page-content">
         <h2>Research & Analysis</h2>
         <p>Professional market research tools and technical analysis</p>
     </div>
@@ -2929,7 +3041,7 @@ def show_research_page(simulator, current_user):
 def show_trade_page(simulator, current_user):
     """Show trading page"""
     st.markdown("""
-    <div class="page-header">
+    <div class="page-header page-content">
         <h2>Trade Stocks & Crypto</h2>
         <p>Execute trades with real-time market data</p>
     </div>
@@ -3161,7 +3273,7 @@ def show_trade_page(simulator, current_user):
 def show_portfolio_page(simulator, current_user):
     """Show portfolio management page"""
     st.markdown("""
-    <div class="page-header">
+    <div class="page-header page-content">
         <h2>Portfolio Management</h2>
         <p>Track your investments and portfolio performance</p>
     </div>
@@ -3284,7 +3396,7 @@ def show_portfolio_page(simulator, current_user):
 def show_history_page(simulator, current_user):
     """Show trade history page"""
     st.markdown("""
-    <div class="page-header">
+    <div class="page-header page-content">
         <h2>Trade History</h2>
         <p>Review your trading activity and performance</p>
     </div>
@@ -3376,7 +3488,7 @@ def show_history_page(simulator, current_user):
 def show_leaderboard_page(simulator, current_user):
     """Show leaderboard page"""
     st.markdown("""
-    <div class="page-header">
+    <div class="page-header page-content">
         <h2>Leaderboard</h2>
         <p>Compete with other traders and track your ranking</p>
     </div>
@@ -3431,7 +3543,7 @@ def show_leaderboard_page(simulator, current_user):
 def show_account_page(simulator, current_user):
     """Show account information page"""
     st.markdown("""
-    <div class="page-header">
+    <div class="page-header page-content">
         <h2>Account Information</h2>
         <p>Manage your account settings and view trading statistics</p>
     </div>
