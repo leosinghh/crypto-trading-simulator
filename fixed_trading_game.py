@@ -485,7 +485,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Enhanced CSS with professional Investopedia-style design
+# Enhanced CSS with updated color palette (removed emojis from CSS)
 st.markdown("""
 <style>
     /* Import Google Fonts */
@@ -498,18 +498,18 @@ st.markdown("""
     
     .main .block-container {
         padding: 1rem 2rem;
-        background: #f8f9fa;
+        background: #DDCECD;
         min-height: 100vh;
     }
     
     /* Header Styles */
     .trading-header {
-        background: linear-gradient(135deg, #004B23 0%, #006400 25%, #38B000 50%, #70E000 75%, #9EF01A 100%);
+        background: linear-gradient(135deg, #37392E 0%, #19647E 25%, #28AFB0 50%, #DDCECD 75%, #EEE5E5 100%);
         color: white;
         padding: 2rem;
         border-radius: 12px;
         margin-bottom: 2rem;
-        box-shadow: 0 4px 20px rgba(0,75,35,0.3);
+        box-shadow: 0 4px 20px rgba(55,57,46,0.3);
         text-align: center;
     }
     
@@ -527,7 +527,7 @@ st.markdown("""
     }
     
     .ghana-pride {
-        background: linear-gradient(135deg, #ff6b6b 0%, #ffd60a 30%, #28a745 70%, #007bff 100%);
+        background: linear-gradient(135deg, #19647E 0%, #28AFB0 30%, #37392E 70%, #DDCECD 100%);
         color: white;
         padding: 1rem;
         border-radius: 8px;
@@ -558,15 +558,15 @@ st.markdown("""
     }
     
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #004B23 0%, #006400 100%);
+        background: linear-gradient(135deg, #37392E 0%, #19647E 100%);
         color: white;
         font-weight: 600;
-        box-shadow: 0 2px 8px rgba(0,75,35,0.3);
+        box-shadow: 0 2px 8px rgba(55,57,46,0.3);
     }
     
     .stTabs [data-baseweb="tab"]:hover {
-        background: rgba(0,100,0,0.1);
-        color: #004B23;
+        background: rgba(25,100,126,0.1);
+        color: #37392E;
     }
     
     /* Card Styles */
@@ -591,18 +591,18 @@ st.markdown("""
         padding: 2rem;
         margin: 1rem 0;
         box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        border-left: 4px solid #006400;
+        border-left: 4px solid #19647E;
     }
     
     .summary-card h3 {
-        color: #004B23;
+        color: #37392E;
         font-size: 1.25rem;
         font-weight: 600;
         margin-bottom: 1rem;
     }
     
     .summary-card h2 {
-        color: #006400;
+        color: #19647E;
         font-size: 2rem;
         font-weight: 700;
         margin: 0.5rem 0;
@@ -614,45 +614,45 @@ st.markdown("""
     }
     
     .portfolio-value {
-        background: linear-gradient(135deg, #5DFDCB 0%, #90D7FF 100%);
-        color: #004B23;
-        border-left: 4px solid #006400;
+        background: linear-gradient(135deg, #28AFB0 0%, #DDCECD 100%);
+        color: #37392E;
+        border-left: 4px solid #19647E;
     }
     
     .cash-available {
-        background: linear-gradient(135deg, #C9F9FF 0%, #BFD0E0 100%);
-        color: #004B23;
-        border-left: 4px solid #90D7FF;
+        background: linear-gradient(135deg, #DDCECD 0%, #EEE5E5 100%);
+        color: #37392E;
+        border-left: 4px solid #28AFB0;
     }
     
     .total-return {
-        background: linear-gradient(135deg, #70E000 0%, #9EF01A 100%);
-        color: #004B23;
-        border-left: 4px solid #38B000;
+        background: linear-gradient(135deg, #28AFB0 0%, #EEE5E5 100%);
+        color: #37392E;
+        border-left: 4px solid #19647E;
     }
     
     .total-trades {
-        background: linear-gradient(135deg, #B8B3BE 0%, #90D7FF 100%);
-        color: #004B23;
-        border-left: 4px solid #70E000;
+        background: linear-gradient(135deg, #37392E 0%, #DDCECD 100%);
+        color: white;
+        border-left: 4px solid #28AFB0;
     }
     
     /* Button Styles */
     .stButton > button {
-        background: linear-gradient(135deg, #006400 0%, #38B000 100%);
+        background: linear-gradient(135deg, #19647E 0%, #28AFB0 100%);
         color: white;
         border: none;
         border-radius: 8px;
         padding: 0.75rem 2rem;
         font-weight: 600;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0,100,0,0.3);
+        box-shadow: 0 2px 8px rgba(25,100,126,0.3);
     }
     
     .stButton > button:hover {
-        background: linear-gradient(135deg, #004B23 0%, #006400 100%);
+        background: linear-gradient(135deg, #37392E 0%, #19647E 100%);
         transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(0,75,35,0.4);
+        box-shadow: 0 4px 15px rgba(55,57,46,0.4);
     }
     
     .stButton > button:active {
@@ -692,7 +692,7 @@ st.markdown("""
     
     /* Colors */
     .positive { 
-        color: #006400; 
+        color: #19647E; 
         font-weight: 600; 
     }
     
@@ -708,11 +708,11 @@ st.markdown("""
     
     /* Market Status */
     .market-status {
-        background: #f8f9fa;
+        background: #EEE5E5;
         border-radius: 8px;
         padding: 1rem;
         margin: 1rem 0;
-        border-left: 4px solid #006400;
+        border-left: 4px solid #19647E;
     }
     
     .market-status.open {
@@ -750,7 +750,7 @@ st.markdown("""
     
     /* Loading states */
     .stSpinner {
-        color: #006400;
+        color: #19647E;
     }
     
     /* Sidebar styling */
@@ -772,7 +772,7 @@ st.markdown("""
     }
     
     .login-container h2 {
-        color: #004B23;
+        color: #37392E;
         text-align: center;
         margin-bottom: 1.5rem;
     }
@@ -788,7 +788,7 @@ st.markdown("""
     }
     
     .chart-container h3 {
-        color: #004B23;
+        color: #37392E;
         margin-bottom: 1rem;
         font-weight: 600;
     }
@@ -824,15 +824,15 @@ st.markdown("""
     
     /* Page section headers */
     .page-header {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        background: linear-gradient(135deg, #EEE5E5 0%, #DDCECD 100%);
         padding: 1.5rem;
         border-radius: 12px;
         margin-bottom: 2rem;
-        border-left: 4px solid #006400;
+        border-left: 4px solid #19647E;
     }
     
     .page-header h2 {
-        color: #004B23;
+        color: #37392E;
         margin: 0;
         font-weight: 600;
     }
@@ -1478,27 +1478,27 @@ class TradingSimulator:
     def get_african_markets(self) -> Dict[str, List[str]]:
         """Get African markets categorized by country"""
         return {
-            "🇬🇭 Ghana Stock Exchange (GSE)": [
+            "Ghana Stock Exchange (GSE)": [
                 'GOIL.AC', 'ECOBANK.AC', 'CAL.AC', 'MTNGH.AC', 'GWEB.AC', 'SOGEGH.AC',
                 'AYRTN.AC', 'UNIL.AC', 'CMLT.AC', 'RBGH.AC', 'BOPP.AC', 'TOTAL.AC',
                 'GGBL.AC', 'SCBGH.AC', 'DIGP.AC', 'CLYD.AC', 'AADS.AC', 'CAPL.AC',
                 'NICO.AC', 'HORDS.AC', 'TRANSOL.AC', 'PRODUCE.AC', 'PIONEER.AC'
             ],
-            "🇿🇦 Johannesburg Stock Exchange (JSE)": [
+            "Johannesburg Stock Exchange (JSE)": [
                 'NPN.JO', 'PRX.JO', 'ABG.JO', 'SHP.JO', 'BVT.JO', 'MTN.JO', 'VOD.JO',
                 'DSY.JO', 'TKG.JO', 'REM.JO', 'BID.JO', 'SBK.JO', 'FSR.JO', 'NED.JO',
                 'AGL.JO', 'IMP.JO', 'SOL.JO', 'CPI.JO', 'RNI.JO', 'APN.JO', 'MCG.JO',
                 'PIK.JO', 'WHL.JO', 'TBS.JO', 'GFI.JO', 'HAR.JO', 'SLM.JO', 'AMS.JO',
                 'CFR.JO', 'INP.JO', 'BTI.JO', 'ARI.JO', 'SPP.JO', 'MRP.JO', 'RBX.JO'
             ],
-            "🇰🇪 Nairobi Securities Exchange (NSE)": [
+            "Nairobi Securities Exchange (NSE)": [
                 'KCB.NR', 'EQTY.NR', 'SCBK.NR', 'ABSA.NR', 'DTBK.NR', 'BAT.NR', 'EABL.NR',
                 'SAFCOM.NR', 'BRITAM.NR', 'JUBILEE.NR', 'LIBERTY.NR', 'COOP.NR', 'UNGA.NR',
                 'KAKUZI.NR', 'SASINI.NR', 'KAPCHORUA.NR', 'WILLIAMSON.NR', 'BAMBURI.NR',
                 'CROWN.NR', 'KENGEN.NR', 'KPLC.NR', 'KEGN.NR', 'KENOL.NR', 'TPS.NR',
                 'UMEME.NR', 'TOTAL.NR', 'CARBACID.NR', 'BOC.NR', 'OLYMPIA.NR', 'CENTUM.NR'
             ],
-            "🇳🇬 Nigerian Exchange (NGX)": [
+            "Nigerian Exchange (NGX)": [
                 'GTCO.LG', 'ZENITHBANK.LG', 'UBA.LG', 'ACCESS.LG', 'FBNH.LG', 'FIDELITYBK.LG',
                 'STERLINGNG.LG', 'WEMA.LG', 'UNITY.LG', 'STANBIC.LG', 'DANGCEM.LG', 'BUA.LG',
                 'MTNN.LG', 'AIRTELAFRI.LG', 'SEPLAT.LG', 'OANDO.LG', 'TOTAL.LG', 'CONOIL.LG',
@@ -1506,7 +1506,7 @@ class TradingSimulator:
                 'FLOURMILL.LG', 'HONEYFLOUR.LG', 'CADBURY.LG', 'VITAFOAM.LG', 'JBERGER.LG',
                 'LIVESTOCK.LG', 'CHIPLC.LG', 'ELLAHLAKES.LG', 'NAHCO.LG', 'RTBRISCOE.LG'
             ],
-            "🇪🇬 Egyptian Exchange (EGX)": [
+            "Egyptian Exchange (EGX)": [
                 'CIB.CA', 'COMI.CA', 'ALEX.CA', 'ABUK.CA', 'SAIB.CA', 'ADIB.CA', 'QNBK.CA',
                 'ELSWEDY.CA', 'HRHO.CA', 'TMGH.CA', 'OTMT.CA', 'PHDC.CA', 'PALM.CA', 'MNHD.CA',
                 'MOPCO.CA', 'EGAS.CA', 'EGTS.CA', 'EGCH.CA', 'SKPC.CA', 'IRON.CA', 'EZDK.CA',
@@ -1981,28 +1981,22 @@ class TradingSimulator:
             if is_crypto:
                 display_name = symbol.replace('-USD', '')
                 asset_type = "Cryptocurrency"
-                asset_icon = "🪙"
             elif symbol.endswith('.AC'):
                 display_name = symbol
                 asset_type = "Ghana Stock Exchange (GSE) - Live Mock Data"
-                asset_icon = "🇬🇭"
             elif symbol.endswith('.NR'):
                 display_name = symbol
                 asset_type = "Kenya NSE - Live Mock Data"
-                asset_icon = "🇰🇪"
             elif symbol.endswith('.LG'):
                 display_name = symbol
                 asset_type = "Nigeria NGX - Live Mock Data"
-                asset_icon = "🇳🇬"
             elif is_african:
                 display_name = symbol
                 country = self.get_african_country_from_symbol(symbol)
                 asset_type = f"African Stock - {country}"
-                asset_icon = "🌍"
             else:
                 display_name = symbol
                 asset_type = "Stock"
-                asset_icon = "📈"
             
             # Main candlestick chart
             fig.add_trace(go.Candlestick(
@@ -2072,11 +2066,11 @@ class TradingSimulator:
             # Add mock data indicator for mock data stocks
             if is_mock:
                 if symbol.endswith('.AC'):
-                    mock_text = "🇬🇭 LIVE MOCK DATA"
+                    mock_text = "LIVE MOCK DATA"
                 elif symbol.endswith('.NR'):
-                    mock_text = "🇰🇪 LIVE MOCK DATA"
+                    mock_text = "LIVE MOCK DATA"
                 elif symbol.endswith('.LG'):
-                    mock_text = "🇳🇬 LIVE MOCK DATA"
+                    mock_text = "LIVE MOCK DATA"
                 else:
                     mock_text = "LIVE MOCK DATA"
                 
@@ -2099,7 +2093,7 @@ class TradingSimulator:
             
             # Update layout
             fig.update_layout(
-                title=f"{asset_icon} {display_name} - {asset_type} Technical Analysis ({period})",
+                title=f"{display_name} - {asset_type} Technical Analysis ({period})",
                 yaxis_title=f"Price ({currency})",
                 xaxis_title="Date",
                 template="plotly_white",
@@ -2157,11 +2151,11 @@ class TradingSimulator:
                         if symbol.endswith('-USD'):
                             display_name = symbol.replace('-USD', '')
                         elif symbol.endswith('.AC'):
-                            display_name = f"🇬🇭 {symbol}"
+                            display_name = f"{symbol}"
                         elif symbol.endswith('.NR'):
-                            display_name = f"🇰🇪 {symbol}"
+                            display_name = f"{symbol}"
                         elif symbol.endswith('.LG'):
-                            display_name = f"🇳🇬 {symbol}"
+                            display_name = f"{symbol}"
                         elif self.is_african_stock(symbol):
                             display_name = f"{symbol} ({self.get_african_country_from_symbol(symbol)})"
                         else:
@@ -2211,13 +2205,13 @@ class TradingSimulator:
                     current_value = stock_data['price'] * position['shares']
                     total_portfolio_value += current_value
                     
-                    # Add appropriate icon based on asset type
+                    # Add appropriate label based on asset type
                     if stock_data.get('is_crypto'):
-                        symbol_display = f"🪙 {position['symbol'].replace('-USD', '')}"
+                        symbol_display = f"{position['symbol'].replace('-USD', '')}"
                     elif stock_data.get('is_african'):
-                        symbol_display = f"🌍 {position['symbol']}"
+                        symbol_display = f"{position['symbol']}"
                     else:
-                        symbol_display = f"📈 {position['symbol']}"
+                        symbol_display = f"{position['symbol']}"
                     
                     portfolio_data.append({
                         'Symbol': symbol_display,
@@ -2317,7 +2311,7 @@ def show_login_page():
     """Show login and registration page"""
     st.markdown("""
     <div class="trading-header">
-        <h1>📈 Leo's Trader</h1>
+        <h1>Leo's Trader</h1>
         <p>Professional Trading Simulator - Master the Markets with Virtual Money</p>
     </div>
     """, unsafe_allow_html=True)
@@ -2325,13 +2319,13 @@ def show_login_page():
     # Ghana Pride Section
     st.markdown("""
     <div class="ghana-pride">
-        <h3>🇬🇭 Proudly Made in Ghana 🇬🇭</h3>
+        <h3>Proudly Made in Ghana</h3>
         <p>Developed with passion from the Gateway to Africa</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Login/Register tabs
-    tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+    tab1, tab2 = st.tabs(["Login", "Register"])
     
     with tab1:
         st.markdown("""
@@ -2383,7 +2377,7 @@ def show_login_page():
                         simulator = TradingSimulator()
                         result = simulator.db.create_user(new_username, new_password, new_email)
                         if result['success']:
-                            st.success("✅ Account created successfully! Please login.")
+                            st.success("Account created successfully! Please login.")
                         else:
                             st.error(result['message'])
                     else:
@@ -2395,7 +2389,7 @@ def show_dashboard(simulator, current_user):
     """Show main dashboard"""
     st.markdown("""
     <div class="page-header">
-        <h2>📊 Trading Dashboard</h2>
+        <h2>Trading Dashboard</h2>
         <p>Your complete trading overview and market summary</p>
     </div>
     """, unsafe_allow_html=True)
@@ -2411,7 +2405,7 @@ def show_dashboard(simulator, current_user):
     with col1:
         st.markdown(f"""
         <div class="summary-card portfolio-value">
-            <h3>💰 Portfolio Value</h3>
+            <h3>Portfolio Value</h3>
             <h2>${portfolio_value:,.2f}</h2>
         </div>
         """, unsafe_allow_html=True)
@@ -2419,7 +2413,7 @@ def show_dashboard(simulator, current_user):
     with col2:
         st.markdown(f"""
         <div class="summary-card cash-available">
-            <h3>💵 Cash Available</h3>
+            <h3>Cash Available</h3>
             <h2>${current_user['cash']:,.2f}</h2>
         </div>
         """, unsafe_allow_html=True)
@@ -2428,7 +2422,7 @@ def show_dashboard(simulator, current_user):
         return_color = "total-return" if total_return >= 0 else "total-return"
         st.markdown(f"""
         <div class="summary-card {return_color}">
-            <h3>📈 Total Return</h3>
+            <h3>Total Return</h3>
             <h2>${total_return:,.2f}</h2>
             <div class="delta {'positive' if total_return >= 0 else 'negative'}">({return_percentage:+.2f}%)</div>
         </div>
@@ -2437,7 +2431,7 @@ def show_dashboard(simulator, current_user):
     with col4:
         st.markdown(f"""
         <div class="summary-card total-trades">
-            <h3>🔄 Total Trades</h3>
+            <h3>Total Trades</h3>
             <h2>{current_user['total_trades']}</h2>
         </div>
         """, unsafe_allow_html=True)
@@ -2445,7 +2439,7 @@ def show_dashboard(simulator, current_user):
     # Market overview section
     st.markdown("""
     <div class="chart-container">
-        <h3>📊 Market Overview</h3>
+        <h3>Market Overview</h3>
     </div>
     """, unsafe_allow_html=True)
     
@@ -2453,7 +2447,7 @@ def show_dashboard(simulator, current_user):
     col_idx1, col_idx2 = st.columns(2)
     
     with col_idx1:
-        st.write("#### 📈 Major Indices")
+        st.write("#### Major Indices")
         indices = ['SPY', 'QQQ', 'IWM', 'VTI']
         indices_data = []
         for index in indices:
@@ -2471,7 +2465,7 @@ def show_dashboard(simulator, current_user):
             st.dataframe(df_indices, use_container_width=True, hide_index=True)
     
     with col_idx2:
-        st.write("#### 🪙 Top Cryptocurrencies")
+        st.write("#### Top Cryptocurrencies")
         crypto_major = ['BTC-USD', 'ETH-USD', 'BNB-USD', 'XRP-USD']
         crypto_data = []
         for crypto in crypto_major:
@@ -2494,7 +2488,7 @@ def show_dashboard(simulator, current_user):
     if portfolio:
         st.markdown("""
         <div class="chart-container">
-            <h3>📊 Portfolio Allocation</h3>
+            <h3>Portfolio Allocation</h3>
         </div>
         """, unsafe_allow_html=True)
         
@@ -2507,25 +2501,25 @@ def show_dashboard(simulator, current_user):
     if trades:
         st.markdown("""
         <div class="chart-container">
-            <h3>📋 Recent Trades</h3>
+            <h3>Recent Trades</h3>
         </div>
         """, unsafe_allow_html=True)
         
         recent_trades = trades[:5]  # Show last 5 trades
         trades_data = []
         for trade in recent_trades:
-            # Asset type icon
+            # Asset type display
             if trade['symbol'].endswith('-USD'):
-                icon = "🪙"
+                symbol_display = f"CRYPTO {trade['symbol'].replace('-USD', '')}"
             elif simulator.is_african_stock(trade['symbol']):
-                icon = "🌍"
+                symbol_display = f"AFRICAN {trade['symbol']}"
             else:
-                icon = "📈"
+                symbol_display = f"STOCK {trade['symbol']}"
             
             trades_data.append({
                 'Time': trade['timestamp'].strftime('%m/%d %H:%M'),
-                'Action': '🛒 BUY' if trade['type'] == 'BUY' else '💰 SELL',
-                'Asset': f"{icon} {trade['symbol']}",
+                'Action': 'BUY' if trade['type'] == 'BUY' else 'SELL',
+                'Asset': symbol_display,
                 'Shares': trade['shares'],
                 'Price': f"${trade['price']:.2f}",
                 'P&L': f"${trade['profit_loss']:+,.2f}" if trade['profit_loss'] != 0 else "-"
@@ -2539,7 +2533,7 @@ def show_research_page(simulator, current_user):
     """Show research and analysis page"""
     st.markdown("""
     <div class="page-header">
-        <h2>🔬 Research & Analysis</h2>
+        <h2>Research & Analysis</h2>
         <p>Professional market research tools and technical analysis</p>
     </div>
     """, unsafe_allow_html=True)
@@ -2547,7 +2541,7 @@ def show_research_page(simulator, current_user):
     # Research mode selector
     research_mode = st.selectbox(
         "Research Mode",
-        ["Single Asset Analysis", "Compare Multiple Assets", "Market Screener", "🌍 African Markets"],
+        ["Single Asset Analysis", "Compare Multiple Assets", "Market Screener", "African Markets"],
         key="research_mode"
     )
     
@@ -2555,7 +2549,7 @@ def show_research_page(simulator, current_user):
         # Asset type selector
         asset_type = st.selectbox(
             "Select Asset Type",
-            ["All Assets", "Stocks & ETFs", "Cryptocurrencies", "🌍 African Markets"],
+            ["All Assets", "Stocks & ETFs", "Cryptocurrencies", "African Markets"],
             key="asset_type_filter"
         )
         
@@ -2564,7 +2558,7 @@ def show_research_page(simulator, current_user):
             available_assets = [s for s in simulator.available_stocks if not s.endswith('-USD') and not simulator.is_african_stock(s)]
         elif asset_type == "Cryptocurrencies":
             available_assets = [s for s in simulator.available_stocks if s.endswith('-USD')]
-        elif asset_type == "🌍 African Markets":
+        elif asset_type == "African Markets":
             available_assets = [s for s in simulator.available_stocks if simulator.is_african_stock(s)]
         else:
             available_assets = simulator.available_stocks
@@ -2587,21 +2581,22 @@ def show_research_page(simulator, current_user):
                     # Asset header
                     if asset_data.get('is_crypto'):
                         asset_display_name = analysis_asset.replace('-USD', '')
-                        asset_type_icon = "🪙"
+                        asset_type_label = "Cryptocurrency"
                     elif asset_data.get('is_african'):
                         asset_display_name = analysis_asset
-                        asset_type_icon = "🌍"
+                        asset_type_label = "African Stock"
                     else:
                         asset_display_name = analysis_asset
-                        asset_type_icon = "📈"
+                        asset_type_label = "Stock"
                     
-                    asset_header = f"{asset_type_icon} {asset_data['name']} ({asset_display_name})"
+                    asset_header = f"{asset_data['name']} ({asset_display_name})"
                     if asset_data.get('is_mock'):
                         asset_header += " - Live Mock Data"
                     
                     st.markdown(f"""
                     <div class="metric-card">
                         <h2>{asset_header}</h2>
+                        <p><strong>Type:</strong> {asset_type_label}</p>
                         <p><strong>Sector:</strong> {asset_data.get('sector', 'N/A')}</p>
                         <p><strong>Industry:</strong> {asset_data.get('industry', 'N/A')}</p>
                     </div>
@@ -2609,7 +2604,7 @@ def show_research_page(simulator, current_user):
                 
                 with col_info2:
                     # Quick action buttons
-                    if st.button("🛒 Quick Buy", key="research_buy", use_container_width=True):
+                    if st.button("Quick Buy", key="research_buy", use_container_width=True):
                         st.session_state.current_page = 'Trade'
                         st.session_state.quick_trade_asset = analysis_asset
                         st.session_state.quick_trade_action = 'BUY'
@@ -2620,13 +2615,13 @@ def show_research_page(simulator, current_user):
                     owns_asset = any(p['symbol'] == analysis_asset for p in portfolio)
                     
                     if owns_asset:
-                        if st.button("💰 Quick Sell", key="research_sell", use_container_width=True):
+                        if st.button("Quick Sell", key="research_sell", use_container_width=True):
                             st.session_state.current_page = 'Trade'
                             st.session_state.quick_trade_asset = analysis_asset
                             st.session_state.quick_trade_action = 'SELL'
                             st.rerun()
                     else:
-                        st.button("💰 Quick Sell", key="research_sell", disabled=True, use_container_width=True, help="You don't own this asset")
+                        st.button("Quick Sell", key="research_sell", disabled=True, use_container_width=True, help="You don't own this asset")
                 
                 # Current price metrics
                 col_price1, col_price2, col_price3, col_price4 = st.columns(4)
@@ -2664,7 +2659,7 @@ def show_research_page(simulator, current_user):
                 # Technical analysis chart
                 st.markdown("""
                 <div class="chart-container">
-                    <h3>📊 Technical Analysis</h3>
+                    <h3>Technical Analysis</h3>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -2695,7 +2690,7 @@ def show_research_page(simulator, current_user):
                 st.error("Unable to load asset data")
     
     elif research_mode == "Compare Multiple Assets":
-        st.write("### 📊 Asset Comparison")
+        st.write("### Asset Comparison")
         
         # Asset selector for comparison
         comparison_assets = st.multiselect(
@@ -2727,7 +2722,7 @@ def show_research_page(simulator, current_user):
             # Create comparison chart
             st.markdown("""
             <div class="chart-container">
-                <h3>📈 Performance Comparison</h3>
+                <h3>Performance Comparison</h3>
             </div>
             """, unsafe_allow_html=True)
             
@@ -2741,7 +2736,7 @@ def show_research_page(simulator, current_user):
             # Comparison table
             st.markdown("""
             <div class="chart-container">
-                <h3>📋 Asset Comparison Table</h3>
+                <h3>Asset Comparison Table</h3>
             </div>
             """, unsafe_allow_html=True)
             
@@ -2751,16 +2746,16 @@ def show_research_page(simulator, current_user):
                 if asset_data:
                     if asset_data.get('is_crypto'):
                         display_name = asset.replace('-USD', '')
-                        asset_type_icon = "🪙"
+                        asset_type_label = "CRYPTO"
                     elif asset_data.get('is_african'):
                         display_name = asset
-                        asset_type_icon = "🌍"
+                        asset_type_label = "AFRICAN"
                     else:
                         display_name = asset
-                        asset_type_icon = "📈"
+                        asset_type_label = "STOCK"
                     
                     comparison_data.append({
-                        'Asset': f"{asset_type_icon} {display_name}",
+                        'Asset': f"{asset_type_label} {display_name}",
                         'Name': asset_data['name'][:30],
                         'Price': simulator.format_currency_display(asset_data['price'], asset_data['currency']),
                         'Change': simulator.format_currency_display(asset_data['change'], asset_data['currency']),
@@ -2774,7 +2769,7 @@ def show_research_page(simulator, current_user):
                 st.dataframe(df, use_container_width=True, hide_index=True)
     
     elif research_mode == "Market Screener":
-        st.write("### 🔍 Market Screener")
+        st.write("### Market Screener")
         
         # Market screener filters
         col_filter1, col_filter2 = st.columns(2)
@@ -2806,7 +2801,7 @@ def show_research_page(simulator, current_user):
         # Show market data
         st.markdown("""
         <div class="chart-container">
-            <h3>📊 Market Data</h3>
+            <h3>Market Data</h3>
         </div>
         """, unsafe_allow_html=True)
         
@@ -2816,17 +2811,17 @@ def show_research_page(simulator, current_user):
                 data = simulator.get_stock_price(asset)
                 if data:
                     if data.get('is_crypto'):
-                        icon = "🪙"
+                        asset_type_label = "CRYPTO"
                         display_name = asset.replace('-USD', '')
                     elif data.get('is_african'):
-                        icon = "🌍"
+                        asset_type_label = "AFRICAN"
                         display_name = asset
                     else:
-                        icon = "📈"
+                        asset_type_label = "STOCK"
                         display_name = asset
                     
                     screener_data.append({
-                        'Symbol': f"{icon} {display_name}",
+                        'Symbol': f"{asset_type_label} {display_name}",
                         'Name': data['name'][:25],
                         'Price': simulator.format_currency_display(data['price'], data['currency']),
                         'Change': simulator.format_currency_display(data['change'], data['currency']),
@@ -2839,8 +2834,8 @@ def show_research_page(simulator, current_user):
             df_screener = pd.DataFrame(screener_data)
             st.dataframe(df_screener, use_container_width=True, hide_index=True)
     
-    elif research_mode == "🌍 African Markets":
-        st.write("### 🌍 African Stock Exchanges")
+    elif research_mode == "African Markets":
+        st.write("### African Stock Exchanges")
         
         # African markets selector
         african_markets = simulator.get_african_markets()
@@ -2894,7 +2889,7 @@ def show_trade_page(simulator, current_user):
     """Show trading page"""
     st.markdown("""
     <div class="page-header">
-        <h2>💰 Trade Stocks & Crypto</h2>
+        <h2>Trade Stocks & Crypto</h2>
         <p>Execute trades with real-time market data</p>
     </div>
     """, unsafe_allow_html=True)
@@ -2909,14 +2904,14 @@ def show_trade_page(simulator, current_user):
     with trade_col1:
         st.markdown("""
         <div class="chart-container">
-            <h3>🛒 Place Order</h3>
+            <h3>Place Order</h3>
         </div>
         """, unsafe_allow_html=True)
         
         # Asset selection
         trade_asset_type = st.selectbox(
             "Asset Type",
-            ["All Assets", "Stocks & ETFs", "Cryptocurrencies", "🌍 African Markets"],
+            ["All Assets", "Stocks & ETFs", "Cryptocurrencies", "African Markets"],
             key="trade_asset_type"
         )
         
@@ -2925,7 +2920,7 @@ def show_trade_page(simulator, current_user):
             trade_available_assets = [s for s in simulator.available_stocks if not s.endswith('-USD') and not simulator.is_african_stock(s)]
         elif trade_asset_type == "Cryptocurrencies":
             trade_available_assets = [s for s in simulator.available_stocks if s.endswith('-USD')]
-        elif trade_asset_type == "🌍 African Markets":
+        elif trade_asset_type == "African Markets":
             trade_available_assets = [s for s in simulator.available_stocks if simulator.is_african_stock(s)]
         else:
             trade_available_assets = simulator.available_stocks
@@ -2951,17 +2946,18 @@ def show_trade_page(simulator, current_user):
                 # Display current asset info
                 if asset_data.get('is_crypto'):
                     display_name = selected_asset.replace('-USD', '')
-                    asset_type_icon = "🪙"
+                    asset_type_label = "Cryptocurrency"
                 elif asset_data.get('is_african'):
                     display_name = selected_asset
-                    asset_type_icon = "🌍"
+                    asset_type_label = "African Stock"
                 else:
                     display_name = selected_asset
-                    asset_type_icon = "📈"
+                    asset_type_label = "Stock"
                 
                 st.markdown(f"""
                 <div class="metric-card">
-                    <h3>{asset_type_icon} {asset_data['name']} ({display_name})</h3>
+                    <h3>{asset_data['name']} ({display_name})</h3>
+                    <p><strong>Type:</strong> {asset_type_label}</p>
                     <p><strong>Current Price:</strong> {simulator.format_currency_display(asset_data['price'], asset_data['currency'])}</p>
                     <p><strong>24h Change:</strong> <span class="{'positive' if asset_data['change'] >= 0 else 'negative'}">{simulator.format_currency_display(asset_data['change'], asset_data['currency'])} ({asset_data['change_percent']:+.2f}%)</span></p>
                 </div>
@@ -3092,7 +3088,7 @@ def show_trade_page(simulator, current_user):
     with trade_col2:
         st.markdown("""
         <div class="chart-container">
-            <h3>📊 Market Movers</h3>
+            <h3>Market Movers</h3>
         </div>
         """, unsafe_allow_html=True)
         
@@ -3103,20 +3099,20 @@ def show_trade_page(simulator, current_user):
             data = simulator.get_stock_price(asset)
             if data:
                 if data.get('is_crypto'):
-                    icon = "🪙"
                     display_name = asset.replace('-USD', '')
+                    asset_type_label = "CRYPTO"
                 elif data.get('is_african'):
-                    icon = "🌍"
                     display_name = asset
+                    asset_type_label = "AFRICAN"
                 else:
-                    icon = "📈"
                     display_name = asset
+                    asset_type_label = "STOCK"
                 
                 change_class = "positive" if data['change'] >= 0 else "negative"
                 
                 st.markdown(f"""
                 <div class="metric-card">
-                    <p><strong>{icon} {display_name}</strong></p>
+                    <p><strong>{asset_type_label} {display_name}</strong></p>
                     <p>{simulator.format_currency_display(data['price'], data['currency'])} <span class="{change_class}">({data['change_percent']:+.2f}%)</span></p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -3125,7 +3121,7 @@ def show_portfolio_page(simulator, current_user):
     """Show portfolio management page"""
     st.markdown("""
     <div class="page-header">
-        <h2>📈 Portfolio Management</h2>
+        <h2>Portfolio Management</h2>
         <p>Track your investments and portfolio performance</p>
     </div>
     """, unsafe_allow_html=True)
@@ -3153,7 +3149,7 @@ def show_portfolio_page(simulator, current_user):
         # Portfolio pie chart
         st.markdown("""
         <div class="chart-container">
-            <h3>🥧 Portfolio Allocation</h3>
+            <h3>Portfolio Allocation</h3>
         </div>
         """, unsafe_allow_html=True)
         
@@ -3166,7 +3162,7 @@ def show_portfolio_page(simulator, current_user):
     # Holdings table
     st.markdown("""
     <div class="chart-container">
-        <h3>📋 Current Holdings</h3>
+        <h3>Current Holdings</h3>
     </div>
     """, unsafe_allow_html=True)
     
@@ -3183,13 +3179,13 @@ def show_portfolio_page(simulator, current_user):
                 unrealized_pl = current_value - invested_value
                 unrealized_pl_percent = (unrealized_pl / invested_value) * 100 if invested_value > 0 else 0
                 
-                # Asset type icon
+                # Asset type label
                 if current_data.get('is_crypto'):
-                    icon = "🪙"
+                    asset_type_label = "CRYPTO"
                 elif current_data.get('is_african'):
-                    icon = "🌍"
+                    asset_type_label = "AFRICAN"
                 else:
-                    icon = "📈"
+                    asset_type_label = "STOCK"
                 
                 # For African stocks, convert USD stored prices back to local currency for display
                 if current_data.get('is_african') and current_data['currency'] != 'USD':
@@ -3214,7 +3210,7 @@ def show_portfolio_page(simulator, current_user):
                     unrealized_pl_local = current_value_local - invested_value_local
                     
                     holdings_data.append({
-                        'Asset': f"{icon} {position['symbol']}",
+                        'Asset': f"{asset_type_label} {position['symbol']}",
                         'Company': position['name'][:25],
                         'Shares': position['shares'],
                         'Avg Price': avg_price_display,
@@ -3226,7 +3222,7 @@ def show_portfolio_page(simulator, current_user):
                 else:
                     # For USD assets (US stocks, crypto)
                     holdings_data.append({
-                        'Asset': f"{icon} {position['symbol']}",
+                        'Asset': f"{asset_type_label} {position['symbol']}",
                         'Company': position['name'][:25],
                         'Shares': position['shares'],
                         'Avg Price': f"${position['avg_price']:.2f}",
@@ -3248,7 +3244,7 @@ def show_history_page(simulator, current_user):
     """Show trade history page"""
     st.markdown("""
     <div class="page-header">
-        <h2>📋 Trade History</h2>
+        <h2>Trade History</h2>
         <p>Review your trading activity and performance</p>
     </div>
     """, unsafe_allow_html=True)
@@ -3281,23 +3277,23 @@ def show_history_page(simulator, current_user):
         # Trades table
         st.markdown("""
         <div class="chart-container">
-            <h3>📊 Trade History</h3>
+            <h3>Trade History</h3>
         </div>
         """, unsafe_allow_html=True)
         
         trades_data = []
         for trade in trades[:100]:  # Show last 100 trades
-            # Asset type icon
+            # Asset type label
             if trade['symbol'].endswith('-USD'):
-                icon = "🪙"
+                asset_type_label = "CRYPTO"
                 is_african = False
                 currency = 'USD'
             elif simulator.is_african_stock(trade['symbol']):
-                icon = "🌍"
+                asset_type_label = "AFRICAN"
                 is_african = True
                 currency = simulator.get_currency_symbol(trade['symbol'])
             else:
-                icon = "📈"
+                asset_type_label = "STOCK"
                 is_african = False
                 currency = 'USD'
             
@@ -3320,8 +3316,8 @@ def show_history_page(simulator, current_user):
             
             trades_data.append({
                 'Date': trade['timestamp'].strftime('%Y-%m-%d %H:%M'),
-                'Type': '🛒 BUY' if trade['type'] == 'BUY' else '💰 SELL',
-                'Asset': f"{icon} {trade['symbol']}",
+                'Type': 'BUY' if trade['type'] == 'BUY' else 'SELL',
+                'Asset': f"{asset_type_label} {trade['symbol']}",
                 'Company': trade['name'][:20],
                 'Shares': trade['shares'],
                 'Price': price_display,
@@ -3340,7 +3336,7 @@ def show_leaderboard_page(simulator, current_user):
     """Show leaderboard page"""
     st.markdown("""
     <div class="page-header">
-        <h2>🏆 Leaderboard</h2>
+        <h2>Leaderboard</h2>
         <p>Compete with other traders and track your ranking</p>
     </div>
     """, unsafe_allow_html=True)
@@ -3351,26 +3347,26 @@ def show_leaderboard_page(simulator, current_user):
     if leaderboard:
         st.markdown("""
         <div class="chart-container">
-            <h3>🥇 Top Traders</h3>
+            <h3>Top Traders</h3>
         </div>
         """, unsafe_allow_html=True)
         
         leaderboard_data = []
         for i, player in enumerate(leaderboard[:20]):  # Top 20 players
-            # Determine rank emoji
+            # Determine rank display
             if player['rank'] == 1:
-                rank_display = "🥇"
+                rank_display = "1st"
             elif player['rank'] == 2:
-                rank_display = "🥈"
+                rank_display = "2nd"
             elif player['rank'] == 3:
-                rank_display = "🥉"
+                rank_display = "3rd"
             else:
-                rank_display = f"#{player['rank']}"
+                rank_display = f"{player['rank']}th"
             
             # Highlight current user
             username_display = player['username']
             if player['user_id'] == current_user['id']:
-                username_display = f"👤 {username_display}"
+                username_display = f"YOU - {username_display}"
             
             leaderboard_data.append({
                 'Rank': rank_display,
@@ -3395,7 +3391,7 @@ def show_account_page(simulator, current_user):
     """Show account information page"""
     st.markdown("""
     <div class="page-header">
-        <h2>👤 Account Information</h2>
+        <h2>Account Information</h2>
         <p>Manage your account settings and view trading statistics</p>
     </div>
     """, unsafe_allow_html=True)
@@ -3406,7 +3402,7 @@ def show_account_page(simulator, current_user):
     with col_acc1:
         st.markdown("""
         <div class="chart-container">
-            <h3>📊 Account Overview</h3>
+            <h3>Account Overview</h3>
         </div>
         """, unsafe_allow_html=True)
         
@@ -3418,7 +3414,7 @@ def show_account_page(simulator, current_user):
     with col_acc2:
         st.markdown("""
         <div class="chart-container">
-            <h3>📈 Trading Statistics</h3>
+            <h3>Trading Statistics</h3>
         </div>
         """, unsafe_allow_html=True)
         
@@ -3430,7 +3426,7 @@ def show_account_page(simulator, current_user):
     # Exchange rates status
     st.markdown("""
     <div class="chart-container">
-        <h3>💱 Exchange Rates Information</h3>
+        <h3>Exchange Rates Information</h3>
     </div>
     """, unsafe_allow_html=True)
     
@@ -3442,7 +3438,7 @@ def show_account_page(simulator, current_user):
     with col_fx1:
         st.markdown(f"""
         <div class="metric-card">
-            <h4>📊 Rate Source</h4>
+            <h4>Rate Source</h4>
             <p>{st.session_state.get('exchange_rates_source', 'Not loaded')}</p>
             <small>Last updated: {st.session_state.get('exchange_rates_last_update', 'Never')}</small>
         </div>
@@ -3451,7 +3447,7 @@ def show_account_page(simulator, current_user):
     with col_fx2:
         st.markdown(f"""
         <div class="metric-card">
-            <h4>🔄 Update Frequency</h4>
+            <h4>Update Frequency</h4>
             <p>Every 30 minutes</p>
             <small>Multiple API fallbacks</small>
         </div>
@@ -3462,10 +3458,8 @@ def show_account_page(simulator, current_user):
     rates_data = []
     for currency, rate in st.session_state.exchange_rates.items():
         if currency != 'USD':
-            currency_symbols = {'GHS': '🇬🇭', 'KES': '🇰🇪', 'NGN': '🇳🇬', 'ZAR': '🇿🇦', 'EGP': '🇪🇬'}
-            flag = currency_symbols.get(currency, '🏳️')
             rates_data.append({
-                'Currency': f"{flag} {currency}",
+                'Currency': currency,
                 'Rate': f"{rate:.2f}",
                 'Example': f"$100 = {simulator.format_currency_display(rate * 100, currency)}"
             })
@@ -3477,7 +3471,7 @@ def show_account_page(simulator, current_user):
     # Game settings
     st.markdown("""
     <div class="chart-container">
-        <h3>⚙️ Game Settings</h3>
+        <h3>Game Settings</h3>
     </div>
     """, unsafe_allow_html=True)
     
@@ -3488,7 +3482,7 @@ def show_account_page(simulator, current_user):
     with col_set1:
         st.markdown(f"""
         <div class="metric-card">
-            <h4>💰 Starting Cash</h4>
+            <h4>Starting Cash</h4>
             <p>${settings['starting_cash']:,.2f}</p>
         </div>
         """, unsafe_allow_html=True)
@@ -3496,7 +3490,7 @@ def show_account_page(simulator, current_user):
     with col_set2:
         st.markdown(f"""
         <div class="metric-card">
-            <h4>💸 Commission</h4>
+            <h4>Commission</h4>
             <p>$0.00 per trade (Commission-Free!)</p>
         </div>
         """, unsafe_allow_html=True)
@@ -3504,7 +3498,7 @@ def show_account_page(simulator, current_user):
     with col_set3:
         st.markdown(f"""
         <div class="metric-card">
-            <h4>⏰ Game Duration</h4>
+            <h4>Game Duration</h4>
             <p>{settings['game_duration_days']} days</p>
         </div>
         """, unsafe_allow_html=True)
@@ -3512,19 +3506,19 @@ def show_account_page(simulator, current_user):
     # About section
     st.markdown("""
     <div class="chart-container">
-        <h3>ℹ️ About Leo's Trader</h3>
+        <h3>About Leo's Trader</h3>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown("""
     **Leo's Trader** is a comprehensive trading simulation platform that allows you to:
     
-    - 📈 **Trade Real Stocks**: Practice with live market data from major US exchanges
-    - 🪙 **Cryptocurrency Trading**: Trade major cryptocurrencies with real-time prices
-    - 🌍 **African Markets**: Explore opportunities in Ghana, Kenya, Nigeria, South Africa, and Egypt
-    - 📊 **Technical Analysis**: Use advanced charting tools and indicators
-    - 🏆 **Compete**: Join the leaderboard and compete with other traders
-    - 📱 **Learn**: Risk-free environment to learn trading strategies
+    - **Trade Real Stocks**: Practice with live market data from major US exchanges
+    - **Cryptocurrency Trading**: Trade major cryptocurrencies with real-time prices
+    - **African Markets**: Explore opportunities in Ghana, Kenya, Nigeria, South Africa, and Egypt
+    - **Technical Analysis**: Use advanced charting tools and indicators
+    - **Compete**: Join the leaderboard and compete with other traders
+    - **Learn**: Risk-free environment to learn trading strategies
     
     **Features:**
     - Real-time market data for stocks and crypto
@@ -3534,7 +3528,7 @@ def show_account_page(simulator, current_user):
     - Technical analysis charts
     - Multi-currency support
     
-    **🇬🇭 Proudly developed in Ghana** to promote financial literacy and trading education across Africa and beyond.
+    **Proudly developed in Ghana** to promote financial literacy and trading education across Africa and beyond.
     """)
 
 def main():
@@ -3558,21 +3552,21 @@ def main():
         # Header with user info
         st.markdown("""
         <div class="trading-header">
-            <h1>📈 Leo's Trader</h1>
+            <h1>Leo's Trader</h1>
             <p>Professional Trading Simulator - Master the Markets</p>
         </div>
         """, unsafe_allow_html=True)
         
         # Navigation
         pages = {
-            "📊 Dashboard": "Dashboard",
-            "🔬 Research": "Research", 
-            "💰 Trade": "Trade",
-            "📈 Portfolio": "Portfolio",
-            "📋 History": "History",
-            "🏆 Leaderboard": "Leaderboard",
-            "👤 Account": "Account",
-            "🚪 Logout": "Logout"
+            "Dashboard": "Dashboard",
+            "Research": "Research", 
+            "Trade": "Trade",
+            "Portfolio": "Portfolio",
+            "History": "History",
+            "Leaderboard": "Leaderboard",
+            "Account": "Account",
+            "Logout": "Logout"
         }
         
         # Create navigation
