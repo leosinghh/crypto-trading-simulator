@@ -743,59 +743,164 @@ st.markdown("""
         font-weight: 500; 
     }
     
-    /* Sidebar styling */
+    /* Modern Collapsible Sidebar Styling */
     .css-1d391kg {
-        background: #37392E;
-        border-radius: 0;
-        padding: 2rem 1rem;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 1rem;
+        margin: 1rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        width: auto !important;
+        min-width: 280px;
     }
     
-    /* Sidebar navigation styles */
-    .sidebar-nav {
+    /* Sidebar Header with Company Info */
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: rgba(55, 57, 46, 0.05);
+        border-radius: 12px;
+        border: 1px solid rgba(55, 57, 46, 0.1);
+    }
+    
+    .sidebar-header .company-avatar {
+        width: 40px;
+        height: 40px;
         background: #37392E;
-        padding: 1rem 0;
-        border-radius: 8px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .sidebar-header .company-info h4 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #37392E;
+        line-height: 1.2;
+    }
+    
+    .sidebar-header .company-info p {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #666;
+        opacity: 0.8;
+    }
+    
+    /* Modern Navigation Menu */
+    .modern-nav {
+        margin-bottom: 1.5rem;
+    }
+    
+    .modern-nav .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.25rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #37392E;
+        font-weight: 500;
+        font-size: 0.9rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .modern-nav .nav-item:hover {
+        background: rgba(25, 100, 126, 0.08);
+        transform: translateX(2px);
+    }
+    
+    .modern-nav .nav-item.active {
+        background: #19647E;
+        color: white;
+        box-shadow: 0 2px 8px rgba(25, 100, 126, 0.3);
+    }
+    
+    .modern-nav .nav-item .nav-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Sidebar navigation override for Streamlit buttons */
+    .sidebar-nav {
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
         margin-bottom: 1rem;
     }
     
     .sidebar-nav .stButton > button {
         background: transparent;
-        color: white;
+        color: #37392E;
         border: none;
-        border-radius: 8px;
-        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
         font-weight: 500;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         width: 100%;
         text-align: left;
-        margin-bottom: 0.5rem;
-        font-size: 1rem;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
         box-shadow: none;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
     }
     
     .sidebar-nav .stButton > button:hover {
-        background: #28AFB0;
-        color: white;
-        transform: translateX(5px);
-        box-shadow: 0 2px 8px rgba(40,175,176,0.3);
+        background: rgba(25, 100, 126, 0.08);
+        color: #19647E;
+        transform: translateX(2px);
+        box-shadow: none;
     }
     
-    .sidebar-nav .stButton > button.active {
+    .sidebar-nav .stButton > button:focus {
         background: #19647E;
         color: white;
-        font-weight: 600;
-        border-left: 4px solid #28AFB0;
+        box-shadow: 0 2px 8px rgba(25, 100, 126, 0.3);
     }
     
-    /* ENHANCED Sidebar user info with portfolio data */
+    /* Enhanced User Info Card */
     .sidebar-user-info {
-        background: #28AFB0;
+        background: linear-gradient(135deg, #28AFB0 0%, #19647E 100%);
         color: white;
         padding: 1.5rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(40, 175, 176, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .sidebar-user-info::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     }
     
     .sidebar-user-info h4 {
@@ -813,7 +918,7 @@ st.markdown("""
     }
     
     .sidebar-user-info .portfolio-summary {
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
         padding-top: 1rem;
         margin-top: 1rem;
     }
@@ -824,11 +929,12 @@ st.markdown("""
         align-items: center;
         margin: 0.5rem 0;
         font-size: 0.8rem;
+        padding: 0.25rem 0;
     }
     
     .sidebar-user-info .portfolio-value {
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
     
     .sidebar-user-info .positive {
@@ -839,6 +945,105 @@ st.markdown("""
     .sidebar-user-info .negative {
         color: #FFB6C1;
         font-weight: 600;
+    }
+    
+    /* User Profile Section */
+    .user-profile {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(55, 57, 46, 0.05);
+        border-radius: 12px;
+        margin-top: 1rem;
+        border: 1px solid rgba(55, 57, 46, 0.1);
+    }
+    
+    .user-profile .user-avatar {
+        width: 36px;
+        height: 36px;
+        background: #37392E;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+    }
+    
+    .user-profile .user-info h5 {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #37392E;
+        line-height: 1.2;
+    }
+    
+    .user-profile .user-info p {
+        margin: 0;
+        font-size: 0.7rem;
+        color: #666;
+        opacity: 0.8;
+    }
+    
+    /* Logout Button */
+    .logout-btn .stButton > button {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.2);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        width: 100%;
+        font-size: 0.85rem;
+    }
+    
+    .logout-btn .stButton > button:hover {
+        background: #dc3545;
+        color: white;
+        border-color: #dc3545;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+    
+    /* Ghana Pride Section - Modernized */
+    .ghana-pride-sidebar {
+        background: linear-gradient(135deg, #DDCECD 0%, #19647E 100%);
+        color: #37392E;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-top: 1rem;
+        text-align: center;
+        border: 1px solid rgba(25, 100, 126, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .ghana-pride-sidebar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(55, 57, 46, 0.2), transparent);
+    }
+    
+    .ghana-pride-sidebar h4 {
+        color: #37392E;
+        margin: 0 0 0.25rem 0;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .ghana-pride-sidebar p {
+        color: #37392E;
+        margin: 0;
+        font-size: 0.7rem;
+        opacity: 0.8;
     }
     
     /* Login/Register forms */
@@ -3593,7 +3798,18 @@ def main():
         
         # Sidebar Navigation
         with st.sidebar:
-            # Enhanced User Info Card with Portfolio Data (REMOVED Leo's Trader header card)
+            # Modern Sidebar Header with Company Info
+            st.markdown(f"""
+            <div class="sidebar-header">
+                <div class="company-avatar">LT</div>
+                <div class="company-info">
+                    <h4>Leo's Trader</h4>
+                    <p>Trading Simulator</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Enhanced User Info Card with Portfolio Data
             st.markdown(f"""
             <div class="sidebar-user-info">
                 <h4>Welcome, {current_user['username']}</h4>
@@ -3616,18 +3832,18 @@ def main():
             </div>
             """, unsafe_allow_html=True)
             
-            # Navigation Menu
+            # Modern Navigation Menu
             st.markdown('<div class="sidebar-nav">', unsafe_allow_html=True)
             
-            # Navigation buttons
+            # Navigation buttons with icons
             pages = {
-                "Dashboard": "Dashboard",
-                "Research": "Research", 
-                "Trade": "Trade",
-                "Portfolio": "Portfolio",
-                "History": "History",
-                "Leaderboard": "Leaderboard",
-                "Account": "Account"
+                "🏠 Dashboard": "Dashboard",
+                "📊 Research": "Research", 
+                "💼 Trade": "Trade",
+                "📈 Portfolio": "Portfolio",
+                "📋 History": "History",
+                "🏆 Leaderboard": "Leaderboard",
+                "⚙️ Account": "Account"
             }
             
             # Create navigation buttons
@@ -3638,18 +3854,31 @@ def main():
             
             st.markdown('</div>', unsafe_allow_html=True)
             
-            # Logout button at bottom
-            st.markdown("---")
-            if st.button("Logout", key="logout_btn", use_container_width=True):
+            # User Profile Section
+            user_initial = current_user['username'][0].upper() if current_user['username'] else 'U'
+            st.markdown(f"""
+            <div class="user-profile">
+                <div class="user-avatar">{user_initial}</div>
+                <div class="user-info">
+                    <h5>{current_user['username']}</h5>
+                    <p>{current_user['email']}</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Logout button
+            st.markdown('<div class="logout-btn">', unsafe_allow_html=True)
+            if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
                 st.session_state.logged_in = False
                 st.session_state.current_user = None
                 st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
             
-            # Ghana Pride Section in sidebar
+            # Ghana Pride Section - Modernized
             st.markdown("""
-            <div style="background: #DDCECD; color: #37392E; padding: 1rem; border-radius: 8px; margin-top: 2rem; text-align: center;">
-                <h4 style="color: #37392E; margin: 0;">Proudly Made in Ghana</h4>
-                <p style="color: #37392E; margin: 0.5rem 0 0 0; font-size: 0.8rem;">Gateway to Africa</p>
+            <div class="ghana-pride-sidebar">
+                <h4>🇬🇭 Proudly Made in Ghana</h4>
+                <p>Gateway to Africa</p>
             </div>
             """, unsafe_allow_html=True)
         
