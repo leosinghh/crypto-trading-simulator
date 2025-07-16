@@ -474,14 +474,14 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
-    /* Global Dark Theme */
+    /* Global Dark Theme with Green Accents */
     .stApp {
-        background-color: #1a1a1a;
+        background-color: #0f1419;
         color: #ffffff;
     }
     
     .main .block-container {
-        background-color: #1a1a1a;
+        background-color: #0f1419;
         color: #ffffff;
         padding: 0;
         max-width: 100%;
@@ -489,13 +489,14 @@ st.markdown("""
     
     /* Header Navigation */
     .header-nav {
-        background-color: #2d3748;
+        background: linear-gradient(135deg, #004B23 0%, #006400 100%);
         padding: 1rem 2rem;
-        border-bottom: 1px solid #4a5568;
+        border-bottom: 1px solid #38B000;
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0;
+        box-shadow: 0 2px 10px rgba(0,75,35,0.3);
     }
     
     .logo {
@@ -503,6 +504,7 @@ st.markdown("""
         font-weight: 700;
         color: #ffffff;
         font-family: 'Inter', sans-serif;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     
     .nav-buttons {
@@ -512,8 +514,8 @@ st.markdown("""
     
     .nav-button {
         background-color: transparent;
-        color: #cbd5e0;
-        border: 1px solid #4a5568;
+        color: #ffffff;
+        border: 1px solid #38B000;
         padding: 0.5rem 1rem;
         border-radius: 6px;
         cursor: pointer;
@@ -524,19 +526,22 @@ st.markdown("""
     }
     
     .nav-button:hover {
-        background-color: #4a5568;
-        color: #ffffff;
+        background: linear-gradient(135deg, #38B000 0%, #70E000 100%);
+        color: #000000;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(56,176,0,0.3);
     }
     
     .nav-button.active {
-        background-color: #4299e1;
-        color: #ffffff;
-        border-color: #4299e1;
+        background: linear-gradient(135deg, #70E000 0%, #9EF01A 100%);
+        color: #000000;
+        border-color: #70E000;
+        box-shadow: 0 2px 8px rgba(112,224,0,0.3);
     }
     
     /* Main Content Layout */
     .main-content {
-        background-color: #2d3748;
+        background-color: #0f1419;
         min-height: 100vh;
         padding: 2rem;
     }
@@ -550,14 +555,28 @@ st.markdown("""
     }
     
     .overview-card {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 12px;
         padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .overview-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(56,176,0,0.1) 0%, transparent 50%);
+        pointer-events: none;
     }
     
     .overview-title {
-        color: #a0aec0;
+        color: #70E000;
         font-size: 0.875rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -572,7 +591,7 @@ st.markdown("""
     }
     
     .metric-label {
-        color: #a0aec0;
+        color: #9EF01A;
         font-size: 0.875rem;
         font-weight: 500;
     }
@@ -594,28 +613,56 @@ st.markdown("""
     }
     
     .metric-change.positive {
-        color: #48bb78;
+        color: #70E000;
     }
     
     .metric-change.negative {
-        color: #f56565;
+        color: #ff4757;
     }
     
     .performance-chart {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 12px;
         padding: 1.5rem;
         height: 400px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .performance-chart::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(56,176,0,0.1) 0%, transparent 50%);
+        pointer-events: none;
     }
     
     /* Holdings Section */
     .holdings-section {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 12px;
         padding: 1.5rem;
         margin-top: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .holdings-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(56,176,0,0.1) 0%, transparent 50%);
+        pointer-events: none;
     }
     
     .holdings-header {
@@ -626,7 +673,7 @@ st.markdown("""
     }
     
     .holdings-title {
-        color: #a0aec0;
+        color: #70E000;
         font-size: 0.875rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -640,74 +687,78 @@ st.markdown("""
     
     .holdings-tab {
         padding: 0.5rem 1rem;
-        border: 1px solid #4a5568;
+        border: 1px solid #38B000;
         border-radius: 6px;
         background-color: transparent;
-        color: #a0aec0;
+        color: #70E000;
         cursor: pointer;
         font-weight: 500;
         transition: all 0.2s;
     }
     
     .holdings-tab.active {
-        background-color: #4299e1;
-        color: #ffffff;
-        border-color: #4299e1;
+        background: linear-gradient(135deg, #70E000 0%, #9EF01A 100%);
+        color: #000000;
+        border-color: #70E000;
     }
     
     .holdings-tab:hover {
-        background-color: #4a5568;
-        color: #ffffff;
+        background: linear-gradient(135deg, #38B000 0%, #70E000 100%);
+        color: #000000;
     }
     
     /* Market Status */
     .market-status {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 12px;
         padding: 1rem;
         margin-bottom: 2rem;
         text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
     
     .market-status.open {
-        border-color: #48bb78;
+        border-color: #70E000;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
     }
     
     .market-status.closed {
-        border-color: #f56565;
+        border-color: #ff4757;
+        background: linear-gradient(135deg, #2d1a1a 0%, #4a2d2d 100%);
     }
     
     .market-status-text {
-        color: #a0aec0;
+        color: #70E000;
         font-size: 0.875rem;
         font-weight: 500;
     }
     
     .market-status-text.open {
-        color: #48bb78;
+        color: #70E000;
     }
     
     .market-status-text.closed {
-        color: #f56565;
+        color: #ff4757;
     }
     
     /* Data Tables */
     .stDataFrame {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 12px;
         overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
     
     .stDataFrame table {
-        background-color: #1a202c;
+        background-color: transparent;
         color: #ffffff;
     }
     
     .stDataFrame th {
-        background-color: #2d3748;
-        color: #a0aec0;
+        background: linear-gradient(135deg, #004B23 0%, #006400 100%);
+        color: #ffffff;
         font-weight: 600;
         text-transform: uppercase;
         font-size: 0.75rem;
@@ -715,61 +766,91 @@ st.markdown("""
     }
     
     .stDataFrame td {
-        background-color: #1a202c;
+        background-color: transparent;
         color: #ffffff;
-        border-bottom: 1px solid #4a5568;
+        border-bottom: 1px solid #38B000;
     }
     
     /* Buttons */
     .stButton > button {
-        background-color: #4299e1;
+        background: linear-gradient(135deg, #006400 0%, #38B000 100%);
         color: #ffffff;
-        border: 1px solid #4299e1;
-        border-radius: 6px;
+        border: 1px solid #38B000;
+        border-radius: 8px;
         padding: 0.75rem 1.5rem;
         font-weight: 600;
         transition: all 0.2s;
         font-family: 'Inter', sans-serif;
+        box-shadow: 0 4px 15px rgba(56,176,0,0.3);
     }
     
     .stButton > button:hover {
-        background-color: #3182ce;
-        border-color: #3182ce;
+        background: linear-gradient(135deg, #38B000 0%, #70E000 100%);
+        border-color: #70E000;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(112,224,0,0.4);
     }
     
     /* Form Elements */
     .stSelectbox > div > div {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 6px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 8px;
         color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     
     .stTextInput > div > div > input {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 6px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 8px;
         color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #70E000;
+        box-shadow: 0 0 0 3px rgba(112,224,0,0.2);
     }
     
     .stNumberInput > div > div > input {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 6px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 8px;
         color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .stNumberInput > div > div > input:focus {
+        border-color: #70E000;
+        box-shadow: 0 0 0 3px rgba(112,224,0,0.2);
     }
     
     /* Trade Form */
     .trade-form {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .trade-form::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(56,176,0,0.1) 0%, transparent 50%);
+        pointer-events: none;
     }
     
     .trade-form-title {
-        color: #a0aec0;
+        color: #70E000;
         font-size: 0.875rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -777,32 +858,166 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
-    /* Login Form */
+    /* Enhanced Login Container */
     .login-container {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 8px;
-        padding: 2rem;
-        max-width: 400px;
-        margin: 2rem auto;
+        background: linear-gradient(135deg, #004B23 0%, #006400 25%, #38B000 50%, #70E000 75%, #9EF01A 100%);
+        border-radius: 20px;
+        padding: 3rem;
+        max-width: 500px;
+        margin: 3rem auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -50%;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
     }
     
     .login-title {
         color: #ffffff;
-        font-size: 1.5rem;
+        font-size: 2.5rem;
         font-weight: 700;
         text-align: center;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        background: linear-gradient(135deg, #ffffff, #f0f0f0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .login-subtitle {
+        color: rgba(255,255,255,0.9);
+        font-size: 1.1rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-weight: 300;
+    }
+    
+    .login-form-container {
+        background: rgba(255,255,255,0.1);
+        border-radius: 15px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .login-form-container .stTextInput > div > div > input {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 10px;
+        color: #ffffff;
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+        backdrop-filter: blur(5px);
+    }
+    
+    .login-form-container .stTextInput > div > div > input::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .login-form-container .stTextInput > div > div > input:focus {
+        border-color: rgba(255,255,255,0.5);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+    }
+    
+    .login-form-container .stButton > button {
+        background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+        color: #004B23;
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .login-form-container .stButton > button:hover {
+        background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    /* Ghana Pride in Login */
+    .login-ghana-pride {
+        background: rgba(255,255,255,0.1);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .login-ghana-pride h3 {
+        color: #ffd700;
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .login-ghana-pride p {
+        color: rgba(255,255,255,0.9);
+        margin: 0;
+        font-size: 1rem;
+    }
+    
+    /* Tab styling for login */
+    .stTabs [data-baseweb="tab-list"] {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 0.5rem;
         margin-bottom: 1.5rem;
+        backdrop-filter: blur(5px);
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: transparent;
+        border-radius: 8px;
+        color: rgba(255,255,255,0.8);
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: rgba(255,255,255,0.2);
+        color: #ffffff;
+        font-weight: 700;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        background: rgba(255,255,255,0.15);
+        color: #ffffff;
     }
     
     /* Ghana Pride */
     .ghana-pride {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 12px;
         padding: 1rem;
         text-align: center;
         margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
     
     .ghana-pride h3 {
@@ -811,50 +1026,68 @@ st.markdown("""
     }
     
     .ghana-pride p {
-        color: #a0aec0;
+        color: #70E000;
         margin: 0;
     }
     
     /* Success/Error Messages */
     .stSuccess {
-        background-color: #22543d;
-        border: 1px solid #48bb78;
-        border-radius: 6px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #70E000;
+        border-radius: 8px;
         color: #ffffff;
+        box-shadow: 0 2px 10px rgba(112,224,0,0.2);
     }
     
     .stError {
-        background-color: #742a2a;
-        border: 1px solid #f56565;
-        border-radius: 6px;
+        background: linear-gradient(135deg, #2d1a1a 0%, #4a2d2d 100%);
+        border: 1px solid #ff4757;
+        border-radius: 8px;
         color: #ffffff;
+        box-shadow: 0 2px 10px rgba(255,71,87,0.2);
     }
     
     .stInfo {
-        background-color: #2a4365;
-        border: 1px solid #4299e1;
-        border-radius: 6px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 8px;
         color: #ffffff;
+        box-shadow: 0 2px 10px rgba(56,176,0,0.2);
     }
     
     .stWarning {
-        background-color: #744210;
-        border: 1px solid #ed8936;
-        border-radius: 6px;
+        background: linear-gradient(135deg, #2d2a1a 0%, #4a472d 100%);
+        border: 1px solid #ffd700;
+        border-radius: 8px;
         color: #ffffff;
+        box-shadow: 0 2px 10px rgba(255,215,0,0.2);
     }
     
     /* Charts */
     .chart-container {
-        background-color: #1a202c;
-        border: 1px solid #4a5568;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 100%);
+        border: 1px solid #38B000;
+        border-radius: 12px;
         padding: 1.5rem;
         margin: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .chart-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(56,176,0,0.1) 0%, transparent 50%);
+        pointer-events: none;
     }
     
     .chart-title {
-        color: #a0aec0;
+        color: #70E000;
         font-size: 0.875rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -880,6 +1113,15 @@ st.markdown("""
         
         .main-content {
             padding: 1rem;
+        }
+        
+        .login-container {
+            margin: 1rem;
+            padding: 2rem;
+        }
+        
+        .login-title {
+            font-size: 2rem;
         }
     }
 </style>
@@ -1890,66 +2132,81 @@ class TradingSimulator:
             return None
 
 def show_login_page():
-    """Show login and registration page"""
+    """Show enhanced login and registration page"""
     st.markdown("""
     <div class="main-content">
         <div class="login-container">
             <div class="login-title">Leo's Trader</div>
-            <div class="ghana-pride">
+            <div class="login-subtitle">Professional Trading Simulator</div>
+            <div class="login-ghana-pride">
                 <h3>Proudly Made in Ghana</h3>
-                <p>Professional Trading Simulator</p>
+                <p>Empowering African traders with world-class technology</p>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    tab1, tab2 = st.tabs(["Login", "Register"])
+    # Create a centered container for the tabs
+    col1, col2, col3 = st.columns([1, 2, 1])
     
-    with tab1:
-        with st.form("login_form"):
-            username = st.text_input("Username", placeholder="Enter your username")
-            password = st.text_input("Password", type="password", placeholder="Enter your password")
+    with col2:
+        tab1, tab2 = st.tabs(["Login", "Register"])
+        
+        with tab1:
+            st.markdown('<div class="login-form-container">', unsafe_allow_html=True)
             
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.form_submit_button("Login", use_container_width=True):
-                    if username and password:
-                        simulator = TradingSimulator()
-                        result = simulator.db.authenticate_user(username, password)
-                        if result['success']:
-                            st.session_state.current_user = result['user']
-                            st.session_state.logged_in = True
-                            st.success(f"Welcome back, {result['user']['username']}!")
-                            st.rerun()
+            with st.form("login_form"):
+                st.markdown("### Welcome Back")
+                username = st.text_input("Username", placeholder="Enter your username")
+                password = st.text_input("Password", type="password", placeholder="Enter your password")
+                
+                col_login1, col_login2 = st.columns(2)
+                with col_login1:
+                    if st.form_submit_button("Login", use_container_width=True):
+                        if username and password:
+                            simulator = TradingSimulator()
+                            result = simulator.db.authenticate_user(username, password)
+                            if result['success']:
+                                st.session_state.current_user = result['user']
+                                st.session_state.logged_in = True
+                                st.success(f"Welcome back, {result['user']['username']}!")
+                                st.rerun()
+                            else:
+                                st.error(result['message'])
                         else:
-                            st.error(result['message'])
-                    else:
-                        st.error("Please enter username and password")
+                            st.error("Please enter username and password")
+                
+                with col_login2:
+                    if st.form_submit_button("Demo Mode", use_container_width=True):
+                        st.info("Demo mode coming soon!")
             
-            with col2:
-                if st.form_submit_button("Demo Mode", use_container_width=True):
-                    st.info("Demo mode coming soon!")
-    
-    with tab2:
-        with st.form("register_form"):
-            new_username = st.text_input("Username", placeholder="Choose a username")
-            new_email = st.text_input("Email", placeholder="Enter your email")
-            new_password = st.text_input("Password", type="password", placeholder="Create a password")
-            confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password")
+            st.markdown('</div>', unsafe_allow_html=True)
+        
+        with tab2:
+            st.markdown('<div class="login-form-container">', unsafe_allow_html=True)
             
-            if st.form_submit_button("Create Account", use_container_width=True):
-                if new_username and new_email and new_password and confirm_password:
-                    if new_password == confirm_password:
-                        simulator = TradingSimulator()
-                        result = simulator.db.create_user(new_username, new_password, new_email)
-                        if result['success']:
-                            st.success("Account created successfully! Please login.")
+            with st.form("register_form"):
+                st.markdown("### Create Account")
+                new_username = st.text_input("Username", placeholder="Choose a username")
+                new_email = st.text_input("Email", placeholder="Enter your email")
+                new_password = st.text_input("Password", type="password", placeholder="Create a password")
+                confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password")
+                
+                if st.form_submit_button("Create Account", use_container_width=True):
+                    if new_username and new_email and new_password and confirm_password:
+                        if new_password == confirm_password:
+                            simulator = TradingSimulator()
+                            result = simulator.db.create_user(new_username, new_password, new_email)
+                            if result['success']:
+                                st.success("Account created successfully! Please login.")
+                            else:
+                                st.error(result['message'])
                         else:
-                            st.error(result['message'])
+                            st.error("Passwords do not match")
                     else:
-                        st.error("Passwords do not match")
-                else:
-                    st.error("Please fill in all fields")
+                        st.error("Please fill in all fields")
+            
+            st.markdown('</div>', unsafe_allow_html=True)
 
 def show_portfolio_page(simulator, current_user):
     """Show portfolio page - main page like Investopedia"""
