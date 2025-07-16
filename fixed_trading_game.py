@@ -485,7 +485,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enhanced CSS with updated color palette (removed emojis from CSS)
+# Enhanced CSS with updated color palette and enhanced sidebar user info
 st.markdown("""
 <style>
     /* Import Google Fonts */
@@ -520,67 +520,6 @@ st.markdown("""
         }
     }
     
-    @keyframes slideInFromLeft {
-        0% {
-            opacity: 0;
-            transform: translateX(-30px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    /* Navigation transition effects */
-    .nav-container {
-        transition: all 0.3s ease;
-    }
-    
-    /* Content container animations */
-    .content-section {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: translateX(0);
-        opacity: 1;
-    }
-    
-    .content-section.slide-out-left {
-        animation: slideOutLeft 0.3s ease-in;
-    }
-    
-    .content-section.slide-out-right {
-        animation: slideOutRight 0.3s ease-in;
-    }
-    
-    .content-section.slide-in-left {
-        animation: slideInFromLeft 0.4s ease-out;
-    }
-    
-    .content-section.slide-in-right {
-        animation: slideInFromRight 0.4s ease-out;
-    }
-    
-    @keyframes slideOutLeft {
-        0% {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        100% {
-            opacity: 0;
-            transform: translateX(-100px);
-        }
-    }
-    
-    @keyframes slideOutRight {
-        0% {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        100% {
-            opacity: 0;
-            transform: translateX(100px);
-        }
-    }
-    
     /* Header Styles */
     .trading-header {
         background: #37392E;
@@ -607,6 +546,7 @@ st.markdown("""
         color: white;
     }
     
+    /* Ghana Pride Section */
     .ghana-pride {
         background: #19647E;
         color: white;
@@ -626,38 +566,6 @@ st.markdown("""
     .ghana-pride p {
         color: white;
         margin: 0.5rem 0 0 0;
-    }
-    
-    /* Navigation Tab Styles */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 4px;
-        background: white;
-        border-radius: 8px;
-        padding: 0.5rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        background: transparent;
-        border-radius: 6px;
-        color: #666;
-        font-weight: 500;
-        padding: 0.75rem 1.5rem;
-        transition: all 0.3s ease;
-        border: none;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background: #37392E;
-        color: white;
-        font-weight: 600;
-        box-shadow: 0 2px 8px rgba(55,57,46,0.3);
-    }
-    
-    .stTabs [data-baseweb="tab"]:hover {
-        background: #DDCECD;
-        color: #37392E;
     }
     
     /* Card Styles */
@@ -775,22 +683,6 @@ st.markdown("""
         justify-content: center;
         font-size: 0.9rem;
         position: relative;
-        overflow: hidden;
-    }
-    
-    .stButton > button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    .stButton > button:hover::before {
-        left: 100%;
     }
     
     .stButton > button:hover {
@@ -802,13 +694,6 @@ st.markdown("""
     .stButton > button:active {
         transform: translateY(0) scale(0.98);
         transition: all 0.1s ease;
-    }
-    
-    /* Active navigation button indicator */
-    .stButton > button.active {
-        background: #28AFB0;
-        transform: scale(1.05);
-        box-shadow: 0 4px 15px rgba(40,175,176,0.4);
     }
     
     /* Form Styles */
@@ -858,53 +743,6 @@ st.markdown("""
         font-weight: 500; 
     }
     
-    /* Market Status */
-    .market-status {
-        background: #EEE5E5;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-        border-left: 4px solid #19647E;
-    }
-    
-    .market-status.open {
-        background: #d4edda;
-        border-left-color: #28a745;
-    }
-    
-    .market-status.closed {
-        background: #f8d7da;
-        border-left-color: #dc3545;
-    }
-    
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .trading-header h1 {
-            font-size: 2rem;
-        }
-        
-        .trading-header p {
-            font-size: 1rem;
-        }
-        
-        .main .block-container {
-            padding: 1rem;
-        }
-        
-        .metric-card {
-            padding: 1rem;
-        }
-        
-        .summary-card {
-            padding: 1.5rem;
-        }
-    }
-    
-    /* Loading states */
-    .stSpinner {
-        color: #19647E;
-    }
-    
     /* Sidebar styling */
     .css-1d391kg {
         background: #37392E;
@@ -950,43 +788,21 @@ st.markdown("""
         border-left: 4px solid #28AFB0;
     }
     
-    /* Sidebar header */
-    .sidebar-header {
-        background: #19647E;
-        color: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        margin-bottom: 2rem;
-        text-align: center;
-    }
-    
-    .sidebar-header h2 {
-        color: white;
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-    
-    .sidebar-header p {
-        color: white;
-        margin: 0.5rem 0 0 0;
-        opacity: 0.9;
-        font-size: 0.9rem;
-    }
-    
-    /* User info in sidebar */
+    /* ENHANCED Sidebar user info with portfolio data */
     .sidebar-user-info {
         background: #28AFB0;
         color: white;
-        padding: 1rem;
+        padding: 1.5rem;
         border-radius: 8px;
         margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     
     .sidebar-user-info h4 {
         color: white;
         margin: 0 0 0.5rem 0;
         font-size: 1rem;
+        font-weight: 600;
     }
     
     .sidebar-user-info p {
@@ -994,6 +810,35 @@ st.markdown("""
         margin: 0.2rem 0;
         font-size: 0.8rem;
         opacity: 0.9;
+    }
+    
+    .sidebar-user-info .portfolio-summary {
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .sidebar-user-info .portfolio-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0.5rem 0;
+        font-size: 0.8rem;
+    }
+    
+    .sidebar-user-info .portfolio-value {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .sidebar-user-info .positive {
+        color: #90EE90;
+        font-weight: 600;
+    }
+    
+    .sidebar-user-info .negative {
+        color: #FFB6C1;
+        font-weight: 600;
     }
     
     /* Login/Register forms */
@@ -1076,6 +921,34 @@ st.markdown("""
         color: #37392E;
         margin: 0.5rem 0 0 0;
         opacity: 0.8;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .trading-header h1 {
+            font-size: 2rem;
+        }
+        
+        .trading-header p {
+            font-size: 1rem;
+        }
+        
+        .main .block-container {
+            padding: 1rem;
+        }
+        
+        .metric-card {
+            padding: 1rem;
+        }
+        
+        .summary-card {
+            padding: 1.5rem;
+        }
+        
+        .sidebar-user-info .portfolio-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1234,40 +1107,6 @@ class TradingSimulator:
             # For others, use 2 decimal places
             return f"{symbol}{amount:,.2f}"
     
-    def get_currency_conversion_info(self, amount: float, from_currency: str, to_currency: str = 'USD') -> Dict:
-        """Get detailed currency conversion information for debugging"""
-        self.update_exchange_rates()
-        
-        if from_currency == to_currency:
-            return {
-                'original_amount': amount,
-                'converted_amount': amount,
-                'rate': 1.0,
-                'from_currency': from_currency,
-                'to_currency': to_currency,
-                'rate_source': st.session_state.get('exchange_rates_source', 'Unknown')
-            }
-        
-        rate = st.session_state.exchange_rates.get(from_currency, 1.0)
-        
-        if to_currency == 'USD':
-            converted_amount = amount / rate
-        else:
-            # Convert through USD
-            usd_amount = amount / rate
-            target_rate = st.session_state.exchange_rates.get(to_currency, 1.0)
-            converted_amount = usd_amount * target_rate
-        
-        return {
-            'original_amount': amount,
-            'converted_amount': converted_amount,
-            'rate': rate,
-            'from_currency': from_currency,
-            'to_currency': to_currency,
-            'rate_source': st.session_state.get('exchange_rates_source', 'Unknown'),
-            'all_rates': st.session_state.exchange_rates.copy()
-        }
-    
     def initialize_all_mock_data(self):
         """Initialize mock data for all African Stock Exchanges"""
         # Update exchange rates first
@@ -1415,10 +1254,6 @@ class TradingSimulator:
                     'current_price': price,
                     'last_update': current_time
                 }
-    
-    def update_ghana_mock_data(self):
-        """Update Ghana mock data with new prices"""
-        self.update_mock_data_for_market('ghana', 'ghana_last_update')
     
     def update_mock_data_for_market(self, market: str, last_update_key: str):
         """Update mock data for a specific market"""
@@ -1922,32 +1757,6 @@ class TradingSimulator:
             'MTIE.CA': 'Misr for Trade and Investment Company'
         }
     
-    def get_crypto_categories(self) -> Dict[str, List[str]]:
-        """Get categorized cryptocurrency list"""
-        return {
-            "Major Cryptocurrencies": [
-                'BTC-USD', 'ETH-USD', 'BNB-USD', 'XRP-USD', 'SOL-USD', 'ADA-USD', 'AVAX-USD', 'DOT-USD'
-            ],
-            "DeFi Tokens": [
-                'UNI-USD', 'AAVE-USD', 'COMP-USD', 'MKR-USD', 'SNX-USD', 'SUSHI-USD', 'YFI-USD', 'CRV-USD'
-            ],
-            "Meme Coins": [
-                'DOGE-USD', 'SHIB-USD', 'PEPE-USD', 'FLOKI-USD', 'BONK-USD'
-            ],
-            "Layer 1 & 2": [
-                'MATIC-USD', 'ATOM-USD', 'NEAR-USD', 'APT-USD', 'ARB-USD', 'OP-USD', 'ICP-USD'
-            ],
-            "Altcoins": [
-                'LTC-USD', 'BCH-USD', 'LINK-USD', 'XLM-USD', 'VET-USD', 'FIL-USD', 'TRX-USD', 'ETC-USD', 'ALGO-USD'
-            ],
-            "Gaming & NFT": [
-                'MANA-USD', 'SAND-USD', 'AXS-USD', 'THETA-USD', 'GALA-USD', 'CHZ-USD', 'FLOW-USD', 'ENJ-USD'
-            ],
-            "Utility Tokens": [
-                'BAT-USD', 'ZRX-USD'
-            ]
-        }
-    
     def is_crypto(self, symbol: str) -> bool:
         """Check if symbol is a cryptocurrency"""
         return symbol.endswith('-USD')
@@ -2301,15 +2110,7 @@ class TradingSimulator:
             
             # Add mock data indicator for mock data stocks
             if is_mock:
-                if symbol.endswith('.AC'):
-                    mock_text = "LIVE MOCK DATA"
-                elif symbol.endswith('.NR'):
-                    mock_text = "LIVE MOCK DATA"
-                elif symbol.endswith('.LG'):
-                    mock_text = "LIVE MOCK DATA"
-                else:
-                    mock_text = "LIVE MOCK DATA"
-                
+                mock_text = "LIVE MOCK DATA"
                 fig.add_annotation(
                     x=hist.index[0],
                     y=hist['High'].max(),
@@ -3785,22 +3586,33 @@ def main():
         if current_user:
             st.session_state.current_user = current_user
         
+        # Calculate portfolio metrics for sidebar
+        portfolio_value = simulator.get_portfolio_value(current_user['id'])
+        total_return = portfolio_value - st.session_state.game_settings['starting_cash']
+        return_percentage = (total_return / st.session_state.game_settings['starting_cash']) * 100
+        
         # Sidebar Navigation
         with st.sidebar:
-            # Sidebar Header
-            st.markdown("""
-            <div class="sidebar-header">
-                <h2>Leo's Trader</h2>
-                <p>Trading Simulator</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # User Info
+            # Enhanced User Info Card with Portfolio Data (REMOVED Leo's Trader header card)
             st.markdown(f"""
             <div class="sidebar-user-info">
                 <h4>Welcome, {current_user['username']}</h4>
                 <p>Cash: ${current_user['cash']:,.2f}</p>
                 <p>Total Trades: {current_user['total_trades']}</p>
+                <div class="portfolio-summary">
+                    <div class="portfolio-item">
+                        <span>Portfolio Value:</span>
+                        <span class="portfolio-value">${portfolio_value:,.2f}</span>
+                    </div>
+                    <div class="portfolio-item">
+                        <span>Total Return:</span>
+                        <span class="portfolio-value {'positive' if total_return >= 0 else 'negative'}">${total_return:+,.2f}</span>
+                    </div>
+                    <div class="portfolio-item">
+                        <span>Return %:</span>
+                        <span class="portfolio-value {'positive' if return_percentage >= 0 else 'negative'}">{return_percentage:+.2f}%</span>
+                    </div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
             
