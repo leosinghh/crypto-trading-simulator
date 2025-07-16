@@ -504,7 +504,7 @@ st.markdown("""
     
     /* Header Styles */
     .trading-header {
-        background: linear-gradient(135deg, #37392E 0%, #19647E 25%, #28AFB0 50%, #DDCECD 75%, #EEE5E5 100%);
+        background: #37392E;
         color: white;
         padding: 2rem;
         border-radius: 12px;
@@ -518,16 +518,18 @@ st.markdown("""
         font-weight: 700;
         margin: 0;
         text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        color: white;
     }
     
     .trading-header p {
         font-size: 1.1rem;
         margin: 0.5rem 0 0 0;
-        opacity: 0.9;
+        opacity: 0.95;
+        color: white;
     }
     
     .ghana-pride {
-        background: linear-gradient(135deg, #19647E 0%, #28AFB0 30%, #37392E 70%, #DDCECD 100%);
+        background: #19647E;
         color: white;
         padding: 1rem;
         border-radius: 8px;
@@ -535,6 +537,16 @@ st.markdown("""
         text-align: center;
         font-weight: 600;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .ghana-pride h3 {
+        color: white;
+        margin: 0;
+    }
+    
+    .ghana-pride p {
+        color: white;
+        margin: 0.5rem 0 0 0;
     }
     
     /* Navigation Tab Styles */
@@ -558,14 +570,14 @@ st.markdown("""
     }
     
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #37392E 0%, #19647E 100%);
+        background: #37392E;
         color: white;
         font-weight: 600;
         box-shadow: 0 2px 8px rgba(55,57,46,0.3);
     }
     
     .stTabs [data-baseweb="tab"]:hover {
-        background: rgba(25,100,126,0.1);
+        background: #DDCECD;
         color: #37392E;
     }
     
@@ -614,43 +626,71 @@ st.markdown("""
     }
     
     .portfolio-value {
-        background: linear-gradient(135deg, #28AFB0 0%, #DDCECD 100%);
-        color: #37392E;
+        background: #28AFB0;
+        color: white;
         border-left: 4px solid #19647E;
+    }
+    
+    .portfolio-value h3,
+    .portfolio-value h2 {
+        color: white;
     }
     
     .cash-available {
-        background: linear-gradient(135deg, #DDCECD 0%, #EEE5E5 100%);
+        background: #DDCECD;
         color: #37392E;
         border-left: 4px solid #28AFB0;
+    }
+    
+    .cash-available h3,
+    .cash-available h2 {
+        color: #37392E;
     }
     
     .total-return {
-        background: linear-gradient(135deg, #28AFB0 0%, #EEE5E5 100%);
-        color: #37392E;
+        background: #28AFB0;
+        color: white;
         border-left: 4px solid #19647E;
     }
     
+    .total-return h3,
+    .total-return h2 {
+        color: white;
+    }
+    
     .total-trades {
-        background: linear-gradient(135deg, #37392E 0%, #DDCECD 100%);
+        background: #37392E;
         color: white;
         border-left: 4px solid #28AFB0;
+    }
+    
+    .total-trades h3,
+    .total-trades h2 {
+        color: white;
     }
     
     /* Button Styles */
     .stButton > button {
-        background: linear-gradient(135deg, #19647E 0%, #28AFB0 100%);
+        background: #19647E;
         color: white;
         border: none;
         border-radius: 8px;
-        padding: 0.75rem 2rem;
+        padding: 0.75rem 1rem;
         font-weight: 600;
         transition: all 0.3s ease;
         box-shadow: 0 2px 8px rgba(25,100,126,0.3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
     }
     
     .stButton > button:hover {
-        background: linear-gradient(135deg, #37392E 0%, #19647E 100%);
+        background: #37392E;
         transform: translateY(-1px);
         box-shadow: 0 4px 15px rgba(55,57,46,0.4);
     }
@@ -824,7 +864,7 @@ st.markdown("""
     
     /* Page section headers */
     .page-header {
-        background: linear-gradient(135deg, #EEE5E5 0%, #DDCECD 100%);
+        background: #EEE5E5;
         padding: 1.5rem;
         border-radius: 12px;
         margin-bottom: 2rem;
@@ -838,8 +878,9 @@ st.markdown("""
     }
     
     .page-header p {
-        color: #6c757d;
+        color: #37392E;
         margin: 0.5rem 0 0 0;
+        opacity: 0.8;
     }
 </style>
 """, unsafe_allow_html=True)
