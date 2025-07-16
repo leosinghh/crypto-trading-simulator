@@ -480,656 +480,366 @@ class TradingGameDatabase:
 # Configure Streamlit page
 st.set_page_config(
     page_title="Leo's Trader",
-    page_icon="💰",
+    page_icon="📈",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Enhanced CSS for modern, aesthetically pleasing interface
+# Enhanced CSS with professional Investopedia-style design
 st.markdown("""
 <style>
     /* Import Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
     
     /* Global Styles */
+    * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
     .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem 2rem;
+        background: #f8f9fa;
         min-height: 100vh;
     }
     
-    /* Enhanced Header */
-    .main-header {
-        text-align: center;
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    /* Header Styles */
+    .trading-header {
+        background: linear-gradient(135deg, #004B23 0%, #006400 25%, #38B000 50%, #70E000 75%, #9EF01A 100%);
         color: white;
-        padding: 3rem 2rem;
-        border-radius: 25px;
+        padding: 2rem;
+        border-radius: 12px;
         margin-bottom: 2rem;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
-        position: relative;
-        overflow: hidden;
-        font-family: 'Inter', sans-serif;
+        box-shadow: 0 4px 20px rgba(0,75,35,0.3);
+        text-align: center;
     }
     
-    .main-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -50%;
-        width: 200%;
-        height: 100%;
-        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-        animation: shimmer 3s infinite;
-    }
-    
-    @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-    }
-    
-    .main-header h1 {
-        font-size: 3.5rem;
+    .trading-header h1 {
+        font-size: 2.5rem;
         font-weight: 700;
         margin: 0;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        background: linear-gradient(135deg, #ffffff, #f0f0f0);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
     
-    .main-header p {
-        font-size: 1.2rem;
-        margin: 1rem 0 0 0;
+    .trading-header p {
+        font-size: 1.1rem;
+        margin: 0.5rem 0 0 0;
         opacity: 0.9;
-        font-weight: 300;
     }
     
-    /* Ghana Pride Section */
     .ghana-pride {
-        text-align: center;
         background: linear-gradient(135deg, #ff6b6b 0%, #ffd60a 30%, #28a745 70%, #007bff 100%);
         color: white;
-        padding: 1.5rem;
-        border-radius: 20px;
-        margin: 1.5rem 0;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        font-weight: 600;
-        font-size: 1.3em;
-        font-family: 'Inter', sans-serif;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .ghana-pride::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: pulse 4s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-    }
-    
-    /* Enhanced Portfolio Cards */
-    .portfolio-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 20px;
-        text-align: center;
-        margin: 0.5rem 0;
-        box-shadow: 0 15px 35px rgba(102,126,234,0.3);
-        border: 1px solid rgba(255,255,255,0.2);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .portfolio-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(102,126,234,0.4);
-    }
-    
-    .portfolio-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-        pointer-events: none;
-    }
-    
-    .portfolio-card h3 {
-        font-size: 1rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        opacity: 0.9;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .portfolio-card h2 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin: 0;
-        font-family: 'JetBrains Mono', monospace;
-    }
-    
-    .profit-card {
-        background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 20px;
-        text-align: center;
-        margin: 0.5rem 0;
-        box-shadow: 0 15px 35px rgba(0,184,148,0.3);
-        border: 1px solid rgba(255,255,255,0.2);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .profit-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(0,184,148,0.4);
-    }
-    
-    .profit-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-        pointer-events: none;
-    }
-    
-    .profit-card h3 {
-        font-size: 1rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        opacity: 0.9;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .profit-card h2 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin: 0;
-        font-family: 'JetBrains Mono', monospace;
-    }
-    
-    .loss-card {
-        background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 20px;
-        text-align: center;
-        margin: 0.5rem 0;
-        box-shadow: 0 15px 35px rgba(214,48,49,0.3);
-        border: 1px solid rgba(255,255,255,0.2);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .loss-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(214,48,49,0.4);
-    }
-    
-    .loss-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-        pointer-events: none;
-    }
-    
-    .loss-card h3 {
-        font-size: 1rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        opacity: 0.9;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .loss-card h2 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin: 0;
-        font-family: 'JetBrains Mono', monospace;
-    }
-    
-    .african-card {
-        background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 20px;
-        text-align: center;
-        margin: 0.5rem 0;
-        box-shadow: 0 15px 35px rgba(253,203,110,0.3);
-        border: 1px solid rgba(255,255,255,0.2);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .african-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(253,203,110,0.4);
-    }
-    
-    .african-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-        pointer-events: none;
-    }
-    
-    .african-card h3 {
-        font-size: 1rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        opacity: 0.9;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .african-card h2 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin: 0;
-        font-family: 'JetBrains Mono', monospace;
-    }
-    
-    /* Enhanced Colors */
-    .positive { 
-        color: #00b894; 
-        font-weight: 600; 
-        text-shadow: 0 1px 2px rgba(0,184,148,0.3);
-    }
-    
-    .negative { 
-        color: #d63031; 
-        font-weight: 600; 
-        text-shadow: 0 1px 2px rgba(214,48,49,0.3);
-    }
-    
-    .neutral { 
-        color: #636e72; 
-        font-weight: 500; 
-    }
-    
-    /* Enhanced Chart Container */
-    .chart-container {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        margin: 1.5rem 0;
-        border: 1px solid rgba(255,255,255,0.8);
-        position: relative;
-        overflow: hidden;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .chart-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .chart-container h3 {
-        color: #2d3436;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        font-size: 1.3rem;
-    }
-    
-    /* Enhanced Metric Cards */
-    .metric-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        padding: 1.5rem;
-        border-radius: 15px;
-        margin: 0.75rem 0;
-        border-left: 4px solid #667eea;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .metric-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 35px rgba(0,0,0,0.12);
-        border-left-color: #5a6fd8;
-    }
-    
-    .metric-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(102,126,234,0.02) 0%, transparent 50%);
-        pointer-events: none;
-    }
-    
-    .metric-card h2 {
-        color: #2d3436;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        font-size: 1.4rem;
-    }
-    
-    .metric-card h3 {
-        color: #2d3436;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        font-size: 1.2rem;
-    }
-    
-    .metric-card h4 {
-        color: #636e72;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        font-size: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .metric-card p {
-        color: #636e72;
-        font-weight: 400;
-        margin: 0.25rem 0;
-        line-height: 1.6;
-    }
-    
-    .metric-card strong {
-        color: #2d3436;
-        font-weight: 600;
-    }
-    
-    /* Enhanced Sidebar */
-    .css-1d391kg {
-        background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
-        border-radius: 15px;
         padding: 1rem;
+        border-radius: 8px;
         margin: 1rem 0;
-    }
-    
-    .css-1d391kg h2 {
-        color: white;
+        text-align: center;
         font-weight: 600;
-        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     
-    /* Enhanced Buttons */
-    .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        font-family: 'Inter', sans-serif;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102,126,234,0.3);
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102,126,234,0.4);
-        background: linear-gradient(135deg, #5a6fd8 0%, #6b7ab8 100%);
-    }
-    
-    .stButton > button:active {
-        transform: translateY(0);
-        box-shadow: 0 4px 15px rgba(102,126,234,0.3);
-    }
-    
-    /* Enhanced Tabs */
+    /* Navigation Tab Styles */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background: rgba(255,255,255,0.1);
-        border-radius: 15px;
+        gap: 4px;
+        background: white;
+        border-radius: 8px;
         padding: 0.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
     }
     
     .stTabs [data-baseweb="tab"] {
         background: transparent;
-        border-radius: 10px;
-        color: rgba(255,255,255,0.7);
+        border-radius: 6px;
+        color: #666;
         font-weight: 500;
         padding: 0.75rem 1.5rem;
         transition: all 0.3s ease;
-        font-family: 'Inter', sans-serif;
+        border: none;
     }
     
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        color: #2d3436;
+        background: linear-gradient(135deg, #004B23 0%, #006400 100%);
+        color: white;
         font-weight: 600;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0,75,35,0.3);
     }
     
-    /* Enhanced Form Elements */
+    .stTabs [data-baseweb="tab"]:hover {
+        background: rgba(0,100,0,0.1);
+        color: #004B23;
+    }
+    
+    /* Card Styles */
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        transform: translateY(-2px);
+    }
+    
+    .summary-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border-left: 4px solid #006400;
+    }
+    
+    .summary-card h3 {
+        color: #004B23;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .summary-card h2 {
+        color: #006400;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+    }
+    
+    .summary-card .delta {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .portfolio-value {
+        background: linear-gradient(135deg, #5DFDCB 0%, #90D7FF 100%);
+        color: #004B23;
+        border-left: 4px solid #006400;
+    }
+    
+    .cash-available {
+        background: linear-gradient(135deg, #C9F9FF 0%, #BFD0E0 100%);
+        color: #004B23;
+        border-left: 4px solid #90D7FF;
+    }
+    
+    .total-return {
+        background: linear-gradient(135deg, #70E000 0%, #9EF01A 100%);
+        color: #004B23;
+        border-left: 4px solid #38B000;
+    }
+    
+    .total-trades {
+        background: linear-gradient(135deg, #B8B3BE 0%, #90D7FF 100%);
+        color: #004B23;
+        border-left: 4px solid #70E000;
+    }
+    
+    /* Button Styles */
+    .stButton > button {
+        background: linear-gradient(135deg, #006400 0%, #38B000 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,100,0,0.3);
+    }
+    
+    .stButton > button:hover {
+        background: linear-gradient(135deg, #004B23 0%, #006400 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0,75,35,0.4);
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0);
+    }
+    
+    /* Form Styles */
     .stSelectbox > div > div {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border-radius: 10px;
-        border: 1px solid rgba(102,126,234,0.2);
-        font-family: 'Inter', sans-serif;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
     .stTextInput > div > div > input {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border-radius: 10px;
-        border: 1px solid rgba(102,126,234,0.2);
-        font-family: 'Inter', sans-serif;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
     .stNumberInput > div > div > input {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border-radius: 10px;
-        border: 1px solid rgba(102,126,234,0.2);
-        font-family: 'JetBrains Mono', monospace;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
-    /* Enhanced Multiselect */
-    .stMultiSelect > div > div {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border-radius: 10px;
-        border: 1px solid rgba(102,126,234,0.2);
-        font-family: 'Inter', sans-serif;
-    }
-    
-    /* Enhanced Dataframes */
+    /* DataFrames */
     .stDataFrame {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        border: 1px solid rgba(102,126,234,0.1);
-    }
-    
-    /* Enhanced Metrics */
-    .metric-container {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin: 0.5rem 0;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        border: 1px solid rgba(102,126,234,0.1);
-        font-family: 'Inter', sans-serif;
-    }
-    
-    /* Enhanced Alerts */
-    .stAlert {
+        background: white;
         border-radius: 12px;
-        border: none;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
     }
     
-    .stSuccess {
-        background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-        color: white;
+    /* Colors */
+    .positive { 
+        color: #006400; 
+        font-weight: 600; 
     }
     
-    .stError {
-        background: linear-gradient(135deg, #d63031 0%, #e17055 100%);
-        color: white;
+    .negative { 
+        color: #dc3545; 
+        font-weight: 600; 
     }
     
-    .stInfo {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+    .neutral { 
+        color: #6c757d; 
+        font-weight: 500; 
     }
     
-    .stWarning {
-        background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
-        color: white;
+    /* Market Status */
+    .market-status {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-left: 4px solid #006400;
     }
     
-    /* Enhanced Spinners */
-    .stSpinner {
-        color: #667eea;
+    .market-status.open {
+        background: #d4edda;
+        border-left-color: #28a745;
     }
     
-    /* Typography Enhancements */
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Inter', sans-serif;
-        font-weight: 600;
-        color: #2d3436;
+    .market-status.closed {
+        background: #f8d7da;
+        border-left-color: #dc3545;
     }
     
-    p, div, span {
-        font-family: 'Inter', sans-serif;
-        color: #636e72;
-    }
-    
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-        background: rgba(255,255,255,0.1);
-        border-radius: 10px;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(135deg, #5a6fd8 0%, #6b7ab8 100%);
-    }
-    
-    /* Mobile Responsiveness */
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
-        .main-header h1 {
-            font-size: 2.5rem;
-        }
-        
-        .main-header p {
-            font-size: 1rem;
-        }
-        
-        .portfolio-card, .profit-card, .loss-card, .african-card {
-            padding: 1.5rem;
-        }
-        
-        .portfolio-card h2, .profit-card h2, .loss-card h2, .african-card h2 {
+        .trading-header h1 {
             font-size: 2rem;
         }
         
-        .chart-container {
+        .trading-header p {
+            font-size: 1rem;
+        }
+        
+        .main .block-container {
+            padding: 1rem;
+        }
+        
+        .metric-card {
+            padding: 1rem;
+        }
+        
+        .summary-card {
             padding: 1.5rem;
         }
-        
-        .metric-card {
-            padding: 1.25rem;
-        }
     }
     
-    /* Dark Mode Support */
-    @media (prefers-color-scheme: dark) {
-        .chart-container {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
-            color: white;
-        }
-        
-        .chart-container h3 {
-            color: white;
-        }
-        
-        .metric-card {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
-            color: white;
-            border-left-color: #00b894;
-        }
-        
-        .metric-card h2, .metric-card h3, .metric-card h4 {
-            color: white;
-        }
-        
-        .metric-card p {
-            color: rgba(255,255,255,0.8);
-        }
+    /* Loading states */
+    .stSpinner {
+        color: #006400;
     }
     
-    /* Animation for Loading States */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* Sidebar styling */
+    .css-1d391kg {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
     
-    .stDataFrame, .metric-card, .chart-container {
-        animation: fadeIn 0.5s ease-out;
+    /* Login/Register forms */
+    .login-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        max-width: 400px;
+        margin: 2rem auto;
     }
     
-    /* Enhanced Focus States */
-    .stSelectbox > div > div:focus-within,
-    .stTextInput > div > div:focus-within,
-    .stNumberInput > div > div:focus-within,
-    .stMultiSelect > div > div:focus-within {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    .login-container h2 {
+        color: #004B23;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Chart containers */
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
+    }
+    
+    .chart-container h3 {
+        color: #004B23;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    /* Success/Error messages */
+    .stSuccess {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+    }
+    
+    .stError {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+    }
+    
+    .stInfo {
+        background: #cce7f0;
+        color: #0c5460;
+        border: 1px solid #b8daff;
+        border-radius: 8px;
+    }
+    
+    .stWarning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+    }
+    
+    /* Page section headers */
+    .page-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #006400;
+    }
+    
+    .page-header h2 {
+        color: #004B23;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .page-header p {
+        color: #6c757d;
+        margin: 0.5rem 0 0 0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1154,6 +864,8 @@ class TradingSimulator:
             st.session_state.market_data_cache = {}
         if 'last_update' not in st.session_state:
             st.session_state.last_update = datetime.now()
+        if 'current_page' not in st.session_state:
+            st.session_state.current_page = 'Dashboard'
         
         # Initialize mock data for all markets
         if 'ghana_mock_data' not in st.session_state:
@@ -2601,1112 +2313,1299 @@ class TradingSimulator:
             st.error(f"Error getting portfolio summary: {str(e)}")
             return {}
 
-def main():
-    try:
-        simulator = TradingSimulator()
-        
-        # Header
+def show_login_page():
+    """Show login and registration page"""
+    st.markdown("""
+    <div class="trading-header">
+        <h1>📈 Leo's Trader</h1>
+        <p>Professional Trading Simulator - Master the Markets with Virtual Money</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Ghana Pride Section
+    st.markdown("""
+    <div class="ghana-pride">
+        <h3>🇬🇭 Proudly Made in Ghana 🇬🇭</h3>
+        <p>Developed with passion from the Gateway to Africa</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Login/Register tabs
+    tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+    
+    with tab1:
         st.markdown("""
-        <div class="main-header">
-            <h1>Leo's Trader</h1>
-            <p>🎮 Learn trading with virtual money • 📈 Build your portfolio • 🪙 Trade crypto 24/7 • 🌍 Explore African markets • 🏆 Compete with friends</p>
+        <div class="login-container">
+            <h2>Welcome Back</h2>
         </div>
         """, unsafe_allow_html=True)
         
-        # Ghana Pride Section
+        with st.form("login_form"):
+            username = st.text_input("Username", placeholder="Enter your username")
+            password = st.text_input("Password", type="password", placeholder="Enter your password")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("Login", use_container_width=True):
+                    if username and password:
+                        simulator = TradingSimulator()
+                        result = simulator.db.authenticate_user(username, password)
+                        if result['success']:
+                            st.session_state.current_user = result['user']
+                            st.session_state.logged_in = True
+                            st.success(f"Welcome back, {result['user']['username']}!")
+                            st.rerun()
+                        else:
+                            st.error(result['message'])
+                    else:
+                        st.error("Please enter username and password")
+            
+            with col2:
+                if st.form_submit_button("Demo Mode", use_container_width=True):
+                    st.info("Demo mode coming soon!")
+    
+    with tab2:
         st.markdown("""
-        <div class="ghana-pride">
-            <h3>🇬🇭 Proudly Made in Ghana 🇬🇭</h3>
-            <p>Developed with passion from the Gateway to Africa</p>
+        <div class="login-container">
+            <h2>Join Leo's Trader</h2>
         </div>
         """, unsafe_allow_html=True)
         
-        # Authentication
-        if not st.session_state.logged_in:
-            st.subheader("🔐 Login or Register")
+        with st.form("register_form"):
+            new_username = st.text_input("Username", placeholder="Choose a username")
+            new_email = st.text_input("Email", placeholder="Enter your email")
+            new_password = st.text_input("Password", type="password", placeholder="Create a password")
+            confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password")
             
-            tab1, tab2 = st.tabs(["Login", "Register"])
+            if st.form_submit_button("Create Account", use_container_width=True):
+                if new_username and new_email and new_password and confirm_password:
+                    if new_password == confirm_password:
+                        simulator = TradingSimulator()
+                        result = simulator.db.create_user(new_username, new_password, new_email)
+                        if result['success']:
+                            st.success("✅ Account created successfully! Please login.")
+                        else:
+                            st.error(result['message'])
+                    else:
+                        st.error("Passwords do not match")
+                else:
+                    st.error("Please fill in all fields")
+
+def show_dashboard(simulator, current_user):
+    """Show main dashboard"""
+    st.markdown("""
+    <div class="page-header">
+        <h2>📊 Trading Dashboard</h2>
+        <p>Your complete trading overview and market summary</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Portfolio overview
+    portfolio_value = simulator.get_portfolio_value(current_user['id'])
+    total_return = portfolio_value - st.session_state.game_settings['starting_cash']
+    return_percentage = (total_return / st.session_state.game_settings['starting_cash']) * 100
+    
+    # Summary cards
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.markdown(f"""
+        <div class="summary-card portfolio-value">
+            <h3>💰 Portfolio Value</h3>
+            <h2>${portfolio_value:,.2f}</h2>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown(f"""
+        <div class="summary-card cash-available">
+            <h3>💵 Cash Available</h3>
+            <h2>${current_user['cash']:,.2f}</h2>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        return_color = "total-return" if total_return >= 0 else "total-return"
+        st.markdown(f"""
+        <div class="summary-card {return_color}">
+            <h3>📈 Total Return</h3>
+            <h2>${total_return:,.2f}</h2>
+            <div class="delta {'positive' if total_return >= 0 else 'negative'}">({return_percentage:+.2f}%)</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col4:
+        st.markdown(f"""
+        <div class="summary-card total-trades">
+            <h3>🔄 Total Trades</h3>
+            <h2>{current_user['total_trades']}</h2>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Market overview section
+    st.markdown("""
+    <div class="chart-container">
+        <h3>📊 Market Overview</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Market indices
+    col_idx1, col_idx2 = st.columns(2)
+    
+    with col_idx1:
+        st.write("#### 📈 Major Indices")
+        indices = ['SPY', 'QQQ', 'IWM', 'VTI']
+        indices_data = []
+        for index in indices:
+            data = simulator.get_stock_price(index)
+            if data:
+                indices_data.append({
+                    'Symbol': index,
+                    'Price': f"${data['price']:.2f}",
+                    'Change': f"{data['change']:+.2f}",
+                    'Change %': f"{data['change_percent']:+.2f}%"
+                })
+        
+        if indices_data:
+            df_indices = pd.DataFrame(indices_data)
+            st.dataframe(df_indices, use_container_width=True, hide_index=True)
+    
+    with col_idx2:
+        st.write("#### 🪙 Top Cryptocurrencies")
+        crypto_major = ['BTC-USD', 'ETH-USD', 'BNB-USD', 'XRP-USD']
+        crypto_data = []
+        for crypto in crypto_major:
+            data = simulator.get_stock_price(crypto)
+            if data:
+                display_name = crypto.replace('-USD', '')
+                crypto_data.append({
+                    'Crypto': display_name,
+                    'Price': f"${data['price']:.2f}",
+                    'Change': f"{data['change']:+.2f}",
+                    'Change %': f"{data['change_percent']:+.2f}%"
+                })
+        
+        if crypto_data:
+            df_crypto = pd.DataFrame(crypto_data)
+            st.dataframe(df_crypto, use_container_width=True, hide_index=True)
+    
+    # Recent portfolio performance
+    portfolio = simulator.db.get_user_portfolio(current_user['id'])
+    if portfolio:
+        st.markdown("""
+        <div class="chart-container">
+            <h3>📊 Portfolio Allocation</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        pie_chart = simulator.create_portfolio_pie_chart(current_user['id'])
+        if pie_chart:
+            st.plotly_chart(pie_chart, use_container_width=True)
+    
+    # Recent trades
+    trades = simulator.db.get_user_trades(current_user['id'])
+    if trades:
+        st.markdown("""
+        <div class="chart-container">
+            <h3>📋 Recent Trades</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        recent_trades = trades[:5]  # Show last 5 trades
+        trades_data = []
+        for trade in recent_trades:
+            # Asset type icon
+            if trade['symbol'].endswith('-USD'):
+                icon = "🪙"
+            elif simulator.is_african_stock(trade['symbol']):
+                icon = "🌍"
+            else:
+                icon = "📈"
             
-            with tab1:
-                with st.form("login_form"):
-                    username = st.text_input("Username")
-                    password = st.text_input("Password", type="password")
+            trades_data.append({
+                'Time': trade['timestamp'].strftime('%m/%d %H:%M'),
+                'Action': '🛒 BUY' if trade['type'] == 'BUY' else '💰 SELL',
+                'Asset': f"{icon} {trade['symbol']}",
+                'Shares': trade['shares'],
+                'Price': f"${trade['price']:.2f}",
+                'P&L': f"${trade['profit_loss']:+,.2f}" if trade['profit_loss'] != 0 else "-"
+            })
+        
+        if trades_data:
+            df_trades = pd.DataFrame(trades_data)
+            st.dataframe(df_trades, use_container_width=True, hide_index=True)
+
+def show_research_page(simulator, current_user):
+    """Show research and analysis page"""
+    st.markdown("""
+    <div class="page-header">
+        <h2>🔬 Research & Analysis</h2>
+        <p>Professional market research tools and technical analysis</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Research mode selector
+    research_mode = st.selectbox(
+        "Research Mode",
+        ["Single Asset Analysis", "Compare Multiple Assets", "Market Screener", "🌍 African Markets"],
+        key="research_mode"
+    )
+    
+    if research_mode == "Single Asset Analysis":
+        # Asset type selector
+        asset_type = st.selectbox(
+            "Select Asset Type",
+            ["All Assets", "Stocks & ETFs", "Cryptocurrencies", "🌍 African Markets"],
+            key="asset_type_filter"
+        )
+        
+        # Filter available assets based on selection
+        if asset_type == "Stocks & ETFs":
+            available_assets = [s for s in simulator.available_stocks if not s.endswith('-USD') and not simulator.is_african_stock(s)]
+        elif asset_type == "Cryptocurrencies":
+            available_assets = [s for s in simulator.available_stocks if s.endswith('-USD')]
+        elif asset_type == "🌍 African Markets":
+            available_assets = [s for s in simulator.available_stocks if simulator.is_african_stock(s)]
+        else:
+            available_assets = simulator.available_stocks
+        
+        # Asset selector for analysis
+        analysis_asset = st.selectbox(
+            "Select Asset for Analysis",
+            [''] + available_assets[:100],
+            key="analysis_asset"
+        )
+        
+        if analysis_asset:
+            # Get asset info
+            asset_data = simulator.get_stock_price(analysis_asset)
+            if asset_data:
+                # Display asset info
+                col_info1, col_info2 = st.columns([2, 1])
+                
+                with col_info1:
+                    # Asset header
+                    if asset_data.get('is_crypto'):
+                        asset_display_name = analysis_asset.replace('-USD', '')
+                        asset_type_icon = "🪙"
+                    elif asset_data.get('is_african'):
+                        asset_display_name = analysis_asset
+                        asset_type_icon = "🌍"
+                    else:
+                        asset_display_name = analysis_asset
+                        asset_type_icon = "📈"
                     
-                    if st.form_submit_button("Login"):
-                        if username and password:
-                            result = simulator.db.authenticate_user(username, password)
+                    asset_header = f"{asset_type_icon} {asset_data['name']} ({asset_display_name})"
+                    if asset_data.get('is_mock'):
+                        asset_header += " - Live Mock Data"
+                    
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <h2>{asset_header}</h2>
+                        <p><strong>Sector:</strong> {asset_data.get('sector', 'N/A')}</p>
+                        <p><strong>Industry:</strong> {asset_data.get('industry', 'N/A')}</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col_info2:
+                    # Quick action buttons
+                    if st.button("🛒 Quick Buy", key="research_buy", use_container_width=True):
+                        st.session_state.current_page = 'Trade'
+                        st.session_state.quick_trade_asset = analysis_asset
+                        st.session_state.quick_trade_action = 'BUY'
+                        st.rerun()
+                    
+                    # Check if user owns this asset
+                    portfolio = simulator.db.get_user_portfolio(current_user['id'])
+                    owns_asset = any(p['symbol'] == analysis_asset for p in portfolio)
+                    
+                    if owns_asset:
+                        if st.button("💰 Quick Sell", key="research_sell", use_container_width=True):
+                            st.session_state.current_page = 'Trade'
+                            st.session_state.quick_trade_asset = analysis_asset
+                            st.session_state.quick_trade_action = 'SELL'
+                            st.rerun()
+                    else:
+                        st.button("💰 Quick Sell", key="research_sell", disabled=True, use_container_width=True, help="You don't own this asset")
+                
+                # Current price metrics
+                col_price1, col_price2, col_price3, col_price4 = st.columns(4)
+                
+                with col_price1:
+                    if asset_data.get('is_crypto') and asset_data['price'] < 1:
+                        price_display = f"{asset_data['currency']} {asset_data['price']:.6f}"
+                    else:
+                        price_display = simulator.format_currency_display(asset_data['price'], asset_data['currency'])
+                    st.metric("Current Price", price_display)
+                
+                with col_price2:
+                    change_color = "normal" if asset_data['change'] >= 0 else "inverse"
+                    change_display = simulator.format_currency_display(asset_data['change'], asset_data['currency'])
+                    st.metric(
+                        "24h Change", 
+                        change_display,
+                        f"{asset_data['change_percent']:+.2f}%",
+                        delta_color=change_color
+                    )
+                
+                with col_price3:
+                    st.metric("Volume", f"{asset_data['volume']:,}")
+                
+                with col_price4:
+                    if asset_data['market_cap'] > 0:
+                        if asset_data['market_cap'] > 1_000_000_000:
+                            cap_display = f"{asset_data['currency']} {asset_data['market_cap']/1_000_000_000:.1f}B"
+                        else:
+                            cap_display = f"{asset_data['currency']} {asset_data['market_cap']/1_000_000:.1f}M"
+                        st.metric("Market Cap", cap_display)
+                    else:
+                        st.metric("Market Cap", "N/A")
+                
+                # Technical analysis chart
+                st.markdown("""
+                <div class="chart-container">
+                    <h3>📊 Technical Analysis</h3>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Time period selector
+                period_options = {
+                    '1 Month': '1mo',
+                    '3 Months': '3mo',
+                    '6 Months': '6mo',
+                    '1 Year': '1y',
+                    '2 Years': '2y'
+                }
+                
+                selected_period = st.selectbox(
+                    "Chart Period",
+                    list(period_options.keys()),
+                    index=1
+                )
+                
+                period = period_options[selected_period]
+                
+                with st.spinner("Loading chart..."):
+                    comprehensive_chart = simulator.create_comprehensive_chart(analysis_asset, period)
+                    if comprehensive_chart:
+                        st.plotly_chart(comprehensive_chart, use_container_width=True)
+                    else:
+                        st.error("Unable to load chart data")
+            else:
+                st.error("Unable to load asset data")
+    
+    elif research_mode == "Compare Multiple Assets":
+        st.write("### 📊 Asset Comparison")
+        
+        # Asset selector for comparison
+        comparison_assets = st.multiselect(
+            "Select Assets to Compare (max 5)",
+            simulator.available_stocks[:100],
+            max_selections=5,
+            key="comparison_assets"
+        )
+        
+        if comparison_assets:
+            # Time period for comparison
+            period_options = {
+                '1 Month': '1mo',
+                '3 Months': '3mo',
+                '6 Months': '6mo',
+                '1 Year': '1y',
+                '2 Years': '2y'
+            }
+            
+            comparison_period = st.selectbox(
+                "Comparison Period",
+                list(period_options.keys()),
+                index=1,
+                key="comparison_period"
+            )
+            
+            period = period_options[comparison_period]
+            
+            # Create comparison chart
+            st.markdown("""
+            <div class="chart-container">
+                <h3>📈 Performance Comparison</h3>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            with st.spinner("Loading comparison..."):
+                comparison_chart = simulator.create_comparison_chart(comparison_assets, period)
+                if comparison_chart:
+                    st.plotly_chart(comparison_chart, use_container_width=True)
+                else:
+                    st.error("Unable to load comparison chart")
+            
+            # Comparison table
+            st.markdown("""
+            <div class="chart-container">
+                <h3>📋 Asset Comparison Table</h3>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            comparison_data = []
+            for asset in comparison_assets:
+                asset_data = simulator.get_stock_price(asset)
+                if asset_data:
+                    if asset_data.get('is_crypto'):
+                        display_name = asset.replace('-USD', '')
+                        asset_type_icon = "🪙"
+                    elif asset_data.get('is_african'):
+                        display_name = asset
+                        asset_type_icon = "🌍"
+                    else:
+                        display_name = asset
+                        asset_type_icon = "📈"
+                    
+                    comparison_data.append({
+                        'Asset': f"{asset_type_icon} {display_name}",
+                        'Name': asset_data['name'][:30],
+                        'Price': simulator.format_currency_display(asset_data['price'], asset_data['currency']),
+                        'Change': simulator.format_currency_display(asset_data['change'], asset_data['currency']),
+                        'Change %': f"{asset_data['change_percent']:+.2f}%",
+                        'Volume': f"{asset_data['volume']:,}",
+                        'Market Cap': f"{asset_data['currency']} {asset_data['market_cap']/1_000_000_000:.1f}B" if asset_data['market_cap'] > 1_000_000_000 else f"{asset_data['currency']} {asset_data['market_cap']/1_000_000:.1f}M" if asset_data['market_cap'] > 0 else "N/A"
+                    })
+            
+            if comparison_data:
+                df = pd.DataFrame(comparison_data)
+                st.dataframe(df, use_container_width=True, hide_index=True)
+    
+    elif research_mode == "Market Screener":
+        st.write("### 🔍 Market Screener")
+        
+        # Market screener filters
+        col_filter1, col_filter2 = st.columns(2)
+        
+        with col_filter1:
+            market_filter = st.selectbox(
+                "Market",
+                ["All Markets", "US Stocks", "Cryptocurrencies", "African Markets"],
+                key="market_filter"
+            )
+        
+        with col_filter2:
+            sort_by = st.selectbox(
+                "Sort By",
+                ["Price", "Change %", "Volume", "Market Cap"],
+                key="sort_by"
+            )
+        
+        # Filter assets based on selection
+        if market_filter == "US Stocks":
+            filtered_assets = [s for s in simulator.available_stocks if not s.endswith('-USD') and not simulator.is_african_stock(s)]
+        elif market_filter == "Cryptocurrencies":
+            filtered_assets = [s for s in simulator.available_stocks if s.endswith('-USD')]
+        elif market_filter == "African Markets":
+            filtered_assets = [s for s in simulator.available_stocks if simulator.is_african_stock(s)]
+        else:
+            filtered_assets = simulator.available_stocks
+        
+        # Show market data
+        st.markdown("""
+        <div class="chart-container">
+            <h3>📊 Market Data</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        screener_data = []
+        with st.spinner("Loading market data..."):
+            for asset in filtered_assets[:30]:  # Limit to first 30 for performance
+                data = simulator.get_stock_price(asset)
+                if data:
+                    if data.get('is_crypto'):
+                        icon = "🪙"
+                        display_name = asset.replace('-USD', '')
+                    elif data.get('is_african'):
+                        icon = "🌍"
+                        display_name = asset
+                    else:
+                        icon = "📈"
+                        display_name = asset
+                    
+                    screener_data.append({
+                        'Symbol': f"{icon} {display_name}",
+                        'Name': data['name'][:25],
+                        'Price': simulator.format_currency_display(data['price'], data['currency']),
+                        'Change': simulator.format_currency_display(data['change'], data['currency']),
+                        'Change %': f"{data['change_percent']:+.2f}%",
+                        'Volume': f"{data['volume']:,}",
+                        'Sector': data.get('sector', 'N/A')[:20]
+                    })
+        
+        if screener_data:
+            df_screener = pd.DataFrame(screener_data)
+            st.dataframe(df_screener, use_container_width=True, hide_index=True)
+    
+    elif research_mode == "🌍 African Markets":
+        st.write("### 🌍 African Stock Exchanges")
+        
+        # African markets selector
+        african_markets = simulator.get_african_markets()
+        selected_african_market = st.selectbox(
+            "Select African Market",
+            list(african_markets.keys()),
+            key="selected_african_market"
+        )
+        
+        if selected_african_market:
+            st.markdown(f"""
+            <div class="chart-container">
+                <h3>{selected_african_market}</h3>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            market_stocks = african_markets[selected_african_market]
+            market_data = []
+            
+            with st.spinner(f"Loading {selected_african_market} data..."):
+                for stock in market_stocks[:20]:  # Limit to first 20 for performance
+                    data = simulator.get_stock_price(stock)
+                    if data:
+                        market_data.append({
+                            'Symbol': stock,
+                            'Company': data['name'][:30],
+                            'Price': f"{data['currency']} {data['price']:.2f}",
+                            'Change': f"{data['change']:+.2f}",
+                            'Change %': f"{data['change_percent']:+.2f}%",
+                            'Volume': f"{data['volume']:,}",
+                            'Sector': data.get('sector', 'N/A')[:20]
+                        })
+            
+            if market_data:
+                df_market = pd.DataFrame(market_data)
+                st.dataframe(df_market, use_container_width=True, hide_index=True)
+                
+                # Market stats
+                positive_count = len([d for d in market_data if '+' in d['Change']])
+                total_count = len(market_data)
+                
+                col_stat1, col_stat2, col_stat3 = st.columns(3)
+                with col_stat1:
+                    st.metric("Stocks Tracked", total_count)
+                with col_stat2:
+                    st.metric("Gainers", positive_count)
+                with col_stat3:
+                    st.metric("Losers", total_count - positive_count)
+
+def show_trade_page(simulator, current_user):
+    """Show trading page"""
+    st.markdown("""
+    <div class="page-header">
+        <h2>💰 Trade Stocks & Crypto</h2>
+        <p>Execute trades with real-time market data</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Quick trade setup if coming from research
+    if hasattr(st.session_state, 'quick_trade_asset') and st.session_state.quick_trade_asset:
+        st.info(f"Quick Trade: {st.session_state.quick_trade_action} {st.session_state.quick_trade_asset}")
+    
+    # Trading interface
+    trade_col1, trade_col2 = st.columns([2, 1])
+    
+    with trade_col1:
+        st.markdown("""
+        <div class="chart-container">
+            <h3>🛒 Place Order</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Asset selection
+        trade_asset_type = st.selectbox(
+            "Asset Type",
+            ["All Assets", "Stocks & ETFs", "Cryptocurrencies", "🌍 African Markets"],
+            key="trade_asset_type"
+        )
+        
+        # Filter assets based on type
+        if trade_asset_type == "Stocks & ETFs":
+            trade_available_assets = [s for s in simulator.available_stocks if not s.endswith('-USD') and not simulator.is_african_stock(s)]
+        elif trade_asset_type == "Cryptocurrencies":
+            trade_available_assets = [s for s in simulator.available_stocks if s.endswith('-USD')]
+        elif trade_asset_type == "🌍 African Markets":
+            trade_available_assets = [s for s in simulator.available_stocks if simulator.is_african_stock(s)]
+        else:
+            trade_available_assets = simulator.available_stocks
+        
+        # Pre-select asset if coming from quick trade
+        default_asset = ""
+        if hasattr(st.session_state, 'quick_trade_asset') and st.session_state.quick_trade_asset:
+            if st.session_state.quick_trade_asset in trade_available_assets:
+                default_asset = st.session_state.quick_trade_asset
+        
+        selected_asset = st.selectbox(
+            "Select Asset",
+            [''] + trade_available_assets[:100],
+            index=trade_available_assets.index(default_asset) + 1 if default_asset else 0,
+            key="selected_trade_asset"
+        )
+        
+        if selected_asset:
+            # Get current price
+            asset_data = simulator.get_stock_price(selected_asset)
+            
+            if asset_data:
+                # Display current asset info
+                if asset_data.get('is_crypto'):
+                    display_name = selected_asset.replace('-USD', '')
+                    asset_type_icon = "🪙"
+                elif asset_data.get('is_african'):
+                    display_name = selected_asset
+                    asset_type_icon = "🌍"
+                else:
+                    display_name = selected_asset
+                    asset_type_icon = "📈"
+                
+                st.markdown(f"""
+                <div class="metric-card">
+                    <h3>{asset_type_icon} {asset_data['name']} ({display_name})</h3>
+                    <p><strong>Current Price:</strong> {simulator.format_currency_display(asset_data['price'], asset_data['currency'])}</p>
+                    <p><strong>24h Change:</strong> <span class="{'positive' if asset_data['change'] >= 0 else 'negative'}">{simulator.format_currency_display(asset_data['change'], asset_data['currency'])} ({asset_data['change_percent']:+.2f}%)</span></p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Trade form
+                with st.form("trade_form"):
+                    # Pre-select action if coming from quick trade
+                    default_action_index = 0
+                    if hasattr(st.session_state, 'quick_trade_action') and st.session_state.quick_trade_action:
+                        if st.session_state.quick_trade_action == 'BUY':
+                            default_action_index = 0
+                        elif st.session_state.quick_trade_action == 'SELL':
+                            default_action_index = 1
+                    
+                    trade_action = st.selectbox(
+                        "Action",
+                        ["BUY", "SELL"],
+                        index=default_action_index
+                    )
+                    
+                    shares = st.number_input(
+                        "Number of Shares/Units",
+                        min_value=1,
+                        value=1,
+                        step=1
+                    )
+                    
+                    # Calculate trade cost
+                    commission = st.session_state.game_settings['commission']
+                    
+                    if trade_action == "BUY":
+                        # For African stocks, convert local currency price to USD for actual cost
+                        if asset_data['currency'] != 'USD':
+                            actual_cost_usd = simulator.convert_to_usd(asset_data['price'], asset_data['currency']) * shares
+                            total_cost_local = asset_data['price'] * shares
+                            cost_display = simulator.format_currency_display(total_cost_local, asset_data['currency'])
+                            st.write(f"**Total Cost:** {cost_display} (commission-free trading)")
+                            st.write(f"**Equivalent to:** ${actual_cost_usd:,.2f} USD")
+                        else:
+                            actual_cost_usd = asset_data['price'] * shares
+                            st.write(f"**Total Cost:** ${actual_cost_usd:,.2f} (commission-free trading)")
+                        
+                        # Check if user has enough cash (in USD)
+                        if actual_cost_usd > current_user['cash']:
+                            st.error(f"Insufficient funds! You need ${actual_cost_usd:,.2f} USD but only have ${current_user['cash']:,.2f} USD")
+                            can_trade = False
+                        else:
+                            can_trade = True
+                    
+                    else:  # SELL
+                        portfolio = simulator.db.get_user_portfolio(current_user['id'])
+                        owned_position = next((p for p in portfolio if p['symbol'] == selected_asset), None)
+                        
+                        if owned_position and owned_position['shares'] >= shares:
+                            # For African stocks, convert local currency price to USD for actual proceeds
+                            if asset_data['currency'] != 'USD':
+                                actual_proceeds_usd = simulator.convert_to_usd(asset_data['price'], asset_data['currency']) * shares
+                                total_proceeds_local = asset_data['price'] * shares
+                                proceeds_display = simulator.format_currency_display(total_proceeds_local, asset_data['currency'])
+                                
+                                # Convert average price back to local currency for display
+                                avg_price_local = simulator.convert_from_usd(owned_position['avg_price'], asset_data['currency'])
+                                avg_price_display = simulator.format_currency_display(avg_price_local, asset_data['currency'])
+                                
+                                profit_loss_usd = actual_proceeds_usd - (owned_position['avg_price'] * shares)
+                                
+                                st.write(f"**Owned Shares:** {owned_position['shares']}")
+                                st.write(f"**Average Price:** {avg_price_display}")
+                                st.write(f"**Total Proceeds:** {proceeds_display} (commission-free trading)")
+                                st.write(f"**Equivalent to:** ${actual_proceeds_usd:,.2f} USD")
+                            else:
+                                actual_proceeds_usd = asset_data['price'] * shares
+                                profit_loss_usd = (asset_data['price'] - owned_position['avg_price']) * shares
+                                
+                                st.write(f"**Owned Shares:** {owned_position['shares']}")
+                                st.write(f"**Average Price:** ${owned_position['avg_price']:.2f}")
+                                st.write(f"**Total Proceeds:** ${actual_proceeds_usd:,.2f} (commission-free trading)")
+                            
+                            profit_color = "positive" if profit_loss_usd >= 0 else "negative"
+                            st.markdown(f"**Estimated P&L:** <span class='{profit_color}'>${profit_loss_usd:+,.2f} USD</span>", unsafe_allow_html=True)
+                            
+                            can_trade = True
+                        else:
+                            if owned_position:
+                                st.error(f"Insufficient shares! You own {owned_position['shares']} shares but trying to sell {shares}")
+                            else:
+                                st.error("You don't own this asset")
+                            can_trade = False
+                    
+                    # Submit trade
+                    if st.form_submit_button(f"Execute {trade_action}", disabled=not can_trade, use_container_width=True):
+                        if can_trade:
+                            result = simulator.db.execute_trade(
+                                current_user['id'],
+                                selected_asset,
+                                trade_action,
+                                shares,
+                                # Pass the USD price for internal storage
+                                simulator.convert_to_usd(asset_data['price'], asset_data['currency']) if asset_data['currency'] != 'USD' else asset_data['price'],
+                                asset_data['name'],
+                                asset_data['currency'],
+                                # Pass the original local currency price for display purposes
+                                asset_data['price']
+                            )
+                            
                             if result['success']:
-                                st.session_state.current_user = result['user']
-                                st.session_state.logged_in = True
-                                st.success(f"Welcome back, {result['user']['username']}!")
+                                st.success(result['message'])
+                                if trade_action == "SELL" and result.get('profit_loss'):
+                                    profit_loss = result['profit_loss']
+                                    if profit_loss >= 0:
+                                        st.success(f"Profit: ${profit_loss:+,.2f}")
+                                    else:
+                                        st.error(f"Loss: ${profit_loss:+,.2f}")
+                                
+                                # Clear quick trade session state
+                                if hasattr(st.session_state, 'quick_trade_asset'):
+                                    del st.session_state.quick_trade_asset
+                                if hasattr(st.session_state, 'quick_trade_action'):
+                                    del st.session_state.quick_trade_action
+                                
                                 st.rerun()
                             else:
                                 st.error(result['message'])
-                        else:
-                            st.error("Please enter username and password")
-            
-            with tab2:
-                with st.form("register_form"):
-                    new_username = st.text_input("Choose Username")
-                    new_email = st.text_input("Email")
-                    new_password = st.text_input("Choose Password", type="password")
-                    confirm_password = st.text_input("Confirm Password", type="password")
-                    
-                    if st.form_submit_button("Register"):
-                        if new_username and new_email and new_password and confirm_password:
-                            if new_password == confirm_password:
-                                result = simulator.db.create_user(new_username, new_password, new_email)
-                                if result['success']:
-                                    st.success("Registration successful! Please login.")
-                                else:
-                                    st.error(result['message'])
-                            else:
-                                st.error("Passwords do not match")
-                        else:
-                            st.error("Please fill in all fields")
+            else:
+                st.error("Unable to load asset data")
+    
+    with trade_col2:
+        st.markdown("""
+        <div class="chart-container">
+            <h3>📊 Market Movers</h3>
+        </div>
+        """, unsafe_allow_html=True)
         
+        # Show some trending assets
+        trending_assets = ['AAPL', 'TSLA', 'BTC-USD', 'ETH-USD', 'MTNGH.AC', 'SAFCOM.NR']
+        
+        for asset in trending_assets:
+            data = simulator.get_stock_price(asset)
+            if data:
+                if data.get('is_crypto'):
+                    icon = "🪙"
+                    display_name = asset.replace('-USD', '')
+                elif data.get('is_african'):
+                    icon = "🌍"
+                    display_name = asset
+                else:
+                    icon = "📈"
+                    display_name = asset
+                
+                change_class = "positive" if data['change'] >= 0 else "negative"
+                
+                st.markdown(f"""
+                <div class="metric-card">
+                    <p><strong>{icon} {display_name}</strong></p>
+                    <p>{simulator.format_currency_display(data['price'], data['currency'])} <span class="{change_class}">({data['change_percent']:+.2f}%)</span></p>
+                </div>
+                """, unsafe_allow_html=True)
+
+def show_portfolio_page(simulator, current_user):
+    """Show portfolio management page"""
+    st.markdown("""
+    <div class="page-header">
+        <h2>📈 Portfolio Management</h2>
+        <p>Track your investments and portfolio performance</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Portfolio summary
+    portfolio_summary = simulator.get_portfolio_summary(current_user['id'])
+    
+    if portfolio_summary:
+        col_port1, col_port2, col_port3, col_port4 = st.columns(4)
+        
+        with col_port1:
+            st.metric("Cash", f"${portfolio_summary['cash']:,.2f}")
+        
+        with col_port2:
+            st.metric("Invested", f"${portfolio_summary['total_invested']:,.2f}")
+        
+        with col_port3:
+            st.metric("Current Value", f"${portfolio_summary['total_current_value']:,.2f}")
+        
+        with col_port4:
+            unrealized_pl = portfolio_summary['total_unrealized_pl']
+            color = "normal" if unrealized_pl >= 0 else "inverse"
+            st.metric("Unrealized P&L", f"${unrealized_pl:+,.2f}", delta_color=color)
+        
+        # Portfolio pie chart
+        st.markdown("""
+        <div class="chart-container">
+            <h3>🥧 Portfolio Allocation</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        pie_chart = simulator.create_portfolio_pie_chart(current_user['id'])
+        if pie_chart:
+            st.plotly_chart(pie_chart, use_container_width=True)
         else:
-            # Main application for logged-in users
-            current_user = st.session_state.current_user
-            
-            # Sidebar
-            with st.sidebar:
-                st.header(f"👨‍💼 {current_user['username']}")
+            st.info("No portfolio positions to display")
+    
+    # Holdings table
+    st.markdown("""
+    <div class="chart-container">
+        <h3>📋 Current Holdings</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    portfolio = simulator.db.get_user_portfolio(current_user['id'])
+    
+    if portfolio:
+        holdings_data = []
+        
+        for position in portfolio:
+            current_data = simulator.get_stock_price(position['symbol'])
+            if current_data:
+                current_value = current_data['price'] * position['shares']
+                invested_value = position['avg_price'] * position['shares']
+                unrealized_pl = current_value - invested_value
+                unrealized_pl_percent = (unrealized_pl / invested_value) * 100 if invested_value > 0 else 0
                 
-                # User stats
-                st.write(f"**Cash:** ${current_user['cash']:,.2f}")
-                st.write(f"**Total Trades:** {current_user['total_trades']}")
-                st.write(f"**P&L:** ${current_user['total_profit_loss']:+,.2f}")
-                
-                if st.button("Logout"):
-                    st.session_state.logged_in = False
-                    st.session_state.current_user = None
-                    st.rerun()
-            
-            # Refresh user data
-            current_user = simulator.db.get_user_data(current_user['id'])
-            if current_user:
-                st.session_state.current_user = current_user
-            
-            # Portfolio overview
-            portfolio_value = simulator.get_portfolio_value(current_user['id'])
-            total_return = portfolio_value - st.session_state.game_settings['starting_cash']
-            return_percentage = (total_return / st.session_state.game_settings['starting_cash']) * 100
-            
-            col1, col2, col3, col4 = st.columns(4)
-            
-            with col1:
-                card_class = "profit-card" if total_return >= 0 else "loss-card"
-                st.markdown(f"""
-                <div class="{card_class}">
-                    <h3>💰 Portfolio Value</h3>
-                    <h2>${portfolio_value:,.2f}</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col2:
-                st.markdown(f"""
-                <div class="portfolio-card">
-                    <h3>💵 Cash Available</h3>
-                    <h2>${current_user['cash']:,.2f}</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col3:
-                card_class = "profit-card" if total_return >= 0 else "loss-card"
-                st.markdown(f"""
-                <div class="{card_class}">
-                    <h3>📈 Total Return</h3>
-                    <h2>${total_return:,.2f}</h2>
-                    <p>({return_percentage:+.2f}%)</p>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col4:
-                st.markdown(f"""
-                <div class="portfolio-card">
-                    <h3>🔄 Total Trades</h3>
-                    <h2>{current_user['total_trades']}</h2>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            # Main tabs
-            tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📊 Research", "💰 Trade", "📈 Portfolio", "📋 History", "🏆 Leaderboard", "⚙️ Settings"])
-            
-            with tab1:
-                st.subheader("📊 Research & Technical Analysis")
-                
-                # Research mode selector
-                research_mode = st.selectbox(
-                    "Research Mode",
-                    ["Single Asset Analysis", "Compare Multiple Assets", "Market Overview", "🌍 African Markets"],
-                    key="research_mode"
-                )
-                
-                if research_mode == "Single Asset Analysis":
-                    # Asset type selector
-                    asset_type = st.selectbox(
-                        "Select Asset Type",
-                        ["All Assets", "Stocks & ETFs", "Cryptocurrencies", "🌍 African Markets"],
-                        key="asset_type_filter"
-                    )
-                    
-                    # Filter available assets based on selection
-                    if asset_type == "Stocks & ETFs":
-                        available_assets = [s for s in simulator.available_stocks if not s.endswith('-USD') and not simulator.is_african_stock(s)]
-                    elif asset_type == "Cryptocurrencies":
-                        available_assets = [s for s in simulator.available_stocks if s.endswith('-USD')]
-                    elif asset_type == "🌍 African Markets":
-                        available_assets = [s for s in simulator.available_stocks if simulator.is_african_stock(s)]
-                    else:
-                        available_assets = simulator.available_stocks
-                    
-                    # For crypto, show by categories
-                    if asset_type == "Cryptocurrencies":
-                        st.write("### 🪙 Cryptocurrency Categories")
-                        crypto_categories = simulator.get_crypto_categories()
-                        
-                        selected_category = st.selectbox(
-                            "Select Category",
-                            ["All Cryptocurrencies"] + list(crypto_categories.keys()),
-                            key="crypto_category"
-                        )
-                        
-                        if selected_category != "All Cryptocurrencies":
-                            available_assets = crypto_categories[selected_category]
-                    
-                    # For African markets, show by country
-                    elif asset_type == "🌍 African Markets":
-                        st.write("### 🌍 African Markets by Country")
-                        african_markets = simulator.get_african_markets()
-                        
-                        selected_market = st.selectbox(
-                            "Select Market",
-                            ["All African Markets"] + list(african_markets.keys()),
-                            key="african_market"
-                        )
-                        
-                        if selected_market != "All African Markets":
-                            available_assets = african_markets[selected_market]
-                    
-                    # Asset selector for analysis
-                    analysis_asset = st.selectbox(
-                        "Select Asset for Analysis",
-                        [''] + available_assets[:100],
-                        key="analysis_asset"
-                    )
-                    
-                    if analysis_asset:
-                        # Time period selector
-                        period_options = {
-                            '1 Month': '1mo',
-                            '3 Months': '3mo',
-                            '6 Months': '6mo',
-                            '1 Year': '1y',
-                            '2 Years': '2y',
-                            '5 Years': '5y'
-                        }
-                        
-                        selected_period = st.selectbox(
-                            "Time Period",
-                            list(period_options.keys()),
-                            index=1
-                        )
-                        
-                        period = period_options[selected_period]
-                        
-                        # Get asset info
-                        asset_data = simulator.get_stock_price(analysis_asset)
-                        if asset_data:
-                            # Display asset info
-                            if asset_data.get('is_crypto'):
-                                asset_display_name = analysis_asset.replace('-USD', '')
-                                asset_type_icon = "🪙"
-                            elif asset_data.get('is_african'):
-                                asset_display_name = analysis_asset
-                                asset_type_icon = "🌍"
-                            else:
-                                asset_display_name = analysis_asset
-                                asset_type_icon = "📈"
-                            
-                            # Asset header with mock data indicator
-                            asset_header = f"{asset_type_icon} {asset_data['name']} ({asset_display_name})"
-                            if asset_data.get('is_mock'):
-                                asset_header += " - Live Mock Data"
-                            
-                            st.markdown(f"""
-                            <div class="metric-card">
-                                <h2>{asset_header}</h2>
-                                <p><strong>Sector:</strong> {asset_data['sector']}</p>
-                                <p><strong>Industry:</strong> {asset_data['industry']}</p>
-                            </div>
-                            """, unsafe_allow_html=True)
-                            
-                            # Current price metrics
-                            col_price1, col_price2, col_price3, col_price4 = st.columns(4)
-                            
-                            with col_price1:
-                                if asset_data.get('is_crypto') and asset_data['price'] < 1:
-                                    price_display = f"{asset_data['currency']} {asset_data['price']:.6f}"
-                                else:
-                                    price_display = simulator.format_currency_display(asset_data['price'], asset_data['currency'])
-                                st.metric("Current Price", price_display)
-                            
-                            with col_price2:
-                                change_color = "normal" if asset_data['change'] >= 0 else "inverse"
-                                change_display = simulator.format_currency_display(asset_data['change'], asset_data['currency'])
-                                st.metric(
-                                    "24h Change", 
-                                    change_display,
-                                    f"{asset_data['change_percent']:+.2f}%",
-                                    delta_color=change_color
-                                )
-                            
-                            with col_price3:
-                                st.metric("Volume", f"{asset_data['volume']:,}")
-                            
-                            with col_price4:
-                                if asset_data['market_cap'] > 0:
-                                    if asset_data['market_cap'] > 1_000_000_000:
-                                        cap_display = f"{asset_data['currency']} {asset_data['market_cap']/1_000_000_000:.1f}B"
-                                    else:
-                                        cap_display = f"{asset_data['currency']} {asset_data['market_cap']/1_000_000:.1f}M"
-                                    st.metric("Market Cap", cap_display)
-                                else:
-                                    st.metric("Market Cap", "N/A")
-                            
-                            # Additional metrics
-                            col_info1, col_info2, col_info3 = st.columns(3)
-                            with col_info1:
-                                st.metric("Day High", simulator.format_currency_display(asset_data['day_high'], asset_data['currency']))
-                            with col_info2:
-                                st.metric("Day Low", simulator.format_currency_display(asset_data['day_low'], asset_data['currency']))
-                            with col_info3:
-                                if asset_data.get('pe_ratio') and not asset_data.get('is_crypto'):
-                                    st.metric("P/E Ratio", f"{asset_data['pe_ratio']:.2f}")
-                                else:
-                                    daily_change = ((asset_data['day_high'] - asset_data['day_low']) / asset_data['day_low']) * 100
-                                    st.metric("Daily Range", f"{daily_change:.2f}%")
-                            
-                            # Comprehensive chart
-                            st.markdown("""
-                            <div class="chart-container">
-                                <h3>📊 Technical Analysis Chart</h3>
-                            </div>
-                            """, unsafe_allow_html=True)
-                            
-                            with st.spinner("Loading comprehensive chart..."):
-                                comprehensive_chart = simulator.create_comprehensive_chart(analysis_asset, period)
-                                if comprehensive_chart:
-                                    st.plotly_chart(comprehensive_chart, use_container_width=True)
-                                else:
-                                    st.error("Unable to load chart data")
-                            
-                            # Quick trade section
-                            st.write("### ⚡ Quick Trade")
-                            quick_col1, quick_col2 = st.columns(2)
-                            
-                            with quick_col1:
-                                buy_button_text = f"🛒 Buy {asset_display_name}"
-                                if st.button(buy_button_text, key="research_buy"):
-                                    st.session_state.quick_trade_asset = analysis_asset
-                                    st.session_state.quick_trade_action = 'BUY'
-                                    st.info(f"Go to Trade tab to buy {asset_display_name}")
-                            
-                            with quick_col2:
-                                # Check if user owns this asset
-                                portfolio = simulator.db.get_user_portfolio(current_user['id'])
-                                owns_asset = any(p['symbol'] == analysis_asset for p in portfolio)
-                                
-                                sell_button_text = f"💰 Sell {asset_display_name}"
-                                if owns_asset:
-                                    if st.button(sell_button_text, key="research_sell"):
-                                        st.session_state.quick_trade_asset = analysis_asset
-                                        st.session_state.quick_trade_action = 'SELL'
-                                        st.info(f"Go to Trade tab to sell {asset_display_name}")
-                                else:
-                                    st.button(sell_button_text, key="research_sell", disabled=True, help="You don't own this asset")
-                        
-                        else:
-                            st.error("Unable to load asset data")
-                
-                elif research_mode == "Compare Multiple Assets":
-                    st.write("### 📊 Asset Comparison")
-                    
-                    # Asset selector for comparison
-                    comparison_assets = st.multiselect(
-                        "Select Assets to Compare (max 5)",
-                        simulator.available_stocks[:100],
-                        max_selections=5,
-                        key="comparison_assets"
-                    )
-                    
-                    if comparison_assets:
-                        # Time period for comparison
-                        period_options = {
-                            '1 Month': '1mo',
-                            '3 Months': '3mo',
-                            '6 Months': '6mo',
-                            '1 Year': '1y',
-                            '2 Years': '2y'
-                        }
-                        
-                        comparison_period = st.selectbox(
-                            "Time Period",
-                            list(period_options.keys()),
-                            index=1,
-                            key="comparison_period"
-                        )
-                        
-                        period = period_options[comparison_period]
-                        
-                        # Create comparison chart
-                        st.markdown("""
-                        <div class="chart-container">
-                            <h3>📈 Normalized Performance Comparison</h3>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        
-                        with st.spinner("Loading comparison chart..."):
-                            comparison_chart = simulator.create_comparison_chart(comparison_assets, period)
-                            if comparison_chart:
-                                st.plotly_chart(comparison_chart, use_container_width=True)
-                            else:
-                                st.error("Unable to load comparison chart")
-                        
-                        # Comparison table
-                        st.write("### 📋 Asset Comparison Table")
-                        comparison_data = []
-                        
-                        for asset in comparison_assets:
-                            asset_data = simulator.get_stock_price(asset)
-                            if asset_data:
-                                if asset_data.get('is_crypto'):
-                                    display_name = asset.replace('-USD', '')
-                                    asset_type_icon = "🪙"
-                                elif asset_data.get('is_african'):
-                                    display_name = asset
-                                    asset_type_icon = "🌍"
-                                else:
-                                    display_name = asset
-                                    asset_type_icon = "📈"
-                                
-                                comparison_data.append({
-                                    'Asset': f"{asset_type_icon} {display_name}",
-                                    'Name': asset_data['name'][:30],
-                                    'Price': simulator.format_currency_display(asset_data['price'], asset_data['currency']),
-                                    'Change': simulator.format_currency_display(asset_data['change'], asset_data['currency']),
-                                    'Change %': f"{asset_data['change_percent']:+.2f}%",
-                                    'Volume': f"{asset_data['volume']:,}",
-                                    'Market Cap': f"{asset_data['currency']} {asset_data['market_cap']/1_000_000_000:.1f}B" if asset_data['market_cap'] > 1_000_000_000 else f"{asset_data['currency']} {asset_data['market_cap']/1_000_000:.1f}M" if asset_data['market_cap'] > 0 else "N/A"
-                                })
-                        
-                        if comparison_data:
-                            df = pd.DataFrame(comparison_data)
-                            st.dataframe(df, use_container_width=True)
-                
-                elif research_mode == "Market Overview":
-                    st.write("### 🌐 Market Overview")
-                    
-                    # Market indices
-                    indices = ['SPY', 'QQQ', 'IWM', 'VTI']
-                    crypto_major = ['BTC-USD', 'ETH-USD', 'BNB-USD', 'XRP-USD']
-                    african_major = ['NPN.JO', 'SAFCOM.NR', 'GTCO.LG', 'CIB.CA', 'MTNGH.AC']
-                    
-                    # Market indices overview
-                    st.write("#### 📈 Market Indices")
-                    indices_data = []
-                    for index in indices:
-                        data = simulator.get_stock_price(index)
-                        if data:
-                            indices_data.append({
-                                'Index': index,
-                                'Price': f"${data['price']:.2f}",
-                                'Change': f"{data['change']:+.2f}",
-                                'Change %': f"{data['change_percent']:+.2f}%"
-                            })
-                    
-                    if indices_data:
-                        df_indices = pd.DataFrame(indices_data)
-                        st.dataframe(df_indices, use_container_width=True)
-                    
-                    # Crypto overview
-                    st.write("#### 🪙 Major Cryptocurrencies")
-                    crypto_data = []
-                    for crypto in crypto_major:
-                        data = simulator.get_stock_price(crypto)
-                        if data:
-                            display_name = crypto.replace('-USD', '')
-                            crypto_data.append({
-                                'Crypto': f"🪙 {display_name}",
-                                'Name': data['name'][:20],
-                                'Price': f"${data['price']:.2f}",
-                                'Change': f"{data['change']:+.2f}",
-                                'Change %': f"{data['change_percent']:+.2f}%",
-                                'Volume': f"{data['volume']:,}"
-                            })
-                    
-                    if crypto_data:
-                        df_crypto = pd.DataFrame(crypto_data)
-                        st.dataframe(df_crypto, use_container_width=True)
-                    
-                    # African markets overview
-                    st.write("#### 🌍 African Markets Highlights")
-                    african_data = []
-                    for african in african_major:
-                        data = simulator.get_stock_price(african)
-                        if data:
-                            country = simulator.get_african_country_from_symbol(african)
-                            african_data.append({
-                                'Stock': f"🌍 {african}",
-                                'Company': data['name'][:25],
-                                'Country': country,
-                                'Price': f"{data['currency']} {data['price']:.2f}",
-                                'Change': f"{data['change']:+.2f}",
-                                'Change %': f"{data['change_percent']:+.2f}%"
-                            })
-                    
-                    if african_data:
-                        df_african = pd.DataFrame(african_data)
-                        st.dataframe(df_african, use_container_width=True)
-                
-                elif research_mode == "🌍 African Markets":
-                    st.write("### 🌍 African Stock Exchanges")
-                    
-                    # African markets selector
-                    african_markets = simulator.get_african_markets()
-                    selected_african_market = st.selectbox(
-                        "Select African Market",
-                        list(african_markets.keys()),
-                        key="selected_african_market"
-                    )
-                    
-                    if selected_african_market:
-                        st.write(f"#### {selected_african_market}")
-                        
-                        market_stocks = african_markets[selected_african_market]
-                        market_data = []
-                        
-                        with st.spinner(f"Loading {selected_african_market} data..."):
-                            for stock in market_stocks[:20]:  # Limit to first 20 for performance
-                                data = simulator.get_stock_price(stock)
-                                if data:
-                                    market_data.append({
-                                        'Symbol': stock,
-                                        'Company': data['name'][:30],
-                                        'Price': f"{data['currency']} {data['price']:.2f}",
-                                        'Change': f"{data['change']:+.2f}",
-                                        'Change %': f"{data['change_percent']:+.2f}%",
-                                        'Volume': f"{data['volume']:,}",
-                                        'Sector': data.get('sector', 'N/A')[:20]
-                                    })
-                        
-                        if market_data:
-                            df_market = pd.DataFrame(market_data)
-                            st.dataframe(df_market, use_container_width=True)
-                            
-                            # Market stats
-                            positive_count = len([d for d in market_data if '+' in d['Change']])
-                            total_count = len(market_data)
-                            
-                            col_stat1, col_stat2, col_stat3 = st.columns(3)
-                            with col_stat1:
-                                st.metric("Stocks Tracked", total_count)
-                            with col_stat2:
-                                st.metric("Gainers", positive_count)
-                            with col_stat3:
-                                st.metric("Losers", total_count - positive_count)
-                        else:
-                            st.info("Loading market data...")
-            
-            with tab2:
-                st.subheader("💰 Trade Stocks & Crypto")
-                
-                # Quick trade setup if coming from research
-                if hasattr(st.session_state, 'quick_trade_asset') and st.session_state.quick_trade_asset:
-                    st.info(f"Quick Trade: {st.session_state.quick_trade_action} {st.session_state.quick_trade_asset}")
-                
-                # Trading interface
-                trade_col1, trade_col2 = st.columns([1, 1])
-                
-                with trade_col1:
-                    st.write("### 🛒 Buy/Sell Assets")
-                    
-                    # Asset selection
-                    trade_asset_type = st.selectbox(
-                        "Asset Type",
-                        ["All Assets", "Stocks & ETFs", "Cryptocurrencies", "🌍 African Markets"],
-                        key="trade_asset_type"
-                    )
-                    
-                    # Filter assets based on type
-                    if trade_asset_type == "Stocks & ETFs":
-                        trade_available_assets = [s for s in simulator.available_stocks if not s.endswith('-USD') and not simulator.is_african_stock(s)]
-                    elif trade_asset_type == "Cryptocurrencies":
-                        trade_available_assets = [s for s in simulator.available_stocks if s.endswith('-USD')]
-                    elif trade_asset_type == "🌍 African Markets":
-                        trade_available_assets = [s for s in simulator.available_stocks if simulator.is_african_stock(s)]
-                    else:
-                        trade_available_assets = simulator.available_stocks
-                    
-                    # Pre-select asset if coming from quick trade
-                    default_asset = ""
-                    if hasattr(st.session_state, 'quick_trade_asset') and st.session_state.quick_trade_asset:
-                        if st.session_state.quick_trade_asset in trade_available_assets:
-                            default_asset = st.session_state.quick_trade_asset
-                    
-                    selected_asset = st.selectbox(
-                        "Select Asset",
-                        [''] + trade_available_assets[:100],
-                        index=trade_available_assets.index(default_asset) + 1 if default_asset else 0,
-                        key="selected_trade_asset"
-                    )
-                    
-                    if selected_asset:
-                        # Get current price
-                        asset_data = simulator.get_stock_price(selected_asset)
-                        
-                        if asset_data:
-                            # Display current asset info
-                            if asset_data.get('is_crypto'):
-                                display_name = selected_asset.replace('-USD', '')
-                                asset_type_icon = "🪙"
-                            elif asset_data.get('is_african'):
-                                display_name = selected_asset
-                                asset_type_icon = "🌍"
-                            else:
-                                display_name = selected_asset
-                                asset_type_icon = "📈"
-                            
-                            st.markdown(f"""
-                            <div class="metric-card">
-                                <h3>{asset_type_icon} {asset_data['name']} ({display_name})</h3>
-                                <p><strong>Current Price:</strong> {simulator.format_currency_display(asset_data['price'], asset_data['currency'])}</p>
-                                <p><strong>24h Change:</strong> <span class="{'positive' if asset_data['change'] >= 0 else 'negative'}">{simulator.format_currency_display(asset_data['change'], asset_data['currency'])} ({asset_data['change_percent']:+.2f}%)</span></p>
-                            </div>
-                            """, unsafe_allow_html=True)
-                            
-                            # Trade form
-                            with st.form("trade_form"):
-                                # Pre-select action if coming from quick trade
-                                default_action_index = 0
-                                if hasattr(st.session_state, 'quick_trade_action') and st.session_state.quick_trade_action:
-                                    if st.session_state.quick_trade_action == 'BUY':
-                                        default_action_index = 0
-                                    elif st.session_state.quick_trade_action == 'SELL':
-                                        default_action_index = 1
-                                
-                                trade_action = st.selectbox(
-                                    "Action",
-                                    ["BUY", "SELL"],
-                                    index=default_action_index
-                                )
-                                
-                                shares = st.number_input(
-                                    "Number of Shares/Units",
-                                    min_value=1,
-                                    value=1,
-                                    step=1
-                                )
-                                
-                                # Calculate trade cost
-                                commission = st.session_state.game_settings['commission']
-                                
-                                if trade_action == "BUY":
-                                    # For African stocks, convert local currency price to USD for actual cost
-                                    if asset_data['currency'] != 'USD':
-                                        actual_cost_usd = simulator.convert_to_usd(asset_data['price'], asset_data['currency']) * shares
-                                        total_cost_local = asset_data['price'] * shares
-                                        cost_display = simulator.format_currency_display(total_cost_local, asset_data['currency'])
-                                        st.write(f"**Total Cost:** {cost_display} (commission-free trading)")
-                                        st.write(f"**Equivalent to:** ${actual_cost_usd:,.2f} USD")
-                                    else:
-                                        actual_cost_usd = asset_data['price'] * shares
-                                        st.write(f"**Total Cost:** ${actual_cost_usd:,.2f} (commission-free trading)")
-                                    
-                                    # Check if user has enough cash (in USD)
-                                    if actual_cost_usd > current_user['cash']:
-                                        st.error(f"Insufficient funds! You need ${actual_cost_usd:,.2f} USD but only have ${current_user['cash']:,.2f} USD")
-                                        can_trade = False
-                                    else:
-                                        can_trade = True
-                                
-                                else:  # SELL
-                                    portfolio = simulator.db.get_user_portfolio(current_user['id'])
-                                    owned_position = next((p for p in portfolio if p['symbol'] == selected_asset), None)
-                                    
-                                    if owned_position and owned_position['shares'] >= shares:
-                                        # For African stocks, convert local currency price to USD for actual proceeds
-                                        if asset_data['currency'] != 'USD':
-                                            actual_proceeds_usd = simulator.convert_to_usd(asset_data['price'], asset_data['currency']) * shares
-                                            total_proceeds_local = asset_data['price'] * shares
-                                            proceeds_display = simulator.format_currency_display(total_proceeds_local, asset_data['currency'])
-                                            
-                                            # Convert average price back to local currency for display
-                                            avg_price_local = simulator.convert_from_usd(owned_position['avg_price'], asset_data['currency'])
-                                            avg_price_display = simulator.format_currency_display(avg_price_local, asset_data['currency'])
-                                            
-                                            profit_loss_usd = actual_proceeds_usd - (owned_position['avg_price'] * shares)
-                                            
-                                            st.write(f"**Owned Shares:** {owned_position['shares']}")
-                                            st.write(f"**Average Price:** {avg_price_display}")
-                                            st.write(f"**Total Proceeds:** {proceeds_display} (commission-free trading)")
-                                            st.write(f"**Equivalent to:** ${actual_proceeds_usd:,.2f} USD")
-                                        else:
-                                            actual_proceeds_usd = asset_data['price'] * shares
-                                            profit_loss_usd = (asset_data['price'] - owned_position['avg_price']) * shares
-                                            
-                                            st.write(f"**Owned Shares:** {owned_position['shares']}")
-                                            st.write(f"**Average Price:** ${owned_position['avg_price']:.2f}")
-                                            st.write(f"**Total Proceeds:** ${actual_proceeds_usd:,.2f} (commission-free trading)")
-                                        
-                                        profit_color = "positive" if profit_loss_usd >= 0 else "negative"
-                                        st.markdown(f"**Estimated P&L:** <span class='{profit_color}'>${profit_loss_usd:+,.2f} USD</span>", unsafe_allow_html=True)
-                                        
-                                        can_trade = True
-                                    else:
-                                        if owned_position:
-                                            st.error(f"Insufficient shares! You own {owned_position['shares']} shares but trying to sell {shares}")
-                                        else:
-                                            st.error("You don't own this asset")
-                                        can_trade = False
-                                
-                                # Submit trade
-                                if st.form_submit_button(f"Execute {trade_action}", disabled=not can_trade):
-                                    if can_trade:
-                                        result = simulator.db.execute_trade(
-                                            current_user['id'],
-                                            selected_asset,
-                                            trade_action,
-                                            shares,
-                                            # Pass the USD price for internal storage
-                                            simulator.convert_to_usd(asset_data['price'], asset_data['currency']) if asset_data['currency'] != 'USD' else asset_data['price'],
-                                            asset_data['name'],
-                                            asset_data['currency'],
-                                            # Pass the original local currency price for display purposes
-                                            asset_data['price']
-                                        )
-                                        
-                                        if result['success']:
-                                            st.success(result['message'])
-                                            if trade_action == "SELL" and result.get('profit_loss'):
-                                                profit_loss = result['profit_loss']
-                                                if profit_loss >= 0:
-                                                    st.success(f"Profit: ${profit_loss:+,.2f}")
-                                                else:
-                                                    st.error(f"Loss: ${profit_loss:+,.2f}")
-                                            
-                                            # Clear quick trade session state
-                                            if hasattr(st.session_state, 'quick_trade_asset'):
-                                                del st.session_state.quick_trade_asset
-                                            if hasattr(st.session_state, 'quick_trade_action'):
-                                                del st.session_state.quick_trade_action
-                                            
-                                            st.rerun()
-                                        else:
-                                            st.error(result['message'])
-                        else:
-                            st.error("Unable to load asset data")
-                
-                with trade_col2:
-                    st.write("### 📊 Market Movers")
-                    
-                    # Show some trending assets
-                    trending_assets = ['AAPL', 'TSLA', 'BTC-USD', 'ETH-USD', 'MTNGH.AC', 'SAFCOM.NR']
-                    
-                    for asset in trending_assets:
-                        data = simulator.get_stock_price(asset)
-                        if data:
-                            if data.get('is_crypto'):
-                                icon = "🪙"
-                                display_name = asset.replace('-USD', '')
-                            elif data.get('is_african'):
-                                icon = "🌍"
-                                display_name = asset
-                            else:
-                                icon = "📈"
-                                display_name = asset
-                            
-                            change_class = "positive" if data['change'] >= 0 else "negative"
-                            
-                            st.markdown(f"""
-                            <div class="metric-card">
-                                <p><strong>{icon} {display_name}</strong></p>
-                                <p>{simulator.format_currency_display(data['price'], data['currency'])} <span class="{change_class}">({data['change_percent']:+.2f}%)</span></p>
-                            </div>
-                            """, unsafe_allow_html=True)
-            
-            with tab3:
-                st.subheader("📈 Portfolio Management")
-                
-                # Portfolio summary
-                portfolio_summary = simulator.get_portfolio_summary(current_user['id'])
-                
-                if portfolio_summary:
-                    col_port1, col_port2, col_port3, col_port4 = st.columns(4)
-                    
-                    with col_port1:
-                        st.metric("Cash", f"${portfolio_summary['cash']:,.2f}")
-                    
-                    with col_port2:
-                        st.metric("Invested", f"${portfolio_summary['total_invested']:,.2f}")
-                    
-                    with col_port3:
-                        st.metric("Current Value", f"${portfolio_summary['total_current_value']:,.2f}")
-                    
-                    with col_port4:
-                        unrealized_pl = portfolio_summary['total_unrealized_pl']
-                        color = "normal" if unrealized_pl >= 0 else "inverse"
-                        st.metric("Unrealized P&L", f"${unrealized_pl:+,.2f}", delta_color=color)
-                    
-                    # Portfolio pie chart
-                    st.write("### 🥧 Portfolio Allocation")
-                    pie_chart = simulator.create_portfolio_pie_chart(current_user['id'])
-                    if pie_chart:
-                        st.plotly_chart(pie_chart, use_container_width=True)
-                    else:
-                        st.info("No portfolio positions to display")
-                
-                # Holdings table
-                st.write("### 📋 Current Holdings")
-                portfolio = simulator.db.get_user_portfolio(current_user['id'])
-                
-                if portfolio:
-                    holdings_data = []
-                    
-                    for position in portfolio:
-                        current_data = simulator.get_stock_price(position['symbol'])
-                        if current_data:
-                            current_value = current_data['price'] * position['shares']
-                            invested_value = position['avg_price'] * position['shares']
-                            unrealized_pl = current_value - invested_value
-                            unrealized_pl_percent = (unrealized_pl / invested_value) * 100 if invested_value > 0 else 0
-                            
-                            # Asset type icon
-                            if current_data.get('is_crypto'):
-                                icon = "🪙"
-                            elif current_data.get('is_african'):
-                                icon = "🌍"
-                            else:
-                                icon = "📈"
-                            
-                            # For African stocks, convert USD stored prices back to local currency for display
-                            if current_data.get('is_african') and current_data['currency'] != 'USD':
-                                # Convert average price from USD to local currency
-                                avg_price_local = simulator.convert_from_usd(position['avg_price'], current_data['currency'])
-                                avg_price_display = simulator.format_currency_display(avg_price_local, current_data['currency'])
-                                
-                                # Current price is already in local currency
-                                current_price_display = simulator.format_currency_display(current_data['price'], current_data['currency'])
-                                
-                                # Calculate market value: current USD value for accurate P&L, local currency for display
-                                current_value_usd = simulator.convert_to_usd(current_data['price'], current_data['currency']) * position['shares']
-                                current_value_local = current_data['price'] * position['shares']
-                                market_value_display = f"{simulator.format_currency_display(current_value_local, current_data['currency'])} (${current_value_usd:,.2f})"
-                                
-                                # Calculate P&L in USD for accuracy
-                                unrealized_pl_usd = current_value_usd - (position['avg_price'] * position['shares'])
-                                unrealized_pl_percent_usd = (unrealized_pl_usd / (position['avg_price'] * position['shares'])) * 100 if position['avg_price'] > 0 else 0
-                                
-                                # Calculate P&L in local currency for display
-                                invested_value_local = avg_price_local * position['shares']
-                                unrealized_pl_local = current_value_local - invested_value_local
-                                
-                                holdings_data.append({
-                                    'Asset': f"{icon} {position['symbol']}",
-                                    'Company': position['name'][:25],
-                                    'Shares': position['shares'],
-                                    'Avg Price': avg_price_display,
-                                    'Current Price': current_price_display,
-                                    'Market Value': market_value_display,
-                                    'Unrealized P&L': f"{simulator.format_currency_display(unrealized_pl_local, current_data['currency'])} (${unrealized_pl_usd:+,.2f})",
-                                    'P&L %': f"{unrealized_pl_percent_usd:+.2f}%"
-                                })
-                            else:
-                                # For USD assets (US stocks, crypto)
-                                holdings_data.append({
-                                    'Asset': f"{icon} {position['symbol']}",
-                                    'Company': position['name'][:25],
-                                    'Shares': position['shares'],
-                                    'Avg Price': f"${position['avg_price']:.2f}",
-                                    'Current Price': f"${current_data['price']:.2f}",
-                                    'Market Value': f"${current_value:,.2f}",
-                                    'Unrealized P&L': f"${unrealized_pl:+,.2f}",
-                                    'P&L %': f"{unrealized_pl_percent:+.2f}%"
-                                })
-                    
-                    if holdings_data:
-                        df_holdings = pd.DataFrame(holdings_data)
-                        st.dataframe(df_holdings, use_container_width=True)
-                    else:
-                        st.info("No current holdings")
+                # Asset type icon
+                if current_data.get('is_crypto'):
+                    icon = "🪙"
+                elif current_data.get('is_african'):
+                    icon = "🌍"
                 else:
-                    st.info("Your portfolio is empty. Start trading to build your portfolio!")
-            
-            with tab4:
-                st.subheader("📋 Trade History")
+                    icon = "📈"
                 
-                # Get trade history
-                trades = simulator.db.get_user_trades(current_user['id'])
-                
-                if trades:
-                    # Trade statistics
-                    total_trades = len(trades)
-                    buy_trades = len([t for t in trades if t['type'] == 'BUY'])
-                    sell_trades = len([t for t in trades if t['type'] == 'SELL'])
-                    total_realized_pl = sum([t['profit_loss'] for t in trades if t['profit_loss'] != 0])
+                # For African stocks, convert USD stored prices back to local currency for display
+                if current_data.get('is_african') and current_data['currency'] != 'USD':
+                    # Convert average price from USD to local currency
+                    avg_price_local = simulator.convert_from_usd(position['avg_price'], current_data['currency'])
+                    avg_price_display = simulator.format_currency_display(avg_price_local, current_data['currency'])
                     
-                    col_hist1, col_hist2, col_hist3, col_hist4 = st.columns(4)
+                    # Current price is already in local currency
+                    current_price_display = simulator.format_currency_display(current_data['price'], current_data['currency'])
                     
-                    with col_hist1:
-                        st.metric("Total Trades", total_trades)
+                    # Calculate market value: current USD value for accurate P&L, local currency for display
+                    current_value_usd = simulator.convert_to_usd(current_data['price'], current_data['currency']) * position['shares']
+                    current_value_local = current_data['price'] * position['shares']
+                    market_value_display = f"{simulator.format_currency_display(current_value_local, current_data['currency'])} (${current_value_usd:,.2f})"
                     
-                    with col_hist2:
-                        st.metric("Buy Orders", buy_trades)
+                    # Calculate P&L in USD for accuracy
+                    unrealized_pl_usd = current_value_usd - (position['avg_price'] * position['shares'])
+                    unrealized_pl_percent_usd = (unrealized_pl_usd / (position['avg_price'] * position['shares'])) * 100 if position['avg_price'] > 0 else 0
                     
-                    with col_hist3:
-                        st.metric("Sell Orders", sell_trades)
+                    # Calculate P&L in local currency for display
+                    invested_value_local = avg_price_local * position['shares']
+                    unrealized_pl_local = current_value_local - invested_value_local
                     
-                    with col_hist4:
-                        color = "normal" if total_realized_pl >= 0 else "inverse"
-                        st.metric("Realized P&L", f"${total_realized_pl:+,.2f}", delta_color=color)
-                    
-                    # Trades table
-                    st.write("### 📊 Recent Trades")
-                    
-                    trades_data = []
-                    for trade in trades[:50]:  # Show last 50 trades
-                        # Asset type icon
-                        if trade['symbol'].endswith('-USD'):
-                            icon = "🪙"
-                            is_african = False
-                            currency = 'USD'
-                        elif simulator.is_african_stock(trade['symbol']):
-                            icon = "🌍"
-                            is_african = True
-                            currency = simulator.get_currency_symbol(trade['symbol'])
-                        else:
-                            icon = "📈"
-                            is_african = False
-                            currency = 'USD'
-                        
-                        # FIXED: Use the original_price if available, otherwise convert from USD stored price
-                        if trade.get('original_price') and trade['original_currency'] != 'USD':
-                            # Use the original local currency price that was stored
-                            price_display = simulator.format_currency_display(trade['original_price'], trade['original_currency'])
-                            total_display = simulator.format_currency_display(trade['original_price'] * trade['shares'], trade['original_currency'])
-                        elif is_african and currency != 'USD':
-                            # Convert USD stored prices back to local currency for display
-                            trade_price_local = simulator.convert_from_usd(trade['price'], currency)
-                            price_display = simulator.format_currency_display(trade_price_local, currency)
-                            
-                            total_cost_local = simulator.convert_from_usd(trade['total_cost'], currency)
-                            total_display = simulator.format_currency_display(total_cost_local, currency)
-                        else:
-                            # For USD assets
-                            price_display = f"${trade['price']:.2f}"
-                            total_display = f"${trade['total_cost']:,.2f}"
-                        
-                        trades_data.append({
-                            'Date': trade['timestamp'].strftime('%Y-%m-%d %H:%M'),
-                            'Type': '🛒 BUY' if trade['type'] == 'BUY' else '💰 SELL',
-                            'Asset': f"{icon} {trade['symbol']}",
-                            'Company': trade['name'][:20],
-                            'Shares': trade['shares'],
-                            'Price': price_display,
-                            'Total': total_display,
-                            'Commission': "$0.00",
-                            'P&L': f"${trade['profit_loss']:+,.2f} USD" if trade['profit_loss'] != 0 else "-"
-                        })
-                    
-                    if trades_data:
-                        df_trades = pd.DataFrame(trades_data)
-                        st.dataframe(df_trades, use_container_width=True)
+                    holdings_data.append({
+                        'Asset': f"{icon} {position['symbol']}",
+                        'Company': position['name'][:25],
+                        'Shares': position['shares'],
+                        'Avg Price': avg_price_display,
+                        'Current Price': current_price_display,
+                        'Market Value': market_value_display,
+                        'Unrealized P&L': f"{simulator.format_currency_display(unrealized_pl_local, current_data['currency'])} (${unrealized_pl_usd:+,.2f})",
+                        'P&L %': f"{unrealized_pl_percent_usd:+.2f}%"
+                    })
                 else:
-                    st.info("No trades yet. Start trading to see your history!")
+                    # For USD assets (US stocks, crypto)
+                    holdings_data.append({
+                        'Asset': f"{icon} {position['symbol']}",
+                        'Company': position['name'][:25],
+                        'Shares': position['shares'],
+                        'Avg Price': f"${position['avg_price']:.2f}",
+                        'Current Price': f"${current_data['price']:.2f}",
+                        'Market Value': f"${current_value:,.2f}",
+                        'Unrealized P&L': f"${unrealized_pl:+,.2f}",
+                        'P&L %': f"{unrealized_pl_percent:+.2f}%"
+                    })
+        
+        if holdings_data:
+            df_holdings = pd.DataFrame(holdings_data)
+            st.dataframe(df_holdings, use_container_width=True, hide_index=True)
+        else:
+            st.info("No current holdings")
+    else:
+        st.info("Your portfolio is empty. Start trading to build your portfolio!")
+
+def show_history_page(simulator, current_user):
+    """Show trade history page"""
+    st.markdown("""
+    <div class="page-header">
+        <h2>📋 Trade History</h2>
+        <p>Review your trading activity and performance</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Get trade history
+    trades = simulator.db.get_user_trades(current_user['id'])
+    
+    if trades:
+        # Trade statistics
+        total_trades = len(trades)
+        buy_trades = len([t for t in trades if t['type'] == 'BUY'])
+        sell_trades = len([t for t in trades if t['type'] == 'SELL'])
+        total_realized_pl = sum([t['profit_loss'] for t in trades if t['profit_loss'] != 0])
+        
+        col_hist1, col_hist2, col_hist3, col_hist4 = st.columns(4)
+        
+        with col_hist1:
+            st.metric("Total Trades", total_trades)
+        
+        with col_hist2:
+            st.metric("Buy Orders", buy_trades)
+        
+        with col_hist3:
+            st.metric("Sell Orders", sell_trades)
+        
+        with col_hist4:
+            color = "normal" if total_realized_pl >= 0 else "inverse"
+            st.metric("Realized P&L", f"${total_realized_pl:+,.2f}", delta_color=color)
+        
+        # Trades table
+        st.markdown("""
+        <div class="chart-container">
+            <h3>📊 Trade History</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        trades_data = []
+        for trade in trades[:100]:  # Show last 100 trades
+            # Asset type icon
+            if trade['symbol'].endswith('-USD'):
+                icon = "🪙"
+                is_african = False
+                currency = 'USD'
+            elif simulator.is_african_stock(trade['symbol']):
+                icon = "🌍"
+                is_african = True
+                currency = simulator.get_currency_symbol(trade['symbol'])
+            else:
+                icon = "📈"
+                is_african = False
+                currency = 'USD'
             
-            with tab5:
-                st.subheader("🏆 Leaderboard")
+            # Use the original_price if available, otherwise convert from USD stored price
+            if trade.get('original_price') and trade['original_currency'] != 'USD':
+                # Use the original local currency price that was stored
+                price_display = simulator.format_currency_display(trade['original_price'], trade['original_currency'])
+                total_display = simulator.format_currency_display(trade['original_price'] * trade['shares'], trade['original_currency'])
+            elif is_african and currency != 'USD':
+                # Convert USD stored prices back to local currency for display
+                trade_price_local = simulator.convert_from_usd(trade['price'], currency)
+                price_display = simulator.format_currency_display(trade_price_local, currency)
                 
-                # Get leaderboard data
-                leaderboard = simulator.db.get_leaderboard()
-                
-                if leaderboard:
-                    st.write("### 🥇 Top Traders")
-                    
-                    leaderboard_data = []
-                    for i, player in enumerate(leaderboard[:20]):  # Top 20 players
-                        # Determine rank emoji
-                        if player['rank'] == 1:
-                            rank_display = "🥇"
-                        elif player['rank'] == 2:
-                            rank_display = "🥈"
-                        elif player['rank'] == 3:
-                            rank_display = "🥉"
-                        else:
-                            rank_display = f"#{player['rank']}"
-                        
-                        # Highlight current user
-                        username_display = player['username']
-                        if player['user_id'] == current_user['id']:
-                            username_display = f"👤 {username_display}"
-                        
-                        leaderboard_data.append({
-                            'Rank': rank_display,
-                            'Trader': username_display,
-                            'Portfolio Value': f"${player['portfolio_value']:,.2f}",
-                            'Cash': f"${player['cash']:,.2f}",
-                            'Total Trades': player['total_trades'],
-                            'P&L': f"${player['total_profit_loss']:+,.2f}"
-                        })
-                    
-                    df_leaderboard = pd.DataFrame(leaderboard_data)
-                    st.dataframe(df_leaderboard, use_container_width=True)
-                    
-                    # Current user stats
-                    current_user_rank = next((p['rank'] for p in leaderboard if p['user_id'] == current_user['id']), None)
-                    if current_user_rank:
-                        st.info(f"Your current rank: #{current_user_rank} out of {len(leaderboard)} traders")
-                else:
-                    st.info("No leaderboard data available")
+                total_cost_local = simulator.convert_from_usd(trade['total_cost'], currency)
+                total_display = simulator.format_currency_display(total_cost_local, currency)
+            else:
+                # For USD assets
+                price_display = f"${trade['price']:.2f}"
+                total_display = f"${trade['total_cost']:,.2f}"
             
-            with tab6:
-                st.subheader("⚙️ Game Settings & Info")
-                
-                # Exchange rates status
-                st.write("### 💱 Exchange Rates Status")
-                
-                # Update exchange rates and show current info
-                simulator.update_exchange_rates()
-                
-                col_fx1, col_fx2 = st.columns(2)
-                
-                with col_fx1:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <h4>📊 Rate Source</h4>
-                        <p>{st.session_state.get('exchange_rates_source', 'Not loaded')}</p>
-                        <small>Last updated: {st.session_state.get('exchange_rates_last_update', 'Never')}</small>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col_fx2:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <h4>🔄 Update Frequency</h4>
-                        <p>Every 30 minutes</p>
-                        <small>Multiple API fallbacks</small>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # Current exchange rates
-                st.write("#### Current Exchange Rates (1 USD =)")
-                rates_data = []
-                for currency, rate in st.session_state.exchange_rates.items():
-                    if currency != 'USD':
-                        currency_symbols = {'GHS': '🇬🇭', 'KES': '🇰🇪', 'NGN': '🇳🇬', 'ZAR': '🇿🇦', 'EGP': '🇪🇬'}
-                        flag = currency_symbols.get(currency, '🏳️')
-                        rates_data.append({
-                            'Currency': f"{flag} {currency}",
-                            'Rate': f"{rate:.2f}",
-                            'Example': f"$100 = {simulator.format_currency_display(rate * 100, currency)}"
-                        })
-                
-                if rates_data:
-                    df_rates = pd.DataFrame(rates_data)
-                    st.dataframe(df_rates, use_container_width=True)
-                
-                # Currency conversion test
-                st.write("#### 🧪 Test Currency Conversion")
-                test_col1, test_col2 = st.columns(2)
-                
-                with test_col1:
-                    test_amount = st.number_input("Amount", value=100.0, min_value=0.01)
-                    test_currency = st.selectbox("From Currency", ['GHS', 'KES', 'NGN', 'ZAR', 'EGP'])
-                
-                with test_col2:
-                    if st.button("Convert to USD"):
-                        conversion_info = simulator.get_currency_conversion_info(test_amount, test_currency, 'USD')
-                        st.success(f"{simulator.format_currency_display(test_amount, test_currency)} = ${conversion_info['converted_amount']:.2f} USD")
-                        st.info(f"Rate: 1 USD = {conversion_info['rate']:.2f} {test_currency}")
-                        st.caption(f"Source: {conversion_info['rate_source']}")
-                
-                # Game settings display
-                settings = st.session_state.game_settings
-                
-                st.write("### 🎮 Game Configuration")
-                
-                col_set1, col_set2, col_set3 = st.columns(3)
-                
-                with col_set1:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <h4>💰 Starting Cash</h4>
-                        <p>${settings['starting_cash']:,.2f}</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col_set2:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <h4>💸 Commission</h4>
-                        <p>$0.00 per trade (Commission-Free!)</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col_set3:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <h4>⏰ Game Duration</h4>
-                        <p>{settings['game_duration_days']} days</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                # User account info
-                st.write("### 👤 Account Information")
-                
-                col_acc1, col_acc2 = st.columns(2)
-                
-                with col_acc1:
-                    st.write(f"**Username:** {current_user['username']}")
-                    st.write(f"**Email:** {current_user['email']}")
-                    st.write(f"**Member Since:** {current_user['created_at']}")
-                
-                with col_acc2:
-                    st.write(f"**Total Trades:** {current_user['total_trades']}")
-                    st.write(f"**Best Trade:** ${current_user['best_trade']:+,.2f}")
-                    st.write(f"**Worst Trade:** ${current_user['worst_trade']:+,.2f}")
-                
-                # About section
-                st.write("### ℹ️ About Leo's Trader")
-                
-                st.markdown("""
-                **Leo's Trader** is a comprehensive trading simulation game that allows you to:
-                
-                - 📈 **Trade Real Stocks**: Practice with live market data from major US exchanges
-                - 🪙 **Cryptocurrency Trading**: Trade major cryptocurrencies with real-time prices
-                - 🌍 **African Markets**: Explore opportunities in Ghana, Kenya, Nigeria, South Africa, and Egypt
-                - 📊 **Technical Analysis**: Use advanced charting tools and indicators
-                - 🏆 **Compete**: Join the leaderboard and compete with other traders
-                - 📱 **Learn**: Risk-free environment to learn trading strategies
-                
-                **Features:**
-                - Real-time market data for stocks and crypto
-                - Live mock data for African stock exchanges
-                - Portfolio management and tracking
-                - Comprehensive trade history
-                - Technical analysis charts
-                - Multi-currency support
-                
-                **🇬🇭 Proudly developed in Ghana** to promote financial literacy and trading education across Africa and beyond.
-                """)
-                
-                # Reset account section
-                st.write("### 🔄 Reset Account")
-                st.warning("⚠️ This will reset your account to starting conditions. This action cannot be undone!")
-                
-                if st.button("🔄 Reset My Account", key="reset_account"):
-                    st.error("Account reset feature will be implemented in a future update.")
+            trades_data.append({
+                'Date': trade['timestamp'].strftime('%Y-%m-%d %H:%M'),
+                'Type': '🛒 BUY' if trade['type'] == 'BUY' else '💰 SELL',
+                'Asset': f"{icon} {trade['symbol']}",
+                'Company': trade['name'][:20],
+                'Shares': trade['shares'],
+                'Price': price_display,
+                'Total': total_display,
+                'Commission': "$0.00",
+                'P&L': f"${trade['profit_loss']:+,.2f} USD" if trade['profit_loss'] != 0 else "-"
+            })
+        
+        if trades_data:
+            df_trades = pd.DataFrame(trades_data)
+            st.dataframe(df_trades, use_container_width=True, hide_index=True)
+    else:
+        st.info("No trades yet. Start trading to see your history!")
+
+def show_leaderboard_page(simulator, current_user):
+    """Show leaderboard page"""
+    st.markdown("""
+    <div class="page-header">
+        <h2>🏆 Leaderboard</h2>
+        <p>Compete with other traders and track your ranking</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Get leaderboard data
+    leaderboard = simulator.db.get_leaderboard()
+    
+    if leaderboard:
+        st.markdown("""
+        <div class="chart-container">
+            <h3>🥇 Top Traders</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        leaderboard_data = []
+        for i, player in enumerate(leaderboard[:20]):  # Top 20 players
+            # Determine rank emoji
+            if player['rank'] == 1:
+                rank_display = "🥇"
+            elif player['rank'] == 2:
+                rank_display = "🥈"
+            elif player['rank'] == 3:
+                rank_display = "🥉"
+            else:
+                rank_display = f"#{player['rank']}"
+            
+            # Highlight current user
+            username_display = player['username']
+            if player['user_id'] == current_user['id']:
+                username_display = f"👤 {username_display}"
+            
+            leaderboard_data.append({
+                'Rank': rank_display,
+                'Trader': username_display,
+                'Portfolio Value': f"${player['portfolio_value']:,.2f}",
+                'Cash': f"${player['cash']:,.2f}",
+                'Total Trades': player['total_trades'],
+                'P&L': f"${player['total_profit_loss']:+,.2f}"
+            })
+        
+        df_leaderboard = pd.DataFrame(leaderboard_data)
+        st.dataframe(df_leaderboard, use_container_width=True, hide_index=True)
+        
+        # Current user stats
+        current_user_rank = next((p['rank'] for p in leaderboard if p['user_id'] == current_user['id']), None)
+        if current_user_rank:
+            st.info(f"Your current rank: #{current_user_rank} out of {len(leaderboard)} traders")
+    else:
+        st.info("No leaderboard data available")
+
+def show_account_page(simulator, current_user):
+    """Show account information page"""
+    st.markdown("""
+    <div class="page-header">
+        <h2>👤 Account Information</h2>
+        <p>Manage your account settings and view trading statistics</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Account overview
+    col_acc1, col_acc2 = st.columns(2)
+    
+    with col_acc1:
+        st.markdown("""
+        <div class="chart-container">
+            <h3>📊 Account Overview</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.write(f"**Username:** {current_user['username']}")
+        st.write(f"**Email:** {current_user['email']}")
+        st.write(f"**Member Since:** {current_user['created_at']}")
+        st.write(f"**Last Login:** {current_user['last_login'] or 'Never'}")
+    
+    with col_acc2:
+        st.markdown("""
+        <div class="chart-container">
+            <h3>📈 Trading Statistics</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.write(f"**Total Trades:** {current_user['total_trades']}")
+        st.write(f"**Total P&L:** ${current_user['total_profit_loss']:+,.2f}")
+        st.write(f"**Best Trade:** ${current_user['best_trade']:+,.2f}")
+        st.write(f"**Worst Trade:** ${current_user['worst_trade']:+,.2f}")
+    
+    # Exchange rates status
+    st.markdown("""
+    <div class="chart-container">
+        <h3>💱 Exchange Rates Information</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Update exchange rates and show current info
+    simulator.update_exchange_rates()
+    
+    col_fx1, col_fx2 = st.columns(2)
+    
+    with col_fx1:
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4>📊 Rate Source</h4>
+            <p>{st.session_state.get('exchange_rates_source', 'Not loaded')}</p>
+            <small>Last updated: {st.session_state.get('exchange_rates_last_update', 'Never')}</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col_fx2:
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4>🔄 Update Frequency</h4>
+            <p>Every 30 minutes</p>
+            <small>Multiple API fallbacks</small>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Current exchange rates
+    st.write("#### Current Exchange Rates (1 USD =)")
+    rates_data = []
+    for currency, rate in st.session_state.exchange_rates.items():
+        if currency != 'USD':
+            currency_symbols = {'GHS': '🇬🇭', 'KES': '🇰🇪', 'NGN': '🇳🇬', 'ZAR': '🇿🇦', 'EGP': '🇪🇬'}
+            flag = currency_symbols.get(currency, '🏳️')
+            rates_data.append({
+                'Currency': f"{flag} {currency}",
+                'Rate': f"{rate:.2f}",
+                'Example': f"$100 = {simulator.format_currency_display(rate * 100, currency)}"
+            })
+    
+    if rates_data:
+        df_rates = pd.DataFrame(rates_data)
+        st.dataframe(df_rates, use_container_width=True, hide_index=True)
+    
+    # Game settings
+    st.markdown("""
+    <div class="chart-container">
+        <h3>⚙️ Game Settings</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    settings = st.session_state.game_settings
+    
+    col_set1, col_set2, col_set3 = st.columns(3)
+    
+    with col_set1:
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4>💰 Starting Cash</h4>
+            <p>${settings['starting_cash']:,.2f}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col_set2:
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4>💸 Commission</h4>
+            <p>$0.00 per trade (Commission-Free!)</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col_set3:
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4>⏰ Game Duration</h4>
+            <p>{settings['game_duration_days']} days</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # About section
+    st.markdown("""
+    <div class="chart-container">
+        <h3>ℹ️ About Leo's Trader</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    **Leo's Trader** is a comprehensive trading simulation platform that allows you to:
+    
+    - 📈 **Trade Real Stocks**: Practice with live market data from major US exchanges
+    - 🪙 **Cryptocurrency Trading**: Trade major cryptocurrencies with real-time prices
+    - 🌍 **African Markets**: Explore opportunities in Ghana, Kenya, Nigeria, South Africa, and Egypt
+    - 📊 **Technical Analysis**: Use advanced charting tools and indicators
+    - 🏆 **Compete**: Join the leaderboard and compete with other traders
+    - 📱 **Learn**: Risk-free environment to learn trading strategies
+    
+    **Features:**
+    - Real-time market data for stocks and crypto
+    - Live mock data for African stock exchanges
+    - Portfolio management and tracking
+    - Comprehensive trade history
+    - Technical analysis charts
+    - Multi-currency support
+    
+    **🇬🇭 Proudly developed in Ghana** to promote financial literacy and trading education across Africa and beyond.
+    """)
+
+def main():
+    try:
+        # Initialize simulator
+        simulator = TradingSimulator()
+        
+        # Show login page if not logged in
+        if not st.session_state.logged_in:
+            show_login_page()
+            return
+        
+        # Get current user
+        current_user = st.session_state.current_user
+        
+        # Refresh user data
+        current_user = simulator.db.get_user_data(current_user['id'])
+        if current_user:
+            st.session_state.current_user = current_user
+        
+        # Header with user info
+        st.markdown("""
+        <div class="trading-header">
+            <h1>📈 Leo's Trader</h1>
+            <p>Professional Trading Simulator - Master the Markets</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Navigation
+        pages = {
+            "📊 Dashboard": "Dashboard",
+            "🔬 Research": "Research", 
+            "💰 Trade": "Trade",
+            "📈 Portfolio": "Portfolio",
+            "📋 History": "History",
+            "🏆 Leaderboard": "Leaderboard",
+            "👤 Account": "Account",
+            "🚪 Logout": "Logout"
+        }
+        
+        # Create navigation
+        col_nav = st.columns(len(pages))
+        
+        for i, (page_name, page_key) in enumerate(pages.items()):
+            with col_nav[i]:
+                if st.button(page_name, key=f"nav_{page_key}", use_container_width=True):
+                    if page_key == "Logout":
+                        st.session_state.logged_in = False
+                        st.session_state.current_user = None
+                        st.rerun()
+                    else:
+                        st.session_state.current_page = page_key
+                        st.rerun()
+        
+        # Show selected page
+        current_page = st.session_state.get('current_page', 'Dashboard')
+        
+        if current_page == 'Dashboard':
+            show_dashboard(simulator, current_user)
+        elif current_page == 'Research':
+            show_research_page(simulator, current_user)
+        elif current_page == 'Trade':
+            show_trade_page(simulator, current_user)
+        elif current_page == 'Portfolio':
+            show_portfolio_page(simulator, current_user)
+        elif current_page == 'History':
+            show_history_page(simulator, current_user)
+        elif current_page == 'Leaderboard':
+            show_leaderboard_page(simulator, current_user)
+        elif current_page == 'Account':
+            show_account_page(simulator, current_user)
     
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
